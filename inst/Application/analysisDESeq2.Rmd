@@ -29,8 +29,6 @@ if (!require("tidyr")) install.packages("tidyr")
 if (!require("scales")) install.packages("scales")
 if (!require("plotly")) install.packages("plotly")
 
-source("functions.R")
-
 ```
 
 

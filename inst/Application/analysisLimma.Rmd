@@ -29,8 +29,6 @@ if (!require("tidyr")) install.packages("tidyr")
 if (!require("scales")) install.packages("scales")
 if (!require("plotly")) install.packages("plotly")
 
-source("functions.R")
-
 ```
 
 
@@ -104,7 +102,7 @@ if (!is.null(data_annotation)) {
 
 dge <- DGEList(counts = assay(se), samples = colData(se), genes = rowData(se))
 row.names(dge$genes) <- row.names(dge$counts)
-
+  
 dge <- dge[ rowSums( abs( dge$counts ) ) > 1, ]
 
 tempDge <- dge

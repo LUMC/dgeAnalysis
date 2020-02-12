@@ -8,7 +8,7 @@
 
 ## Add counts to se
 readCountsFromTable <- function(data_counts, data_samples) {
-  out <- as.matrix(data_counts[, rownames(data_samples)])
+  out <- as.matrix(data_counts[, colnames(data_counts) %in% rownames(data_samples)])
   se <- SummarizedExperiment(assays=list(counts=out))
   se
 }
@@ -74,16 +74,16 @@ stackDge <- function(dge){
 gamConfidenceFit <- function(deTab, biasColumn) {
   method.args = list()
   method.args$method <- "REML"
-
+  
   formula <- avgLog2FC ~ s(columnHere, bs = "cs")
   formula <- paste(gsub("columnHere", parse(text=biasColumn), formula))
   formula <- eval(parse(text = gsub("\\", "", paste(formula[2], formula[3], sep=" ~ "), fixed=TRUE)))
-
+  
   base.args <- list(quote(formula), data = quote(deTab))
   gamModel <- do.call(mgcv::gam, c(base.args, method.args))
   prediction <- augment(gamModel)
   prediction <- prediction[order(prediction[[biasColumn]]), ]
-
+  
   setRange <- range(1, nrow(prediction))
   result <- round(seq(setRange[1], setRange[2], length.out = 500))
   prediction <- prediction[c(result),]
@@ -93,13 +93,13 @@ quaternary_enrichment <- function(deTab){
   #IPA
   deTab <- na.omit(deTab)
   deTab <- deTab[!duplicated(deTab$entrez),]
-
+  
   qPrepare <- deTab[order(rank(deTab$adj.P.Val)),]
   qPrepare <- head(qPrepare, 100)
   qPrepare <- qPrepare[,c ('entrez', 'P.Value', 'avgLog2FC')]
-
+  
   colnames(qPrepare) <- c('entrez', 'pvalue', 'fc')
-
+  
   quaternary_results <- RunCRE_HSAStringDB(qPrepare, method = "Quaternary",
                                            fc.thresh = log2(1.3), pval.thresh = 0.05,
                                            only.significant.pvalues = TRUE,
@@ -107,7 +107,7 @@ quaternary_enrichment <- function(deTab){
                                            epsilon = 1e-16,
                                            relations = NULL, entities = NULL)
   quaternary_results1 <- quaternary_results[c("uid","symbol","regulation","pvalue")]
-
+  
   ternary_results <- RunCRE_HSAStringDB(qPrepare, method = "Ternary",
                                         fc.thresh = log2(1.3), pval.thresh = 0.05,
                                         only.significant.pvalues = TRUE,
@@ -115,7 +115,7 @@ quaternary_enrichment <- function(deTab){
                                         epsilon = 1e-16,
                                         relations = NULL, entities = NULL)
   ternary_results1 <- ternary_results[c("uid","symbol","regulation","pvalue")]
-
+  
   enrichment_results <- RunCRE_HSAStringDB(qPrepare, method = "Enrichment",
                                            fc.thresh = log2(1.3), pval.thresh = 0.05,
                                            only.significant.pvalues = TRUE,
@@ -131,7 +131,7 @@ quaternary_enrichment <- function(deTab){
 
 alignmentSummaryPlot <- function(se, percent=T){
   lse <- alignmentSummary(se)
-
+  
   if (percent) {
     for (var in unique(lse$sample)) {
       temp <- lse[lse$sample == var, ]
@@ -142,8 +142,8 @@ alignmentSummaryPlot <- function(se, percent=T){
                  y = ~sample,
                  orientation='h',
                  color = ~gsub("_", " ", gsub("__", "", feature)),
-                 type = "bar") %>%
-      layout(xaxis = list(title = 'Counts', tickformat = "%"),
+                 type = "bar") %>% 
+      plotly::layout(xaxis = list(title = 'Counts', tickformat = "%"),
              yaxis = list(title = ''),
              barmode = 'stack')
   } else {
@@ -152,8 +152,8 @@ alignmentSummaryPlot <- function(se, percent=T){
                  y = ~sample,
                  orientation='h',
                  color = ~gsub("_", " ", gsub("__", "", feature)),
-                 type = "bar") %>%
-      layout(xaxis = list(title = 'Counts'),
+                 type = "bar") %>% 
+      plotly::layout(xaxis = list(title = 'Counts'),
              yaxis = list(title = ''),
              barmode = 'stack')
   }
@@ -163,7 +163,7 @@ alignmentSummaryPlot <- function(se, percent=T){
 complexityPlot <- function(se, perc=T) {
   maxRank=1000
   data <- complexityData(se, maxRank)
-
+  
   if (perc){
     p <- plot_ly(data,
                  x = ~rank,
@@ -171,7 +171,7 @@ complexityPlot <- function(se, perc=T) {
                  color = ~sample,
                  type = "scattergl",
                  mode="lines+markers") %>%
-      layout(xaxis = list(title = 'Rank', type="log"),
+      plotly::layout(xaxis = list(title = 'Rank', type="log"),
              yaxis = list(tickformat = "%", title = 'Cumulative fraction of total reads till rank'))
   } else {
     p <- plot_ly(data,
@@ -180,7 +180,7 @@ complexityPlot <- function(se, perc=T) {
                  color = ~sample,
                  type = "scattergl",
                  mode="lines+markers") %>%
-      layout(xaxis = list(title = 'Rank', type="log"),
+      plotly::layout(xaxis = list(title = 'Rank', type="log"),
              yaxis = list(title = 'Cumulative reads till rank'))
   }
   p
@@ -192,11 +192,11 @@ complexityPlot <- function(se, perc=T) {
 
 countDistributionLinePlot <- function(dge){
   stackCounts <- data.frame(stackDge(dge))
-
+  
   p <- plot_ly(type = 'scattergl',
                mode = 'lines',
                source="dist_line") %>%
-    layout(xaxis = list(title = 'Log2CPM'),
+    plotly::layout(xaxis = list(title = 'Log2CPM'),
            yaxis = list(title = 'Density'))
   for (var in unique(stackCounts$sample)) {
     temp <- stackCounts[stackCounts$sample == var, ]
@@ -213,7 +213,7 @@ countDistributionLinePlot <- function(dge){
 
 countDistributionBoxPlot <- function(dge){
   stackCounts <- data.frame(stackDge(dge))
-
+  
   p <- plot_ly(type = 'box',
                boxpoints = FALSE)
   for (var in unique(stackCounts$sample)) {
@@ -222,7 +222,7 @@ countDistributionBoxPlot <- function(dge){
                    y = temp$logCPM,
                    name=var,
                    alpha = 0.5) %>%
-      layout(xaxis = list(title = ''),
+      plotly::layout(xaxis = list(title = ''),
              yaxis = list(title = 'Log2CPM'))
   }
   p
@@ -232,10 +232,10 @@ countDistributionBoxPlot <- function(dge){
 #zonder log onoverzichtelijk
 countPerSampleLinePlot <- function(dge){
   counts <- dge$counts
-
+  
   p <- plot_ly(type = 'scattergl',
-               mode = 'lines') %>%
-    layout(xaxis = list(title = 'Counts'),
+               mode = 'lines') %>% 
+    plotly::layout(xaxis = list(title = 'Counts'),
            yaxis = list(title = 'Density'))
   for (var in unique(colnames(counts))) {
     temp <- counts[,var]
@@ -254,10 +254,10 @@ countPerSampleLinePlot <- function(dge){
 #zonder log onoverzichtelijk
 countPerSampleBoxPlot <- function(dge){
   counts <- dge$counts
-
+  
   p <- plot_ly(type = 'box',
-               boxpoints = FALSE) %>%
-    layout(yaxis = list(title = 'Counts'))
+               boxpoints = FALSE) %>% 
+    plotly::layout(yaxis = list(title = 'Counts'))
   for (var in unique(colnames(counts))) {
     temp <- counts[,var]
     p <- add_trace(p,
@@ -272,7 +272,7 @@ multidimensionalScaling2dPlot <- function(dge, color, type){
   logFC <- plotMDS(dge$counts, ndim = ncol(dge)-1)
   for_plots <- data.frame(logFC$cmdscale.out)
   for_plots$group <- dge$samples[,color]
-
+  
   p <- plot_ly(for_plots,
                x = ~X1,
                y = ~X2,
@@ -286,7 +286,7 @@ multidimensionalScaling2dPlot <- function(dge, color, type){
                                          width = 1)),
                key = ~rownames(for_plots),
                source=paste(type, "un_cluster_2d", sep="")) %>%
-    layout(title = paste("MDS Plot, Grouped By:", color),
+    plotly::layout(title = paste("MDS Plot, Grouped By:", color),
            clickmode = "event+select",
            dragmode = "select")
   p
@@ -296,7 +296,7 @@ multidimensionalScaling3dPlot <- function(dge, color){
   logFC <- plotMDS(dge$counts, ndim = ncol(dge)-1)
   for_plots <- data.frame(logFC$cmdscale.out)
   for_plots$group <- dge$samples[,color]
-
+  
   p <- plot_ly(for_plots,
           x = ~X1,
           y = ~X2,
@@ -305,7 +305,7 @@ multidimensionalScaling3dPlot <- function(dge, color){
           text = rownames(for_plots),
           hoverinfo = 'text') %>%
     add_markers() %>%
-    layout(title = paste("MDS Plot, Grouped By:", color))
+    plotly::layout(title = paste("MDS Plot, Grouped By:", color))
   p
 }
 
@@ -319,12 +319,12 @@ variancePcaPlot <- function(dge){
   pca <- prcomp(tdge, center=TRUE)
   percent <- data.frame(summary( pca )$importance[2,])
   colnames(percent) <- "percent"
-
+  
   p <- plot_ly(percent,
                x=rownames(percent),
                y=~percent,
-               type="bar") %>%
-    layout(xaxis = list(title = 'Component', categoryorder='trace'),
+               type="bar") %>% 
+    plotly::layout(xaxis = list(title = 'Component', categoryorder='trace'),
            yaxis = list(title = 'Percentage', tickformat = ".2%"))
   p
 }
@@ -333,15 +333,15 @@ samplePca2dPlot <- function(dge, color){
   tdge <- t(dge$counts)
   tdge[!is.finite(tdge)] <- 0
   pca <- prcomp(tdge, center=TRUE)
-
+  
   pca <- data.frame(scale(tdge, center=T, scale=F)%*%pca$rotation)
   pca$group <- dge$samples[,color]
-
+  
   color <- "phenotype"
-
+  
   p <- plot_ly(pca,
                x=~PC1,
-               y=~PC2,
+               y=~PC2, 
                type = "scattergl",
                mode = "markers",
                color=~pca$group,
@@ -352,7 +352,7 @@ samplePca2dPlot <- function(dge, color){
                                          width = 1)),
                key = ~rownames(pca),
                source="samples_pca_2d") %>%
-    layout(title = 'PCA',
+    plotly::layout(title = 'PCA',
            clickmode = "event+select",
            dragmode = "select")
   p
@@ -362,12 +362,12 @@ samplePca3dPlot <- function(dge, color){
   tdge <- t(dge$counts)
   tdge[!is.finite(tdge)] <- 0
   pca <- prcomp(tdge, center=TRUE)
-
+  
   pca <- data.frame(scale(tdge, center=T, scale=F)%*%pca$rotation)
   pca$group <- dge$samples[,color]
-
+  
   color <- "phenotype"
-
+  
   p <- plot_ly(pca,
                x=~PC1,
                y=~PC2,
@@ -376,7 +376,7 @@ samplePca3dPlot <- function(dge, color){
                text = rownames(pca),
                hoverinfo = 'text') %>%
     add_markers(marker = list(size=5, opacity = 0.75)) %>%
-    layout(title = 'PCA')
+    plotly::layout(title = 'PCA')
   p
 }
 
@@ -386,7 +386,7 @@ genesPca2dPlot <- function(dge, color){
   pca <- data.frame(pca$scores)
   pca <- head(pca, 50)
   k <- kmeans(pca, 5, nstart=25, iter.max=1000)
-
+  
   p <- plot_ly(pca,
                x=~Comp.1,
                y=~Comp.2,
@@ -396,7 +396,7 @@ genesPca2dPlot <- function(dge, color){
                text = rownames(pca),
                hoverinfo = 'text',
                marker = list(size=15)) %>%
-    layout(title = 'PCA')
+    plotly::layout(title = 'PCA')
   p
 }
 
@@ -406,7 +406,7 @@ genesPca3dPlot <- function(dge, color){
   pca <- data.frame(pca$scores)
   pca <- head(pca, 50)
   k <- kmeans(pca, 5, nstart=25, iter.max=1000)
-
+  
   p <- plot_ly(pca,
                x=~Comp.1,
                y=~Comp.2,
@@ -415,7 +415,7 @@ genesPca3dPlot <- function(dge, color){
                text = rownames(pca),
                hoverinfo = 'text') %>%
     add_markers(marker = list(size=3, opacity = 0.75)) %>%
-    layout(title = 'PCA')
+    plotly::layout(title = 'PCA')
   p
 }
 
@@ -424,7 +424,7 @@ samplePcaCpmPlot <- function(dge, color){
   lcpm <- cpm(dge, log=T)
   pca <- prcomp(lcpm, scale = TRUE)
   pca <- data.frame(pca$rotation)
-
+  
   p <- plot_ly(pca,
                x=~PC1,
                y=~PC2,
@@ -433,7 +433,7 @@ samplePcaCpmPlot <- function(dge, color){
                text = rownames(pca),
                hoverinfo = 'text') %>%
     add_markers(marker = list(size=5, opacity = 0.75)) %>%
-    layout(title = 'PCA')
+    plotly::layout(title = 'PCA')
   p
 }
 
@@ -444,7 +444,7 @@ genesPcaCpmPlot <- function(dge, color){
   pca <- data.frame(pca$scores)
   pca <- head(pca, 50)
   k <- kmeans(pca, 5, nstart=25, iter.max=1000)
-
+  
   p <- plot_ly(pca,
                x=~Comp.1,
                y=~Comp.2,
@@ -453,7 +453,7 @@ genesPcaCpmPlot <- function(dge, color){
                text = rownames(pca),
                hoverinfo = 'text') %>%
     add_markers(marker = list(size=3, opacity = 0.75)) %>%
-    layout(title = 'PCA')
+    plotly::layout(title = 'PCA')
   p
 }
 
@@ -467,14 +467,14 @@ variableHeatmapPlot <- function(dge){
   head(var_genes)
   select_var <- names(sort(var_genes, decreasing=TRUE))[1:100]
   high_var_cpm <- lcpm[select_var,]
-
+  
   p <- plot_ly(
           x=~colnames(high_var_cpm),
           y=~rownames(high_var_cpm),
           z=~high_var_cpm,
           colorbar = list(title = "Log2CPM", len=1),
           type = "heatmap") %>%
-    layout(xaxis = list(title = ''),
+    plotly::layout(xaxis = list(title = ''),
            yaxis = list(title = ''))
   p
 }
@@ -484,14 +484,14 @@ topDgeHeatmapPlot <- function(deTab, dge){
   sortdeTab <- head(sortdeTab, 100)
   getnorm <- dge[rownames(sortdeTab),]
   getnorm <- getnorm$counts
-
+  
   p <- plot_ly(
     x=~colnames(getnorm),
     y=~rownames(getnorm),
     z=~getnorm,
     colorbar = list(title = "Log2CPM", len=1),
     type = "heatmap") %>%
-    layout(xaxis = list(title = ''),
+    plotly::layout(xaxis = list(title = ''),
            yaxis = list(title = '',
                         categoryorder = "array",
                         autorange = "reversed"))
@@ -505,7 +505,7 @@ topDgeHeatmapPlot <- function(deTab, dge){
 #analysis en view plots verschillen op een of andere manier?!
 voomPlot <- function(dge, deTab, ps){
   v <- voom(2^(dge$counts), save.plot = TRUE)
-
+  
   p <- plot_ly(x = ~v$voom.xy$x,
                y = ~v$voom.xy$y,
                type = "scattergl",
@@ -532,7 +532,7 @@ voomPlot <- function(dge, deTab, ps){
               y = v$voom.line$y,
               line = list(color = 'rgb(255, 127, 14, 0.75)'),
               name = "Voom average") %>%
-    layout(xaxis = list(title = 'Average Log2 Count'),
+    plotly::layout(xaxis = list(title = 'Average Log2 Count'),
            yaxis = list(title = 'SQRT(Standard Deviation)'),
            clickmode = "event+select",
            dragmode = "select")
@@ -549,7 +549,7 @@ residualVariancePlot <- function(deTab){
             alpha = 0.75,
             text = rownames(deTab$genes),
             hoverinfo = 'text') %>%
-    layout(xaxis = list(title = 'Average Expression'),
+    plotly::layout(xaxis = list(title = 'Average Expression'),
            yaxis = list(title = 'Log2 Sigma'))
   p <- add_trace(p,
                  y = mean(log2(deTab$sigma)),
@@ -561,11 +561,11 @@ residualVariancePlot <- function(deTab){
 deRatioPlot <- function(deTab){
   defeatures <- aggregate(deTab$DE, by=list(category=deTab$DE), FUN=length)
   defeatures$perc <- defeatures[,2]/sum(defeatures[,2])
-
+  
   defeatures$category[which(defeatures$category==0)] <- "Not sign"
   defeatures$category[which(defeatures$category==-1)] <- "Down"
   defeatures$category[which(defeatures$category==1)] <- "Up"
-
+  
   p <- plot_ly(defeatures,
                x = "",
                y = ~perc,
@@ -575,7 +575,7 @@ deRatioPlot <- function(deTab){
                textposition = "auto",
                textfont=list(color="black"),
                hoverinfo = 'text') %>%
-    layout(barmode = 'stack',
+    plotly::layout(barmode = 'stack',
            xaxis = list(title = ""),
            yaxis = list(tickformat = "%", title = "Ratio"))
   p
@@ -583,7 +583,7 @@ deRatioPlot <- function(deTab){
 
 maPlot <- function(deTab, ps){
   prediction <- gamConfidenceFit(deTab, "avgLog2CPM")
-
+  
   p <- plot_ly(deTab[deTab$DE == 0,],
                x=~avgLog2CPM,
                y=~avgLog2FC,
@@ -631,7 +631,7 @@ maPlot <- function(deTab, ps){
                 color = "Standard Error",
                 line = list(color = 'rgba(0, 0, 0, 0)'),
                 name = "Standard Error") %>%
-    layout(xaxis = list(title = 'Average Log2 CPM'),
+    plotly::layout(xaxis = list(title = 'Average Log2 CPM'),
            yaxis = list(title = 'Average Log2 FC'),
            clickmode = "event+select",
            dragmode = "select")
@@ -668,13 +668,13 @@ volcanoPlot <- function(deTab, LogCut, PCut, ps){
               text = rownames(deTab[rownames(deTab) %in% ps,]),
               hoverinfo = 'text',
               key = ~rownames(deTab[rownames(deTab) %in% ps,])) %>%
-    layout(xaxis = list(title = 'Average Log2 FC'),
+    plotly::layout(xaxis = list(title = 'Average Log2 FC'),
            yaxis = list(title = '- Log10 P-Value'),
            shapes=list(
              list(type = "line",  line = list(color = "red"),
                   x0 = 0,  x1 = 1, xref="paper",
                   y0 = PCut, y1 = PCut),
-
+             
              list(type = "line",  line = list(color = "red"),
                   x0 = LogCut,  x1 = LogCut,
                   y0 = 0, y1 = 1, yref="paper"),
@@ -688,17 +688,19 @@ volcanoPlot <- function(deTab, LogCut, PCut, ps){
   p
 }
 
-barcodePlot <- function(deTab, dge, color) {
+barcodePlot <- function(deTab, dge, color, ps) {
   if (is.null(color)) {
     return(NULL)
   }
+  
   sortdeTab <- deTab[order(rank(deTab$adj.P.Val)),]
   sortdeTab <- head(sortdeTab, 25)
+  sortdeTab <- unique(rbind(sortdeTab, deTab[rownames(deTab) %in% ps,]))
   getnorm <- dge[rownames(sortdeTab),]
   getnorm$counts <- getnorm$counts
   stack1 <- as.data.frame(stack(getnorm$counts))
   stack1$group <- getnorm$samples[[color]][stack1$col]
-
+  
   p <- plot_ly(type = "scattergl",
                mode = "markers",
                marker = list(symbol = "line-ns-open",
@@ -710,7 +712,7 @@ barcodePlot <- function(deTab, dge, color) {
                  color = ~stack1$group,
                  text = stack1$col,
                  hoverinfo = 'text') %>%
-    layout(xaxis = list(title = 'Log2 CPM'),
+    plotly::layout(xaxis = list(title = 'Log2 CPM'),
            yaxis = list(title = '',
                         categoryorder = "array",
                         autorange = "reversed"))
@@ -720,12 +722,12 @@ barcodePlot <- function(deTab, dge, color) {
 pValuePlot <- function(deTab){
   pvalue <- round(deTab$P.Value, digits = 2)
   pvalue <- aggregate(pvalue, by=list(p=pvalue), FUN=length)
-
+  
   p <- plot_ly(pvalue,
                x = ~p,
                y = ~x,
                type = "bar") %>%
-    layout(xaxis = list(title = 'P-Value'),
+    plotly::layout(xaxis = list(title = 'P-Value'),
            yaxis = list(title = 'Count'))
   p
 }
@@ -739,7 +741,7 @@ biasPlot <- function(deTab, biasColumn, log) {
     return(NULL)
   }
   prediction <- gamConfidenceFit(deTab, biasColumn)
-
+  
   p <- plot_ly(deTab,
                x = ~get(biasColumn),
                y = ~avgLog2FC,
@@ -768,7 +770,7 @@ biasPlot <- function(deTab, biasColumn, log) {
                 color = "green",
                 line = list(color = 'rgba(0, 0, 0, 0)'),
                 name = "Standard Error") %>%
-    layout(xaxis = list(title = biasColumn, type = log), #, type = "log"),
+    plotly::layout(xaxis = list(title = biasColumn, type = log), #, type = "log"),
            yaxis = list(title = 'Average Log2 FC'))
   p
 }
@@ -793,13 +795,13 @@ update_n <- function(x, showCategory) {
   if (!is.numeric(showCategory)) {
     return(showCategory)
   }
-
+  
   ## geneSets <- geneInCategory(x) ## use core gene for gsea result
   n <- showCategory
   if (nrow(x) < n) {
     n <- nrow(x)
   }
-
+  
   return(n)
 }
 
@@ -827,7 +829,7 @@ list2df <- function(inputList) {
                               length(inputList[[i]])),
                Gene=inputList[[i]])
   })
-
+  
   do.call('rbind', ldf)
 }
 
@@ -867,9 +869,9 @@ enrichBarplot <- function(enrich, amount, value){
                                          tickvals=-color,
                                          ticktext=floor(color) + signif(color %% 1, 4)),
                            reversescale=FALSE)
-
-               ) %>%
-    layout(xaxis = list(title = 'Counts'),
+                                         
+               ) %>% 
+    plotly::layout(xaxis = list(title = 'Counts'),
            yaxis = list(title = ''))
   p
 }
@@ -887,13 +889,13 @@ emap_plotly <- function(enrich){
     n <- nrow(enrich) #
     w <- matrix(NA, nrow=n, ncol=n)
     colnames(w) <- rownames(w) <- enrich$Description
-
+    
     for (i in seq_len(n-1)) {
       for (j in (i+1):n) {
         w[i,j] <- overlap_ratio(geneSets[id[i]], geneSets[id[j]])
       }
     }
-
+    
     wd <- melt(w)
     wd <- wd[wd[,1] != wd[,2],]
     wd <- wd[!is.na(wd[,3]),]
@@ -902,10 +904,10 @@ emap_plotly <- function(enrich){
     g <- delete.edges(g, E(g)[wd[,3] < 0.2])
     ## g <- delete.edges(g, E(g)[wd[,3] < 0.05])
     idx <- unlist(sapply(V(g)$name, function(x) which(x == enrich$Description)))
-
+    
     cnt <- sapply(geneSets[idx], length)
     V(g)$size <- cnt
-
+    
     colVar <- enrich[idx, "pvalue"]
     V(g)$color <- colVar
   }
@@ -919,18 +921,18 @@ viewPathwayPlot <- function(deTab, db, pwName){
   pathways <- eval(parse(text="pathways"))
   pw <- pathways(org2org[[organism]], db)[[pwName]]
   pw <- suppressMessages(convertIdentifiers(pw, "symbol"))
-
+  
   setGeneList <- deTab$avgLog2FC
   names(setGeneList) <- as.character(deTab$geneName)
   setGeneList <- sort(setGeneList, decreasing = TRUE)
   setGeneList <- setGeneList[na.omit(names(setGeneList))]
   setGeneList <- setGeneList[!duplicated(names(setGeneList))]
-
+  
   g <- graphite::pathwayGraph(pw)
   gg <- igraph::igraph.from.graphNEL(g)
   gg <- igraph::as.undirected(gg)
   V(gg)$name <- sub("[^:]+:", "", V(gg)$name)
-
+  
   fc <- setGeneList[V(gg)$name]
   V(gg)$color <- fc
   gg
@@ -942,15 +944,15 @@ cnetPlotly <- function(enrich, deTab, cnet_slider){
   setGeneList <- sort(setGeneList, decreasing = TRUE)
   setGeneList <- setGeneList[na.omit(names(setGeneList))]
   setGeneList <- setGeneList[!duplicated(names(setGeneList))]
-
+  
   geneSets <- extract_geneSets(enrich, cnet_slider)
-
+  
   g <- list2graph(geneSets)
-
+  
   V(g)$name[V(g)$name %in% as.character(deTab$entrez)] <- as.character(deTab$geneName[as.character(deTab$entrez) %in% V(g)$name])
   fc <- setGeneList[V(g)$name]
   V(g)$color <- fc
-
+  
   g
 }
 
@@ -960,12 +962,12 @@ plotlyGraph <- function(g, pwName, getColor, cnet){
   vs <- V(G)
   es <- as.data.frame(get.edgelist(G))
   rownames(L) <- names(vs)
-
+  
   L_cnet <- L[0:cnet,]
   L_genes <- L[(cnet+1):nrow(L),][names(vs)[!is.na(vs$color)],]
   L_genesNA <- L[names(vs)[is.na(vs$color)],]
   vs <- vs[!is.na(vs$color)]
-
+    
   Ne <- length(es[1]$V1)
   network <- plot_ly(
     x = ~L_genesNA$V1,
@@ -1007,12 +1009,12 @@ plotlyGraph <- function(g, pwName, getColor, cnet){
       hoverinfo = "text",
       showlegend=FALSE
     )
-
+  
   edge_shapes <- list()
   for(i in 1:Ne) {
     v0 <- L[as.character(es[i,]$V1),]
     v1 <- L[as.character(es[i,]$V2),]
-
+    
     edge_shape = list(
       type = "line",
       line = list(color = "#030303", width = 0.25),
@@ -1022,13 +1024,13 @@ plotlyGraph <- function(g, pwName, getColor, cnet){
       x1 = v1$V1,
       y1 = v1$V2
     )
-
+    
     edge_shapes[[i]] <- edge_shape
   }
-
+  
   axis <- list(title = "", showgrid = FALSE, showticklabels = FALSE, zeroline = FALSE)
-
-  p <- layout(
+  
+  p <- plotly::layout(
     network,
     title = pwName,
     shapes = edge_shapes,
@@ -1045,12 +1047,12 @@ plotlyGraph <- function(g, pwName, getColor, cnet){
 reOrderDesign <- function(matrix_value, design_value, data_samples) {
   check_matrix <- strsplit(matrix_value, " - ", fixed = TRUE)[[1]]
   check_design <- strsplit(design_value, " + ", fixed = TRUE)[[1]]
-
+  
   get_column <- which(check_matrix[1] == data_samples, arr.ind=TRUE)[,2][[1]]
   column <- colnames(data_samples[get_column])
   remove_design_items <- c("~0", column)
   new_design <- setdiff(check_design, remove_design_items)
-
+  
   if (length(new_design) != 0) {
     new_design <- paste("~0 +", column, "+", gsub(",", " +", toString(c(new_design))))
   } else {
@@ -1064,10 +1066,10 @@ highExpressedFeatures <- function(method, dge, design_value, cpm_value) {
     edger <- calcNormFactors( dge, method = "TMM")
     counts <- cpm(edger, log = TRUE)
     selectedFeatures <- rownames( edger )[ apply( counts, 1, function( v ) sum( v >= cpm_value ) ) >= 1/4 * ncol( counts ) ]
-
+    
   } else {
     selectedFeatures <- filterByExpr(dge, model.matrix(eval(parse(text=design_value)), dge$samples ))
-
+    
   }
   selectedFeatures
 }
@@ -1077,9 +1079,9 @@ filterDge <- function(normDge, excluded_samples, data_samples, se) {
   normDge$counts <- normDge$counts[,!colnames(normDge$counts) %in% excluded_samples]
   data_samples <- data_samples[!rownames(data_samples) %in% excluded_samples, ]
   data_samples <- droplevels(data_samples)
-
+  
   se <- addSamplesFromTableToSE(se, data_samples)
-
+  
   tempDge <- DGEList(counts = normDge$counts, samples = colData(se), genes = normDge$genes)
   tempDge <- calcNormFactors( tempDge, method = "TMM")
   tempDge
@@ -1115,7 +1117,7 @@ vennDiagram <- function(){
                mode = 'text',
                textfont = list(size = 18)
   ) %>%
-    layout(xaxis = list(title = '',
+    plotly::layout(xaxis = list(title = '',
                         zeroline = FALSE,
                         showline = FALSE,
                         showticklabels = FALSE,
@@ -1139,7 +1141,7 @@ vennDiagram <- function(){
                layer="below",
                fill = 'tonextt',
                fillcolor = "#1f77b4"
-             ),
+             ), 
              list(
                x0 = 0.4,
                x1 = 1.5,
