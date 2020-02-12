@@ -1,0 +1,343 @@
+
+/* dashboard--- */
+/*colors: https://www.w3schools.com/colors/colors_picker.asp*/
+/*header height = 90px*/
+
+/*toggle button position and height*/
+.main-header .sidebar-toggle {
+  font-size: 35px;
+  display: block;
+  height: 90px;
+  line-height: 90px;
+  padding: 0px 30px 0px 30px;
+}
+.main-header .logo {
+  font-size: 28px;
+  line-height: 90px; 
+  vertical-align: middle;
+}
+
+/*header text to the right*/
+.skin-blue .main-header .navbar .nav>li>a {
+  font-size: 24px;
+  color: white;
+  display: block;
+  height: 90px;
+  line-height: 90px;
+  background-color: #737373;
+}
+/*header text to the right hover*/
+.skin-blue .main-header .navbar .navbar-nav>li>a:hover {
+  background-color: #737373;
+  color: white;
+  cursor: default;
+}
+.navbar-custom-menu .navbar-nav>li>a {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+/*side bar*/
+.main-sidebar {
+  font-size: 20px;
+}
+
+/*distance text to icon in sidebar*/
+.main-sidebar li a span{
+  margin: 0px 15px;
+}
+
+/*header height*/
+.main-header {max-height: 90px}
+.main-header .logo {height: 90px;}
+.sidebar-toggle {height: 90px; padding-top: 1px !important;}
+.navbar {min-height: 90px !important}
+.left-side, .main-sidebar {padding-top: 90px}
+
+/*background dashboard*/
+.content-wrapper, .right-side {
+  background-color: #f9f9f9;
+}
+
+/*header color*/
+.skin-blue .main-header .navbar {
+  background-color: #737373;
+  height: 90px;
+}
+
+/*navbar background*/
+.skin-blue .main-sidebar, .skin-blue .wrapper {
+  background: white;
+}
+.skin-blue .main-sidebar {
+  border-right-width: 15px;
+  border-right-style: solid;
+  border-image: linear-gradient(to right, #d9d9d9, #f9f9f9) 1 100%;
+}
+
+/*navbar text color*/
+.skin-blue .sidebar a {
+  color: #333333;
+}
+
+/*lumc logo in navbar*/
+.skin-blue .sidebar-menu>img {
+  margin-left: auto;
+  position: absolute;
+  bottom: 10px;
+  right: 25%;
+  left: 50%;
+  opacity: 0.5;
+}
+
+/*current select in navbar*/
+.skin-blue .sidebar-menu>li>a {
+  border-left: 5px solid transparent;
+}
+.skin-blue .sidebar-menu>li.active>a, .skin-blue .sidebar-menu>li:hover>a {
+  color: #333333;
+  background: #f2f2f2;
+  border-left: 5px solid #66ccff;
+}
+
+/*navbar subitem hover*/
+.skin-blue .treeview-menu>li>a {
+  border-left: 5px solid transparent;
+}
+.skin-blue .treeview-menu>li.active>a, .skin-blue .treeview-menu>li:hover>a {
+  color: #333333;
+  background: #f2f2f2;
+  border-left: 5px solid #66ccff;
+}
+
+/*navbar subitem background*/
+.skin-blue .treeview-menu>li>a {
+  color: #333333;
+  background-color: transparent;
+}
+
+/*navbar subitem small left bar*/
+.skin-blue .sidebar-menu>li>.treeview-menu {
+  margin: 0px 0px;
+  padding-left: 0px;
+  background-color: transparent;
+}
+
+/*logo background*/
+.skin-blue .main-header .logo {
+  background-color: #0088cc;
+  color: white;
+  border-right-width: 100px;
+  border-right-style: solid;
+  border-image: linear-gradient(to right, #0088cc, #737373) 1 100%;
+}
+
+/*logo background hover*/
+.skin-blue .main-header .logo:hover {
+  background-color: #0088cc;
+  cursor: default;
+}
+
+/*toggle button*/
+.skin-blue .main-header .navbar .sidebar-toggle {
+    color: white;
+}
+/*toggle button hover*/
+.skin-blue .main-header .navbar .sidebar-toggle:hover{
+  background-image: radial-gradient(#8c8c8c 25%, #737373 75%);
+  color: white;
+}
+
+/* --- dashboard */
+
+
+/* tabsetpanel --- */
+
+.nav-tabs>li>a {
+  color: white;
+  background-color: #0088cc;
+  min-width: 225px;
+  text-align: center;
+  font-size: 15px;
+}
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li>a:hover {
+  color: #0088cc;
+  background-color: #f9f9f9;
+  border: 1px solid #0088cc;
+  border-bottom-color: transparent;
+}
+
+/* --- tabsetpanel */
+
+
+/* body --- */
+
+table.dataTable.stripe tbody tr.odd, table.dataTable.display tbody tr.even {
+  background-color: #e6f7ff;
+}
+table.dataTable.stripe tbody tr.odd, table.dataTable.display tbody tr.odd {
+  background-color: white;
+}
+.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
+  background-color: #cceeff;
+  cursor: pointer;
+}
+table.dataTable tr.selected td{
+  background-color: #b3e6ff !important;
+}
+
+/*border around plotly plot*/
+/*
+.js-plotly-plot .plotly .main-svg {
+  outline: 3px solid #0088cc;
+}
+*/
+
+/* --- body */
+
+
+/* widgets --- */
+
+/*progressbar*/
+.progress-bar{
+  background-color: #005580;
+}
+
+/*slider*/
+.irs-bar {
+  border: #0088cc;
+  background: #0088cc;
+}
+.irs-bar-edge {
+  border: #0088cc;
+  background: #0088cc;
+}
+.irs-from, .irs-to, .irs-single {
+  background: #0088cc;
+}
+
+/*button*/
+.btn-default {
+  background-color: #0088cc;
+  color: white;
+  outline: none;
+  border: 1px solid #0088cc;
+  cursor: pointer;
+}
+.btn-default:hover {
+  background-color: white;
+  color: #0088cc;
+  border: 1px solid #0088cc;
+}
+#run_button {
+  font-size: 24px;
+  width: 250px;
+}
+
+/*radio button*/
+.radio-inline input[type="radio"] {
+  opacity: 0;
+  position: fixed;
+  width: 0;
+}
+.radio-inline span {
+  display: inline-block;
+  background-color: #737373;
+  color: white;
+  padding: 10px 20px;
+  font-size: 14px;
+  line-height: 10px;
+  width: 150px;
+  border: 1px solid #737373;
+  border-radius: 4px;
+}
+.radio-inline input[type="radio"]:checked + span {
+  font-weight: bold;
+  background-color: #0088cc;
+  color: white;
+}
+.radio-inline span:hover {
+  background-color: white;
+  color: #0088cc;
+  border: 1px solid #0088cc;
+}
+
+/*checkbox*/
+.checkbox-inline input[type="checkbox"] {
+  opacity: 0;
+  position: fixed;
+  width: 0;
+}
+.checkbox-inline span {
+  display: inline-block;
+  background-color: #737373;
+  color: white;
+  min-width: 150px;
+  padding: 10px 20px;
+  font-size: 14px;
+  line-height: 10px;
+  border: 1px solid #737373;
+  border-radius: 4px;
+}
+.checkbox-inline input[type="checkbox"]:checked + span {
+  font-weight: bold;
+  background-color: #0088cc;
+  color: white;
+}
+.checkbox-inline span:hover {
+  background-color: white;
+  color: #0088cc;
+  border: 1px solid #0088cc;
+}
+
+/* --- widgets */
+
+
+/* switch --- */
+
+.bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-primary {
+  color: white;
+  font-size: 20px;
+  background: #0088cc;
+}
+
+.bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-default {
+  color: white;
+  font-size: 20px;
+  background: #0088cc;
+}
+
+.bootstrap-switch.bootstrap-switch-inverse.bootstrap-switch-off .bootstrap-switch-label,
+.bootstrap-switch.bootstrap-switch-on .bootstrap-switch-label,
+.bootstrap-switch.bootstrap-switch-off .bootstrap-switch-label {
+  height: 50px;
+}
+
+.bootstrap-switch.bootstrap-switch-animate .bootstrap-switch-container>span {
+  height: 50px;
+}
+
+/* --- toggle switch */
+
+
+/* modal popup --- */
+
+.modal-body {
+  text-align: center;
+}
+
+.modal-dialog {
+  top: 100px;
+  background-color: #f9f9f9;
+  font-size: 25px;
+}
+
+/* --- modal popup */
+
+/* image scroll --- */
+
+#pathway_from_kegg, #pathway_from_reactome, #pathway_from_go, #pathway_from_do {
+  overflow: auto;
+}
+
+/* --- image scroll */

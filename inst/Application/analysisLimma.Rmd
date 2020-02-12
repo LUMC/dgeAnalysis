@@ -1,0 +1,226 @@
+---
+title: "Shiny analysis - Limma/Voom"
+author: "Tom Kuipers"
+output:
+  html_document: default
+always_allow_html: true
+params:
+  data_samples:     "" #"~/Desktop/test_data_view310_with3/meta2.csv"
+  data_counts:      "" #"~/Desktop/test_data_view310_with3/all_samples.fragments_per_gene.tsv"
+  data_annotation:  "" #"~/Desktop/test_data_view310_with3/gene_annotation.tsv"
+  setGeneName:      "" #"id"/"symbol"
+  cpm_value:        "" #1
+  excluded_samples: "" #"sample_3_minus"
+  design_value:     "" #"~0 + group + subject"
+  matrix_value:     "" #"plus - minus"
+  alpha:            "" #0.05
+---
+
+
+## R Markdown
+
+
+```{r setup}
+
+if (!require("knitr")) install.packages("knitr")
+if (!require("SummarizedExperiment")) install.packages("SummarizedExperiment")
+if (!require("limma")) install.packages("limma")
+if (!require("tidyr")) install.packages("tidyr")
+if (!require("scales")) install.packages("scales")
+if (!require("plotly")) install.packages("plotly")
+
+source("functions.R")
+
+```
+
+
+```{r variables}
+# IMPORT VARIABLES
+
+data_samples <- params$data_samples
+data_counts <- params$data_counts
+data_annotation <- params$data_annotation
+setGeneName <- params$setGeneName
+cpm_value <- params$cpm_value
+excluded_samples <- params$excluded_samples
+design_value <- params$design_value
+matrix_value <- params$matrix_value
+alpha <- params$alpha
+
+# Get desgin
+design_value <- reOrderDesign(matrix_value, design_value, data_samples)
+
+```
+
+
+```{r filterData}
+# FILTER DATA IF NESSECARY
+
+#Filter if nessecary
+data_samples <- data_samples[!rownames(data_samples) %in% excluded_samples,]
+data_counts <- data_counts[,!colnames(data_counts) %in% excluded_samples]
+
+```
+
+
+
+```{r showVariables}
+# SHOW VALUES OF VARIABLES
+
+cpm_value
+excluded_samples
+design_value
+matrix_value
+alpha
+
+```
+
+
+```{r showRawData}
+# SHOW RAW DATA
+
+se <- readCountsFromTable(data_counts, data_samples)
+
+alignmentSummaryPlot(se)
+complexityPlot(se)
+
+```
+
+
+```{r filesIntoSE}
+# READ ALL FILES INTO SE
+
+se <- readCountsFromTable(data_counts[!grepl('^__', rownames(data_counts)),], data_samples)
+se <- addSamplesFromTableToSE(se, data_samples)
+if (!is.null(data_annotation)) {
+  se <- addAnnotationsFromTableToSE(se, data_annotation)
+}
+
+```
+
+
+```{r dge}
+# GET AND CREATE DGE
+
+dge <- DGEList(counts = assay(se), samples = colData(se), genes = rowData(se))
+row.names(dge$genes) <- row.names(dge$counts)
+
+dge <- dge[ rowSums( abs( dge$counts ) ) > 1, ]
+
+tempDge <- dge
+tempDge$counts <- cpm(dge, log = TRUE)
+countDistributionLinePlot(tempDge)
+
+```
+
+
+```{r selectedFeatures}
+# GET SELECTED FEATURES
+
+#selectedFeatures <- filterByExpr(dge, model.matrix(eval(parse(text=design_value)), dge$samples ))
+limmaV <- calcNormFactors( dge, method = "TMM")
+counts <- cpm(limmaV, log = TRUE)
+selectedFeatures <- rownames( limmaV )[ apply( counts, 1, function( v ) sum( v >= cpm_value ) ) >= 1/4 * ncol( counts ) ]
+
+```
+
+
+```{r highExpressed}
+# GET HIGH EXPRESSED FEATURES
+
+highExprDge <- dge[ selectedFeatures,, keep.lib.sizes = FALSE ]
+
+```
+
+
+```{r normalize}
+# NORMALIZE DATA
+
+normDge <- calcNormFactors( highExprDge, method = "TMM")
+
+tempDge <- normDge
+tempDge$counts <- cpm(normDge, log = TRUE)
+countDistributionLinePlot(tempDge)
+variancePcaPlot(tempDge)
+
+```
+
+
+```{r design}
+# CREATE DESIGN
+
+design <- model.matrix(eval(parse(text=design_value)), normDge$samples)
+design <- reNameDesign(design, normDge)
+
+matrix_value <- strsplit(matrix_value, ",")[[1]]
+contr.matrix <- makeContrasts(contrasts = matrix_value, levels=design)
+contr.matrix
+
+```
+
+
+```{r analysis}
+# PERFORM ANALYSIS
+
+voom <- voom(normDge, design)
+vfit <- lmFit(voom)
+vfit <- contrasts.fit(vfit, contrasts = contr.matrix)
+efit <- eBayes(vfit)
+
+efit$DE <- decideTests(efit, p.value = alpha)
+summary(efit$DE)
+
+```
+
+
+```{r create_deTab}
+# CREATE deTab TABLE
+
+deTab <- data.frame(topTable(efit, coef=1, n=Inf))
+deTab <- deTab[order(rownames(deTab)),]
+deTab$DE <- c(efit$DE[order(rownames(efit$DE)),])
+
+deTab <- rename(deTab, "avgLog2CPM" = "AveExpr")
+deTab <- rename(deTab, "avgLog2FC" = "logFC")
+
+```
+
+
+```{r changeToSymbol}
+# CHANGE GENE ID TO SYMBOL IF NESSECARY
+
+if (setGeneName == "symbol" && !is.null(data_annotation)) {
+  tempCol <- rownames(deTab)
+  rownames(deTab) <- make.names(deTab$geneName, unique=TRUE)
+  deTab$geneName <- tempCol
+  colnames(deTab)[1] <- "geneId"
+  rownames(normDge$counts) <- rownames(deTab)
+}
+
+```
+
+
+```{r showDGEResult}
+# SHOW DGE RESULTS
+
+maPlot(deTab, NULL)
+pValuePlot(deTab)
+
+```
+
+
+```{r save}
+# SAVE ANALYSIS
+
+normDge$counts <- cpm(normDge, log = TRUE)
+save(deTab, normDge, file="analysis.RData")
+
+```
+
+
+```{r session}
+# INFO
+
+sessionInfo()
+
+```
