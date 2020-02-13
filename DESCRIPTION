@@ -7,7 +7,6 @@ Maintainer: Tom Kuipers <t.b.kuipers@outlook.com>
 Description:
     R shiny tool to perform DGE analysis
 Depends: R (>= 3.6.1)
-biocViews:
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
@@ -19,19 +18,21 @@ Imports:
     shinyjs (>= 1.1),
     BiocManager (>= 1.30.10),
     knitr (>= 1.27),
-    SummarizedExperiment (>= 1.16.1),
-    edgeR (>= 3.28.0),
-    limma (>= 3.42.1),
-    DESeq2 (>= 1.26.0),
     tidyr (>= 1.0.2),
     scales (>= 1.1.0),
     broom (>= 0.5.4),
     plotly (>= 4.9.1),
+    igraph (>= 1.2.4.2),
+    reshape2 (>= 1.4.3)
+biocViews:
+    SummarizedExperiment (>= 1.16.1),
+    edgeR (>= 3.28.0),
+    limma (>= 3.42.1),
+    DESeq2 (>= 1.26.0),
     clusterProfiler (>= 3.14),
     DOSE (>= 3.12.0),
     graphite (>= 1.32.0),
     ReactomePA (>= 1.30.0),
-    igraph (>= 1.2.4.2),
     org.Hs.eg.db (>= 3.10),
-    org.Mm.eg.db (>= 3.10),
-    reshape2 (>= 1.4.3)
+    org.Mm.eg.db (>= 3.10)
+    
