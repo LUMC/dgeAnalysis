@@ -7,6 +7,7 @@ Maintainer: Tom Kuipers <t.b.kuipers@outlook.com>
 Description:
     R shiny tool to perform DGE analysis
 Depends: R (>= 3.6.1)
+biocViews:
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
