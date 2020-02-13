@@ -22,7 +22,7 @@ Imports:
     scales (>= 1.1.0),
     broom (>= 0.5.4),
     ggplot2 (>= 3.2.1),
-    plotly (>= 4.9.2),
+    plotly (>= 4.9.1),
     igraph (>= 1.2.4.2),
     reshape2 (>= 1.4.3)
 biocViews:
