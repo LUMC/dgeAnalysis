@@ -714,7 +714,7 @@ server <- function(input, output, session) {
 
       table_select <- rownames(inUse_deTab[ids,])
       plot_select <- append(s$key, table_select)
-      maPlot(inUse_deTab, plot_select)
+      ma_plot(inUse_deTab, plot_select)
     }, error = function(err) {
       return(NULL)
     })

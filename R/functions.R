@@ -581,7 +581,7 @@ deRatioPlot <- function(deTab){
   p
 }
 
-maPlot <- function(deTab, ps){
+ma_plot <- function(deTab, ps){
   prediction <- gamConfidenceFit(deTab, "avgLog2CPM")
   
   p <- plot_ly(deTab[deTab$DE == 0,],
