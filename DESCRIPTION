@@ -33,10 +33,10 @@ Imports:
     graphite (>= 1.32.0),
     ReactomePA (>= 1.30.0),
     org.Hs.eg.db (>= 3.10),
-    org.Mm.eg.db (>= 3.10)
+    org.Mm.eg.db (>= 3.10),
+    rmarkdown (>= 2.1)
 biocViews: Annotation, Clustering, GeneSetEnrichment, GO, KEGG,
     MultipleComparison, Pathways, Reactome, Visualization,
     Sequencing, RNASeq, ChIPSeq, GeneExpression, Transcription,
     Normalization, DifferentialExpression, Bayesian, Regression,
     PrincipalComponent
-    
