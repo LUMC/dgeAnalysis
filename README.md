@@ -8,7 +8,7 @@ Note: This application is still under development. An extensive readme is coming
 ```r
 install.packages("devtools")
 ```
-2. Install the dgeAnalysis package:
+2. Install the "dgeAnalysis" package:
 ```r
 library("devtools")
 devtools::install_github("LUMC/DGE_analysis")
