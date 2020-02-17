@@ -1,7 +1,7 @@
 # DGE Analysis
 
 This R package contains the R-Shiny application developed to perform differential gene expression analysis.\
-Note: This application is still under development. A extensive readme is coming.
+Note: This application is still under development. An extensive readme is coming.
 
 ## Installing
 1. Install the "devtools" package (if not already installed):
