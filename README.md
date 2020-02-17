@@ -28,6 +28,6 @@ dgeAnalysis::startApp()
     * Annotation, Contains more information about genes (location, length, etc.).
 4. Set a comparison
 5. Run the analysis
-6. View the results\
+6. View the results
 
 Note: In the folder "exampleData" there is a .zip file, containing three data files. These example files can be used to e.g. check if the application is working and/or your data has the correct format.
