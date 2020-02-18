@@ -24,7 +24,6 @@ Imports:
     plotly (>= 4.9.1),
     igraph (>= 1.2.4.2),
     reshape2 (>= 1.4.3),
-    mgcv (>= 1.8-31),
     SummarizedExperiment (>= 1.16.1),
     edgeR (>= 3.28.0),
     limma (>= 3.42.1),
