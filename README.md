@@ -31,3 +31,26 @@ dgeAnalysis::startApp()
 6. View the results
 
 Note: In the folder "exampleData" there is a .zip file, containing three data files. These example files can be used to e.g. check if the application is working and/or your data has the correct format.
+
+## Requirements
+R version: 3.6+
+
+Linux libraries:
+````
+sudo apt-get update && apt-get install \
+   build-essential \
+   gdebi-core \
+   pandoc \
+   pandoc-citeproc \
+   libcairo2-dev \
+   libjpeg-dev \
+   libxt-dev \
+   libssl-dev \
+   libcurl4-gnutls-dev \
+   libxml2-dev \
+   libcurl4-openssl-dev \
+   -y
+````
+
+Windows RTools:\
+   https://cran.r-project.org/bin/windows/Rtools/Rtools35.exe
