@@ -1,13 +1,14 @@
 Package: dgeAnalysis
 Type: Package
 Title: DGE application
-Version: 0.1.0
-Author: Tom Kuipers
-Maintainer: Tom Kuipers <t.b.kuipers@outlook.com>
+Version: 1.0
+Author@R:
+  person("Tom", "Kuipers", email = "t.b.kuipers@outlook.com", role = c("aut", "cre"))
 Description:
-    R shiny tool to perform DGE analysis
+    R shiny tool to perform differential gene expression and view the results interactively.
 Depends: R (>= 3.6.1)
-License: GPL-2
+RoxygenNote: 7.0.2
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: 
