@@ -1,2 +1,7 @@
 
-#https://stackoverflow.com/questions/43002914/how-to-split-shiny-app-code-over-multiple-files-in-rstudio
+source("scripts/libraries.R", local = TRUE)
+source("shiny/shiny_UI.R", local = TRUE)
+source("shiny/shiny_server.R", local = TRUE)
+source("scripts/functions.R", local = TRUE)
+
+shiny::shinyApp(ui = ui, server = server)
