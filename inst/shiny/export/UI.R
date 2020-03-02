@@ -1,0 +1,36 @@
+
+tab_export <- tabItem(
+  tabName = "export",
+  align="center",
+  br(),
+  
+  h2("Bookmark current state of application"),
+  bookmarkButton(),
+  br(),
+  br(),
+  br(),
+  HTML('<hr style="border-color: #0088cc;">'),
+  br(),
+  h2("Download tables"),
+  selectInput("dataset_select", "",
+              c("Samples" = "samples",
+                "Raw counts" = "rawCounts",
+                "Annotation" = "annotation",
+                "Normalized counts" = "normCounts",
+                "All genes" = "deTab",
+                "DE genes" = "deg",
+                "KEGG pathways" = "kegg",
+                "Reactome pathways" = "reactome",
+                "GO pathways" = "go")
+  ),
+  downloadButton("downloadCSV", label = "Download as CSV"),
+  downloadButton("downloadTSV", label = "Download as TSV"),
+  downloadButton("downloadXLSX", label = "Download as XLSX"),
+  br(),
+  br(),
+  br(),
+  HTML('<hr style="border-color: #0088cc;">'),
+  br(),
+  h2("Download R Markdown analysis"),
+  downloadButton("downloadMHTML", label = "Download as HTML")
+)

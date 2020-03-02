@@ -14,7 +14,6 @@ output[["align_sum"]] <- renderPlotly({
     save(se, file="test.RData")
     alignmentSummaryPlot(get_secounts(), perc = F)
   }, error = function(err) {
-    print(err)
     return(NULL)
   })
 })
@@ -25,7 +24,6 @@ output[["align_sum_perc"]] <- renderPlotly({
     checkReload()
     alignmentSummaryPlot(get_secounts())
   }, error = function(err) {
-    print(err)
     return(NULL)
   })
 })
@@ -36,7 +34,6 @@ output[["complex"]] <- renderPlotly({
     checkReload()
     complexityPlot(get_secounts(), perc = F)
   }, error = function(err) {
-    print(err)
     return(NULL)
   })
 })
