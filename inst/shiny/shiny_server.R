@@ -38,7 +38,7 @@ server <- function(input, output, session) {
                menuSubItem("Disease Ontology", tabName = "enrich_do", icon = icon("bezier-curve"))
       ),
       menuItem("Export", tabName = "export", icon = icon("download")),
-      img("lumcLogo.png", width="200px")
+      img(src="lumcLogo.png", width="200px")
     )
   })
 
