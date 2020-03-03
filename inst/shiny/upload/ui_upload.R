@@ -4,18 +4,21 @@ tab_upload <- tabItem(
   align="center",
   br(),
   
+  radioButtons(
+    inputId = "app_mode",
+    label = "",
+    inline = TRUE,
+    c("New analysis" = "new",
+      "View analysis" = "view")
+  ),
+  
   div(
-    style="float: left; width:50%;",
-    disabled(
-      actionButton(
-        "switch_new",
-        "New analysis"
-      )
-    ),
-    br(),br(),br(),
+    style="float: left; width:48%;",
+    
+    br(),
     div(
       id = "show_new_analysis",
-      br(),
+      br(),br(),br(),
       fileInput("file_samples", "Choose your samples (metadata) file:",
                 multiple = FALSE,
                 accept = c("CSV", ".csv", "TSV", ".tsv", "TXT", ".txt")),
@@ -25,7 +28,7 @@ tab_upload <- tabItem(
       fileInput("file_annotation", "Choose your annotation file:",
                 multiple = FALSE,
                 accept = c("CSV", ".csv", "TSV", ".tsv", "TXT", ".txt")),
-      br(),br(),br(),br(),br(),
+      br(),br(),br(),
       style="position: relative; border-radius: 25px; border: 3px solid #0088cc;",
       hidden(
         div(
@@ -37,12 +40,9 @@ tab_upload <- tabItem(
   ),
   
   div(
-    style="float: left; width:50%;",
-    actionButton(
-      "switch_view",
-      "View analysis",
-    ),
-    br(),br(),br(),
+    style="float: right; width:48%;",
+    
+    br(),
     div(
       id = "show_view_analysis",
       br(),

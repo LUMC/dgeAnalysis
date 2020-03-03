@@ -261,6 +261,13 @@ table.dataTable tr.selected td{
   color: #0088cc;
   border: 1px solid #0088cc;
 }
+#app_mode .shiny-options-group {
+  display: flex;
+  justify-content: space-around;
+}
+#app_mode .checkbox-inline, .radio-inline {
+  padding-left: unset;
+}
 
 /*checkbox*/
 .checkbox-inline input[type="checkbox"] {

@@ -1,20 +1,4 @@
 
-## get dge from raw count table
-get_raw_dge <- reactive({
-  data_counts <- data_counts()
-  data_counts <- data_counts[!grepl('^__', rownames(data_counts)),]
-  se <- readCountsFromTable(data_counts(),
-                            data_samples())
-  se <- addSamplesFromTableToSE(se, data_samples())
-  if (!is.null(data_annotation())) {
-    se <- addAnnotationsFromTableToSE(se, data_annotation())
-  }
-  dge <- DGEList(counts = assay(se), samples = colData(se), genes = rowData(se))
-  dge <- dge[ rowSums( abs( dge$counts ) ) > 1, ]
-  dge$counts <- cpm(dge, log = TRUE)
-  dge
-})
-
 ## Distribution plot line
 output[["dist_line"]] <- renderPlotly({
   tryCatch({

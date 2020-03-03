@@ -1,24 +1,4 @@
 
-## Create normDge from table. if an error occurs (mostly because negative numbers) -> log2 values is converted with 2^
-get_normDge <- reactive({
-  tryCatch({
-    se <- readCountsFromTable(data_normalized()[,!colnames(data_normalized()) %in% rownames(excluded_selected())],
-                              data_samples()[!rownames(data_samples()) %in% rownames(excluded_selected()),])
-    se <- addSamplesFromTableToSE(se, data_samples()[!rownames(data_samples()) %in% rownames(excluded_selected()),])
-    normDge <- tryCatch({
-      return(DGEList(counts = assay(se), samples = colData(se)))
-    }, error = function(err) {
-      temp <- DGEList(counts = 2^(assay(se)), samples = colData(se))
-      temp$counts <- log2(temp$counts)
-      return(temp)
-    }
-    )
-    normDge
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
 ## Create table with normalized counts
 output[["normalized_counts"]] <- DT::renderDataTable({
   tryCatch({

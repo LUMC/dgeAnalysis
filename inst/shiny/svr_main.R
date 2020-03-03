@@ -1,6 +1,4 @@
 
-#suppressWarnings(rm(list=c("deTab", "normDge", "inUse_deTab", "inUse_normDge"), envir=.GlobalEnv))
-
 server <- function(input, output, session) {
   
   checkReload <- function(){
