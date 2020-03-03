@@ -1,124 +1,114 @@
 
-## get deTab from table
-get_deTab <- reactive({
-  deTab <- data_deTab()
-  deTab
-})
+## Biological Process (BP)
+## Cellular Component (CC)
+## Molecular Function (MF)
 
-## Selected data points plots
-output[["selected_clicked_plots"]] <- DT::renderDataTable({
+## get and create gene ontology enrichment
+get_go <- reactive({
   tryCatch({
     checkReload()
-    ids <- unique(c(input$normalized_counts_rows_selected,
-                    input$all_genes_table_rows_selected,
-                    input$deg_table_rows_selected))
-    s <- event_data(event = "plotly_selected", source = "analysis_plots")
-    
-    table_select <- rownames(inUse_deTab[ids,])
-    plot_select <- append(table_select, s$key)
-    DT::datatable(inUse_deTab[plot_select,], options = list(pageLength = 15, scrollX = TRUE))
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
-## Voom plot
-output[["voom_plot"]] <- renderPlotly({
-  tryCatch({
-    checkReload()
-    ids <- unique(c(input$normalized_counts_rows_selected,
-                    input$all_genes_table_rows_selected,
-                    input$deg_table_rows_selected))
-    s <- event_data(event = "plotly_selected", source = "analysis_plots")
-    
-    table_select <- rownames(inUse_deTab[ids,])
-    plot_select <- append(s$key, table_select)
-    voomPlot(inUse_normDge, inUse_deTab, plot_select)
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
-## Residual variances :::: NOT IN AT THE MOMENT
-output[["res_var"]] <- renderPlotly({
-  tryCatch({
-    checkReload()
-    if (isTRUE(input$choose_analysis)) {
-      residualVariancePlot(deTab)
+    organism <- get_organismID(inUse_deTab)
+    org <- list(ENS="org.Hs.eg.db",
+                ENSMUS="org.Mm.eg.db")
+    organism <- org[[organism]]
+    if (isTRUE(input$choose_go)) {
+      enrich <- clusterProfiler::enrichGO(inUse_deTab$entrez[inUse_deTab$DE!=0],  ont = input$selectOntology, organism, pvalueCutoff=0.05)
     } else {
-      residualVariancePlot(get_deTab())
+      set.seed(1234)
+      geneList <- get_geneList(inUse_deTab)
+      enrich <- clusterProfiler::gseGO(geneList, ont = input$selectOntology, organism, nPerm=10000, pvalueCutoff=0.05, verbose=FALSE, seed=TRUE)
     }
+    enrich
   }, error = function(err) {
     return(NULL)
   })
 })
 
-## DE ratio
-output[["de_ratio"]] <- renderPlotly({
+## create gene ontology enrichment table
+output[["go_data_table"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
-    deRatioPlot(inUse_deTab)
+    enrich <- as.data.frame(get_go())
+    enrich <- enrich[ , -c(1, (ncol(enrich)-1):ncol(enrich))]
+    DT::datatable(enrich, options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(NULL)
   })
 })
 
-## Mean-Difference (MA) plots
-output[["ma_plot"]] <- renderPlotly({
+## create barplot with gene ontology enrichment terms
+output[["go_barplot"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    ids <- unique(c(input$normalized_counts_rows_selected,
-                    input$all_genes_table_rows_selected,
-                    input$deg_table_rows_selected))
-    s <- event_data(event = "plotly_selected", source = "analysis_plots")
+    enrich <- as.data.frame(get_go())
+    enrichBarplot(enrich, input$bar_go_slider, input$bar_go_value)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## create cnet plot with gene ontology input
+output[["cnet_go_plot"]] <- renderPlotly({
+  tryCatch({
+    checkReload()
+    enrich <- get_go()
     
-    table_select <- rownames(inUse_deTab[ids,])
-    plot_select <- append(s$key, table_select)
-    ma_plot(inUse_deTab, plot_select)
+    geneSets <- extract_geneSets(enrich, input$cnet_go_slider)
+    graphData <- cnetPlotly(enrich, inUse_deTab, input$cnet_go_slider)
+    plotlyGraph(graphData, "Gene-Concept Network", "Log2FC", length(geneSets))
   }, error = function(err) {
     return(NULL)
   })
 })
 
-## Volcano plots
-output[["volcano_plot"]] <- renderPlotly({
+## get all genes of cnet plot
+output[["cnet_go_table"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
-    ids <- unique(c(input$normalized_counts_rows_selected,
-                    input$all_genes_table_rows_selected,
-                    input$deg_table_rows_selected))
-    s <- event_data(event = "plotly_selected", source = "analysis_plots")
+    enrich <- get_go()
     
-    table_select <- rownames(inUse_deTab[ids,])
-    plot_select <- append(s$key, table_select)
-    volcanoPlot(inUse_deTab, input$vulcanoLogCut, -log10(input$vulcanoPCut), plot_select)
+    geneSets <- extract_geneSets(enrich, input$cnet_go_slider)
+    graphData <- cnetPlotly(enrich, inUse_deTab, input$cnet_go_slider)
+    DT::datatable(inUse_deTab[inUse_deTab$geneName %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(NULL)
   })
 })
 
-## Barcode plot
-output[["barcode_plot"]] <- renderPlotly({
+## create gene ontology plot with all pathways
+output[["gsea_go_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    ids <- unique(c(input$normalized_counts_rows_selected,
-                    input$all_genes_table_rows_selected,
-                    input$deg_table_rows_selected))
-    s <- event_data(event = "plotly_selected", source = "analysis_plots")
-    
-    table_select <- rownames(inUse_deTab[ids,])
-    plot_select <- append(s$key, table_select)
-    barcodePlot(inUse_deTab, inUse_normDge, input$group_by4, plot_select)
+    enrich <- get_go()
+    graphData <- emap_plotly(enrich)
+    plotlyGraph(graphData, input$selectOntology, "P-Value", 0)
   }, error = function(err) {
     return(NULL)
   })
 })
 
-## P value plots
-output[["p_val_plot"]] <- renderPlotly({
+## Show dropdown of all found gene ontology pathways
+output[["select_go_pathway"]] <- renderUI({
   tryCatch({
     checkReload()
-    pValuePlot(inUse_deTab)
+    enrich <- as.data.frame(get_go())
+    selectInput("go_select", "Select a pathway:",
+                enrich$Description
+    )
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## show selected pathway from gene ontology
+output[["pathway_from_go"]] <- renderUI({
+  tryCatch({
+    checkReload()
+    enrich <- as.data.frame(get_go())
+    getpathway <- rownames(enrich)[enrich$Description %in% input$go_select]
+    getFromGo <- paste('<img src="https://www.ebi.ac.uk/QuickGO/services/ontology/go/terms/', getpathway, '/chart">', sep="")
+    getFromGo <- HTML(paste('<a href="https://www.ebi.ac.uk/QuickGO/GTerm?id=', getpathway, '" target="_blank">\n', getFromGo, '\n</a>', sep=""))
+    getFromGo
   }, error = function(err) {
     return(NULL)
   })

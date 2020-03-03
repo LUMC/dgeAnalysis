@@ -55,7 +55,7 @@ design_value <- reOrderDesign(matrix_value, design_value, data_samples)
 # FILTER DATA IF NESSECARY
 
 #Filter if nessecary
-data_samples <- data_samples[!rownames(data_samples) %in% excluded_samples,]
+data_samples <- data_samples[!rownames(data_samples) %in% excluded_samples, , drop=FALSE]
 data_counts <- data_counts[,!colnames(data_counts) %in% excluded_samples]
 
 ```
