@@ -75,7 +75,7 @@ alpha
 
 ```{r showRawData}
 # SHOW RAW DATA
-save(data_counts, data_samples, file="test.RData")
+
 se <- readCountsFromTable(data_counts, data_samples)
 
 alignmentSummaryPlot(se)
