@@ -5,9 +5,21 @@ tab_analysis <- tabItem(
   br(),
   
   tabsetPanel(
-    tabPanel("Voom",
+    tabPanel("DE table",
              HTML('<hr style="border-color: #0088cc;">'),
-             plotlyOutput("voom_plot", height = "600px") %>% withSpinner()
+             radioButtons(
+               "setdeTab",
+               "Show selection:",
+               inline = TRUE,
+               c("All genes" = "all",
+                 "DE genes" = "deg")
+             ),
+             fluidRow(
+               column(
+                 12,
+                 DT::dataTableOutput("detab_table") %>% withSpinner())
+             ),
+             HTML('<hr style="border-color: #0088cc;">')
     ),
     tabPanel("DE ratio",
              HTML('<hr style="border-color: #0088cc;">'),

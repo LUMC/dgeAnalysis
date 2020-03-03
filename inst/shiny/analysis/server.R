@@ -5,48 +5,14 @@ get_deTab <- reactive({
   deTab
 })
 
-## Selected data points plots
-output[["selected_clicked_plots"]] <- DT::renderDataTable({
+## Set deTab table
+output[["detab_table"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
-    ids <- unique(c(input$normalized_counts_rows_selected,
-                    input$all_genes_table_rows_selected,
-                    input$deg_table_rows_selected))
-    s <- event_data(event = "plotly_selected", source = "analysis_plots")
-    
-    table_select <- rownames(inUse_deTab[ids,])
-    plot_select <- append(table_select, s$key)
-    DT::datatable(inUse_deTab[plot_select,], options = list(pageLength = 15, scrollX = TRUE))
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
-## Voom plot
-output[["voom_plot"]] <- renderPlotly({
-  tryCatch({
-    checkReload()
-    ids <- unique(c(input$normalized_counts_rows_selected,
-                    input$all_genes_table_rows_selected,
-                    input$deg_table_rows_selected))
-    s <- event_data(event = "plotly_selected", source = "analysis_plots")
-    
-    table_select <- rownames(inUse_deTab[ids,])
-    plot_select <- append(s$key, table_select)
-    voomPlot(inUse_normDge, inUse_deTab, plot_select)
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
-## Residual variances :::: NOT IN AT THE MOMENT
-output[["res_var"]] <- renderPlotly({
-  tryCatch({
-    checkReload()
-    if (isTRUE(input$choose_analysis)) {
-      residualVariancePlot(deTab)
+    if (input$setdeTab == "all") {
+      DT::datatable(inUse_deTab, options = list(pageLength = 50, scrollX = TRUE))
     } else {
-      residualVariancePlot(get_deTab())
+      DT::datatable(inUse_deTab[inUse_deTab$DE != 0,], options = list(pageLength = 50, scrollX = TRUE))
     }
   }, error = function(err) {
     return(NULL)

@@ -61,19 +61,18 @@ output[["matrix_value"]] <- renderUI({
     
     choice <- NULL
     for (col in input$design_value) {
-      for (x in combn(levels(droplevels(data_samples())[[col]]), 2, simplify = FALSE)) {
-        choice <- c(choice, gsub(",", " -", toString(x)))
-      }
-      for (x in combn(rev(levels(droplevels(data_samples())[[col]])), 2, simplify = FALSE)) {
-        choice <- c(choice, gsub(",", " -", toString(x)))
+      for (x in combn(unique(data_samples()[[col]]), 2, simplify = FALSE)) {
+        choice <- c(choice, paste(as.character(x), collapse=" - "))
+        choice <- c(choice, paste(as.character(rev(x)), collapse=" - "))
       }
     }
-    
+  
     selectInput("matrix_value",
                 "Select values to compare:",
                 choices = choice
     )
   }, error = function(err) {
+    print(err)
     return(NULL)
   })
 })

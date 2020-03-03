@@ -54,6 +54,9 @@ server <- function(input, output, session) {
   source("shiny/analysis/server.R", local = TRUE)
   source("shiny/bias/server.R", local = TRUE)
   source("shiny/enrichment/kegg/server.R", local = TRUE)
+  source("shiny/enrichment/reactome/server.R", local = TRUE)
+  source("shiny/enrichment/go/server.R", local = TRUE)
+  source("shiny/enrichment/do/server.R", local = TRUE)
   source("shiny/export/server.R", local = TRUE)
 
 }

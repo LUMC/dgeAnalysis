@@ -10,6 +10,9 @@ source("shiny/heatmaps/UI.R", local = TRUE)
 source("shiny/analysis/UI.R", local = TRUE)
 source("shiny/bias/UI.R", local = TRUE)
 source("shiny/enrichment/kegg/UI.R", local = TRUE)
+source("shiny/enrichment/reactome/UI.R", local = TRUE)
+source("shiny/enrichment/go/UI.R", local = TRUE)
+source("shiny/enrichment/do/UI.R", local = TRUE)
 source("shiny/export/UI.R", local = TRUE)
 
 
@@ -42,6 +45,9 @@ ui <- dashboardPage(
       tab_analysis,
       tab_bias,
       tab_enrich_kegg,
+      tab_enrich_reactome,
+      tab_enrich_go,
+      tab_enrich_do,
       tab_export
     )
   )

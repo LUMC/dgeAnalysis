@@ -129,10 +129,10 @@ quaternary_enrichment <- function(deTab){
 
 ## ----- ALIGNMENT PLOTS -----
 
-alignmentSummaryPlot <- function(se, percent=T){
+alignmentSummaryPlot <- function(se, perc=T){
   lse <- alignmentSummary(se)
   
-  if (percent) {
+  if (perc) {
     for (var in unique(lse$sample)) {
       temp <- lse[lse$sample == var, ]
       lse$count[lse$sample == var] <- temp$count/(sum(temp$count))
@@ -187,7 +187,7 @@ complexityPlot <- function(se, perc=T) {
                  x = ~rank,
                  y = ~fraction,
                  color = ~sample,
-                 type = "scatter",
+                 type = "scattergl",
                  mode="lines+markers") %>%
       plotly::layout(xaxis = list(title = 'Rank', type="log"),
                      title = "Gene complexity %",
@@ -205,7 +205,7 @@ complexityPlot <- function(se, perc=T) {
                  x = ~rank,
                  y = ~value,
                  color = ~sample,
-                 type = "scatter",
+                 type = "scattergl",
                  mode="lines+markers") %>%
       plotly::layout(xaxis = list(title = 'Rank', type="log"),
                      title = "Gene complexity",
@@ -229,7 +229,7 @@ complexityPlot <- function(se, perc=T) {
 countDistributionLinePlot <- function(dge){
   stackCounts <- data.frame(stackDge(dge))
   
-  p <- plot_ly(type = 'scatter',
+  p <- plot_ly(type = 'scattergl',
                mode = 'lines',
                source="dist_line") %>%
     plotly::layout(xaxis = list(title = 'Log2CPM'),
@@ -287,7 +287,7 @@ countDistributionBoxPlot <- function(dge){
 countPerSampleLinePlot <- function(dge){
   counts <- dge$counts
   
-  p <- plot_ly(type = 'scatter',
+  p <- plot_ly(type = 'scattergl',
                mode = 'lines') %>% 
     plotly::layout(xaxis = list(title = 'Counts'),
            yaxis = list(title = 'Density'))
@@ -330,7 +330,7 @@ multidimensionalScaling2dPlot <- function(dge, color, type){
   p <- plot_ly(for_plots,
                x = ~X1,
                y = ~X2,
-               type = "scatter",
+               type = "scattergl",
                mode = "markers",
                color = ~for_plots$group,
                text = rownames(for_plots),
@@ -426,7 +426,7 @@ samplePca2dPlot <- function(dge, color){
   p <- plot_ly(pca,
                x=~PC1,
                y=~PC2, 
-               type = "scatter",
+               type = "scattergl",
                mode = "markers",
                color=~pca$group,
                text = rownames(pca),
@@ -490,7 +490,7 @@ genesPca2dPlot <- function(dge, color){
   p <- plot_ly(pca,
                x=~Comp.1,
                y=~Comp.2,
-               type = "scatter",
+               type = "scattergl",
                mode = "markers",
                color=~as.character(k$cluster),
                text = rownames(pca),
@@ -626,7 +626,7 @@ voomPlot <- function(dge, deTab, ps){
   
   p <- plot_ly(x = ~v$voom.xy$x,
                y = ~v$voom.xy$y,
-               type = "scatter",
+               type = "scattergl",
                mode = "markers",
                color = "Voom",
                alpha = 0.75,
@@ -671,7 +671,7 @@ residualVariancePlot <- function(deTab){
   p <- plot_ly(
             x = ~deTab$AveExpr,
             y = ~log2(deTab$sigma),
-            type = "scatter",
+            type = "scattergl",
             mode = "markers",
             alpha = 0.75,
             text = rownames(deTab$genes),
@@ -723,7 +723,7 @@ ma_plot <- function(deTab, ps){
   p <- plot_ly(deTab[deTab$DE == 0,],
                x=~avgLog2CPM,
                y=~avgLog2FC,
-               type = "scatter",
+               type = "scattergl",
                mode = "markers",
                color=~as.character(DE),
                alpha = 0.75,
@@ -787,7 +787,7 @@ volcanoPlot <- function(deTab, LogCut, PCut, ps){
   p <- plot_ly(deTab[deTab$DE == 0,],
                x=~avgLog2FC,
                y=~-log10(adj.P.Val),
-               type = "scatter",
+               type = "scattergl",
                mode = "markers",
                color=~as.character(DE),
                alpha = 0.75,
@@ -855,7 +855,7 @@ barcodePlot <- function(deTab, dge, color, ps) {
   stack1 <- as.data.frame(stack(getnorm$counts))
   stack1$group <- getnorm$samples[[color]][stack1$col]
   
-  p <- plot_ly(type = "scatter",
+  p <- plot_ly(type = "scattergl",
                mode = "markers",
                marker = list(symbol = "line-ns-open",
                              size = 12,
@@ -917,7 +917,7 @@ biasPlot <- function(deTab, biasColumn, log) {
   p <- plot_ly(deTab,
                x = ~get(biasColumn),
                y = ~avgLog2FC,
-               type = 'scatter',
+               type = 'scattergl',
                mode = "markers",
                color = ~adj.P.Val,
                alpha = 0.75,
@@ -1162,7 +1162,7 @@ plotlyGraph <- function(g, pwName, getColor, cnet){
   network <- plot_ly(
     x = ~L_genesNA$V1,
     y = ~L_genesNA$V2,
-    type = "scatter",
+    type = "scattergl",
     mode = "markers",
     marker=list(size=12,
                 color="white",
@@ -1177,7 +1177,7 @@ plotlyGraph <- function(g, pwName, getColor, cnet){
     add_trace(
       x = ~L_genes$V1,
       y = ~L_genes$V2,
-      type = "scatter",
+      type = "scattergl",
       mode = "markers",
       marker=list(size=12,
                   color=as.numeric(vs$color),
@@ -1207,8 +1207,9 @@ plotlyGraph <- function(g, pwName, getColor, cnet){
     
     edge_shape = list(
       type = "line",
-      line = list(color = "#030303", width = 0.25),
+      line = list(color = "#030303", width = 0.15),
       layer='below',
+      showarrow = TRUE,
       x0 = v0$V1,
       y0 = v0$V2,
       x1 = v1$V1,
@@ -1237,6 +1238,21 @@ plotlyGraph <- function(g, pwName, getColor, cnet){
     )
   p
 }
+#add_annotations(
+#  x = L[as.character(es$V2),]$V1,
+#  y = L[as.character(es$V2),]$V2,
+#  xref = "x", yref = "y",
+#  axref = "x", ayref = "y",
+#  text = "",
+#  arrowcolor = "#030303",
+#  captureevents = TRUE,
+#  arrowwidth = 0.1,
+#  arrowsize = 15,
+#  showarrow = T,
+#  ax = L[as.character(es$V1),]$V1,
+#  ay = L[as.character(es$V1),]$V2,
+#  standoff=5
+#)
 
 ## --------------------------------------------------------------------------
 
@@ -1310,7 +1326,7 @@ reNameDesign <- function(design, normDge) {
 vennDiagram <- function(){
   p <- plot_ly(x = c(0.2, 0.75, 1.3),
                y = c(0.75, 0.75, 0.75),
-               type='scatter',
+               type='scattergl',
                text = c('A', 'A+B', 'B'),
                mode = 'text',
                textfont = list(size = 18)

@@ -10,19 +10,12 @@ get_secounts <- reactive({
 output[["align_sum"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    se <- get_secounts()
-    save(se, file="test.RData")
-    alignmentSummaryPlot(get_secounts(), perc = F)
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
-## Create alignment summary percentage plot
-output[["align_sum_perc"]] <- renderPlotly({
-  tryCatch({
-    checkReload()
-    alignmentSummaryPlot(get_secounts())
+    if (input$setSummary == "actual"){
+      perc = F
+    } else {
+      perc = T
+    }
+    alignmentSummaryPlot(get_secounts(), perc)
   }, error = function(err) {
     return(NULL)
   })
@@ -32,17 +25,12 @@ output[["align_sum_perc"]] <- renderPlotly({
 output[["complex"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    complexityPlot(get_secounts(), perc = F)
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
-## Create complexity percentage plot
-output[["complex_perc"]] <- renderPlotly({
-  tryCatch({
-    checkReload()
-    complexityPlot(get_secounts())
+    if (input$setComplexity == "actual"){
+      perc = F
+    } else {
+      perc = T
+    }
+    complexityPlot(get_secounts(), perc)
   }, error = function(err) {
     return(NULL)
   })
