@@ -200,7 +200,7 @@ deTab <- rename(deTab, "P.Value" = "PValue")
 ```{r showDGEResult}
 # SHOW DGE RESULTS
 
-ma_plot(deTab, NULL)
+ma_plot(deTab)
 pValuePlot(deTab)
 
 ```

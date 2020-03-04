@@ -200,7 +200,7 @@ if (setGeneName == "symbol" && !is.null(data_annotation)) {
 ```{r showDGEResult}
 # SHOW DGE RESULTS
 
-ma_plot(deTab, NULL)
+ma_plot(deTab)
 pValuePlot(deTab)
 
 ```
