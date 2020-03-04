@@ -97,10 +97,10 @@ enrichBarplot <- function(enrich, amount, value){
            yaxis = list(title = '')) %>%
     config(
       toImageButtonOptions = list(
-        format = "svg",
+        format = "png",
         filename = "enrichbar",
-        width = 750,
-        height = 500
+        width = 1500,
+        height = 1000
       )
     )
   p
@@ -270,10 +270,10 @@ plotlyGraph <- function(g, pwName, getColor, cnet){
   ) %>%
     config(
       toImageButtonOptions = list(
-        format = "svg",
+        format = "png",
         filename = "enrichnet",
-        width = 750,
-        height = 500
+        width = 1500,
+        height = 1000
       )
     )
   p

@@ -3,28 +3,32 @@
 
 alignmentSummaryPlot <- function(se, perc=T){
   lse <- alignmentSummary(se)
+  lse$feature <- gsub("_", " ", gsub("__", "", lse$feature))
   
   if (perc) {
     for (var in unique(lse$sample)) {
       temp <- lse[lse$sample == var, ]
       lse$count[lse$sample == var] <- temp$count/(sum(temp$count))
     }
+    
     p <- plot_ly(lse,
                  x = ~count,
                  y = ~sample,
                  orientation='h',
-                 color = ~gsub("_", " ", gsub("__", "", feature)),
-                 type = "bar") %>% 
+                 color = ~feature,
+                 type = "bar",
+                 text = ~paste(feature, round(count*100, 2), '%\n'),
+                 hoverinfo = 'text') %>% 
       plotly::layout(xaxis = list(title = 'Counts', tickformat = "%"),
                      title = "Count assignments %",
-             yaxis = list(title = ''),
-             barmode = 'stack') %>%
+                     yaxis = list(title = ''),
+                     barmode = 'stack') %>%
       config(
         toImageButtonOptions = list(
-          format = "svg",
+          format = "png",
           filename = "alignment_perc",
-          width = 750,
-          height = 500
+          width = 1500,
+          height = 1000
         )
       )
   } else {
@@ -32,18 +36,20 @@ alignmentSummaryPlot <- function(se, perc=T){
                  x = ~count,
                  y = ~sample,
                  orientation='h',
-                 color = ~gsub("_", " ", gsub("__", "", feature)),
-                 type = "bar") %>% 
+                 color = ~feature,
+                 type = "bar",
+                 text = ~paste(feature, formatC(count, format="f", big.mark=".", digits=0), 'Reads\n'),
+                 hoverinfo = 'text') %>% 
       plotly::layout(xaxis = list(title = 'Counts'),
                      title = "Count assignments",
-             yaxis = list(title = ''),
-             barmode = 'stack') %>%
+                     yaxis = list(title = ''),
+                     barmode = 'stack') %>%
       config(
         toImageButtonOptions = list(
-          format = "svg",
+          format = "png",
           filename = "alignment",
-          width = 750,
-          height = 500
+          width = 1500,
+          height = 1000
         )
       )
   }
@@ -60,16 +66,18 @@ complexityPlot <- function(se, perc=T) {
                  y = ~fraction,
                  color = ~sample,
                  type = "scattergl",
-                 mode="lines+markers") %>%
+                 mode = "lines+markers",
+                 text = ~paste(rank, "Genes\n", round(fraction*100, 2), '% Reads\n'),
+                 hoverinfo = 'text') %>%
       plotly::layout(xaxis = list(title = 'Rank', type="log"),
                      title = "Gene complexity %",
              yaxis = list(tickformat = "%", title = 'Cumulative fraction of total reads till rank')) %>%
       config(
         toImageButtonOptions = list(
-          format = "svg",
+          format = "png",
           filename = "complexity_perc",
-          width = 750,
-          height = 500
+          width = 1500,
+          height = 1000
         )
       )
   } else {
@@ -78,16 +86,18 @@ complexityPlot <- function(se, perc=T) {
                  y = ~value,
                  color = ~sample,
                  type = "scattergl",
-                 mode="lines+markers") %>%
+                 mode = "lines+markers",
+                 text = ~paste(rank, "Genes\n", formatC(value, format="f", big.mark=".", digits=0), 'Reads\n'),
+                 hoverinfo = 'text') %>%
       plotly::layout(xaxis = list(title = 'Rank', type="log"),
                      title = "Gene complexity",
              yaxis = list(title = 'Cumulative reads till rank')) %>%
       config(
         toImageButtonOptions = list(
-          format = "svg",
+          format = "png",
           filename = "complexity",
-          width = 750,
-          height = 500
+          width = 1500,
+          height = 1000
         )
       )
   }
@@ -109,10 +119,10 @@ countDistributionLinePlot <- function(dge){
            yaxis = list(title = 'Density')) %>%
     config(
       toImageButtonOptions = list(
-        format = "svg",
+        format = "png",
         filename = "countdistline",
-        width = 750,
-        height = 500
+        width = 1500,
+        height = 1000
       )
     )
   for (var in unique(stackCounts$sample)) {
@@ -121,7 +131,9 @@ countDistributionLinePlot <- function(dge){
     p <- add_trace(p,
                    x = density$x,
                    y = density$y,
-                   name=var,
+                   name = var,
+                   text = var,
+                   hoverinfo = 'text',
                    fill = 'tozeroy',
                    alpha = 0.05)
   }
@@ -135,26 +147,60 @@ countDistributionBoxPlot <- function(dge){
                boxpoints = FALSE) %>%
     config(
       toImageButtonOptions = list(
-        format = "svg",
+        format = "png",
         filename = "countdistbox",
-        width = 750,
-        height = 500
+        width = 1500,
+        height = 1000
       )
     )
   for (var in unique(stackCounts$sample)) {
     temp <- stackCounts[stackCounts$sample == var, ]
     p <- add_trace(p,
                    y = temp$logCPM,
-                   name=var,
+                   name = var,
                    alpha = 0.5) %>%
       plotly::layout(xaxis = list(title = ''),
                      title = "Gene count distribution",
-             yaxis = list(title = 'Log2CPM'))
+                     yaxis = list(title = 'Log2CPM'))
   }
   p
 }
 
-multidimensionalScaling2dPlot <- function(dge, color, type){
+voomPlot <- function(dge, sourceId){
+  v <- voom(2^(dge$counts), save.plot = TRUE)
+  
+  p <- plot_ly(x = ~v$voom.xy$x,
+               y = ~v$voom.xy$y,
+               type = "scattergl",
+               mode = "markers",
+               color = "Voom",
+               alpha = 0.75,
+               text = names(v$voom.xy$x),
+               hoverinfo = 'text',
+               key = ~names(v$voom.xy$x),
+               source=sourceId) %>%
+    add_trace(mode = "lines",
+              x = v$voom.line$x,
+              y = v$voom.line$y,
+              line = list(color = "rgba(7, 164, 181, 1)"),
+              name = "Voom average") %>%
+    plotly::layout(xaxis = list(title = 'Average Log2 Count'),
+                   title = "Voom",
+                   yaxis = list(title = 'SQRT(Standard Deviation)'),
+                   clickmode = "event+select",
+                   dragmode = "select") %>%
+    config(
+      toImageButtonOptions = list(
+        format = "png",
+        filename = sourceId,
+        width = 1500,
+        height = 1000
+      )
+    )
+  p
+}
+
+multidimensionalScaling2dPlot <- function(dge, color, sourceId){
   logFC <- plotMDS(dge$counts, ndim = ncol(dge)-1)
   for_plots <- data.frame(logFC$cmdscale.out)
   for_plots$group <- dge$samples[,color]
@@ -171,7 +217,7 @@ multidimensionalScaling2dPlot <- function(dge, color, type){
                              line = list(color = '#999999',
                                          width = 1)),
                key = ~rownames(for_plots),
-               source=paste(type, "un_cluster_2d", sep="")) %>%
+               source=sourceId) %>%
     plotly::layout(title = paste("MDS Plot, Grouped By:", color),
                    xaxis = list(title = 'MDS1'),
                    yaxis = list(title = 'MDS2'),
@@ -179,10 +225,10 @@ multidimensionalScaling2dPlot <- function(dge, color, type){
            dragmode = "select") %>%
     config(
       toImageButtonOptions = list(
-        format = "svg",
-        filename = "mds2d",
-        width = 750,
-        height = 500
+        format = "png",
+        filename = sourceId,
+        width = 150,
+        height = 1000
       )
     )
   p
@@ -207,10 +253,10 @@ multidimensionalScaling3dPlot <- function(dge, color){
                    zaxis = list(title = 'MDS3')) %>%
     config(
       toImageButtonOptions = list(
-        format = "svg",
+        format = "png",
         filename = "mds3d",
-        width = 750,
-        height = 500
+        width = 1500,
+        height = 1000
       )
     )
   p
@@ -236,10 +282,10 @@ variancePcaPlot <- function(dge){
            yaxis = list(title = 'Percentage', tickformat = ".2%")) %>%
     config(
       toImageButtonOptions = list(
-        format = "svg",
+        format = "png",
         filename = "pcascree",
-        width = 750,
-        height = 500
+        width = 1500,
+        height = 1000
       )
     )
   p
@@ -267,16 +313,16 @@ samplePca2dPlot <- function(dge, color){
                              line = list(color = '#999999',
                                          width = 1)),
                key = ~rownames(pca),
-               source="samples_pca_2d") %>%
+               source="pca_pca2d") %>%
     plotly::layout(title = 'PCA 2D',
            clickmode = "event+select",
            dragmode = "select") %>%
     config(
       toImageButtonOptions = list(
-        format = "svg",
+        format = "pngg",
         filename = "pca2d",
-        width = 750,
-        height = 500
+        width = 1500,
+        height = 1000
       )
     )
   p
@@ -303,10 +349,10 @@ samplePca3dPlot <- function(dge, color){
     plotly::layout(title = 'PCA 3D') %>%
     config(
       toImageButtonOptions = list(
-        format = "svg",
+        format = "png",
         filename = "pca3d",
-        width = 750,
-        height = 500
+        width = 1500,
+        height = 1000
       )
     )
   p
@@ -334,10 +380,10 @@ variableHeatmapPlot <- function(dge){
            yaxis = list(title = '')) %>%
     config(
       toImageButtonOptions = list(
-        format = "svg",
+        format = "png",
         filename = "heatmapvar",
-        width = 750,
-        height = 500
+        width = 1500,
+        height = 1000
       )
     )
   p
@@ -362,10 +408,10 @@ topDgeHeatmapPlot <- function(deTab, dge){
                         autorange = "reversed")) %>%
     config(
       toImageButtonOptions = list(
-        format = "svg",
+        format = "png",
         filename = "heatmapdge",
-        width = 750,
-        height = 500
+        width = 1500,
+        height = 1000
       )
     )
   p
@@ -374,51 +420,6 @@ topDgeHeatmapPlot <- function(deTab, dge){
 ## --------------------------------------------------------------------------
 
 ## ----- ANALYSIS PLOTS -----
-
-voomPlot <- function(dge, deTab, ps){
-  v <- voom(2^(dge$counts), save.plot = TRUE)
-  
-  p <- plot_ly(x = ~v$voom.xy$x,
-               y = ~v$voom.xy$y,
-               type = "scattergl",
-               mode = "markers",
-               color = "Voom",
-               alpha = 0.75,
-               text = names(v$voom.xy$x),
-               hoverinfo = 'text',
-               key = ~names(v$voom.xy$x),
-               source="analysis_plots") %>%
-    add_trace(data = deTab[rownames(deTab) %in% ps,],
-              x=~v$voom.xy$x[names(v$voom.xy$x) %in% ps],
-              y=~v$voom.xy$y[names(v$voom.xy$y) %in% ps],
-              color="Selected",
-              marker = list(
-                color = '#d62728'
-              ),
-              alpha = 0.75,
-              text = names(v$voom.xy$x[names(v$voom.xy$x) %in% ps]),
-              hoverinfo = 'text',
-              key = ~names(v$voom.xy$x[names(v$voom.xy$x) %in% ps])) %>%
-    add_trace(mode = "lines",
-              x = v$voom.line$x,
-              y = v$voom.line$y,
-              line = list(color = 'rgb(255, 127, 14, 0.75)'),
-              name = "Voom average") %>%
-    plotly::layout(xaxis = list(title = 'Average Log2 Count'),
-                   title = "Voom",
-           yaxis = list(title = 'SQRT(Standard Deviation)'),
-           clickmode = "event+select",
-           dragmode = "select") %>%
-    config(
-      toImageButtonOptions = list(
-        format = "svg",
-        filename = "voom",
-        width = 750,
-        height = 500
-      )
-    )
-  p
-}
 
 deRatioPlot <- function(deTab){
   defeatures <- aggregate(deTab$DE, by=list(category=deTab$DE), FUN=length)
@@ -433,26 +434,27 @@ deRatioPlot <- function(deTab){
                y = ~perc,
                color = ~category,
                type = "bar",
-               text = defeatures[,2],
+               text = paste(defeatures[,2], "Genes\n", round(defeatures$perc*100, 2), "%"),
                textposition = "auto",
-               textfont=list(color="black"),
+               textfont= list(color="black"),
+               hovertext = ~paste(category, "expressed"),
                hoverinfo = 'text') %>%
-    plotly::layout(barmode = 'stack',
+    plotly::layout(
            xaxis = list(title = ""),
            title = "Differential expression ratio",
            yaxis = list(tickformat = "%", title = "Ratio")) %>%
     config(
       toImageButtonOptions = list(
-        format = "svg",
+        format = "png",
         filename = "dgeratio",
-        width = 750,
-        height = 500
+        width = 1500,
+        height = 1000
       )
     )
   p
 }
 
-ma_plot <- function(deTab, ps){
+ma_plot <- function(deTab){
   prediction <- gamConfidenceFit(deTab, "avgLog2CPM")
   
   p <- plot_ly(deTab[deTab$DE == 0,],
@@ -465,7 +467,7 @@ ma_plot <- function(deTab, ps){
                text = rownames(deTab[deTab$DE == 0,]),
                hoverinfo = 'text',
                key = ~rownames(deTab[deTab$DE == 0,]),
-               source="analysis_plots") %>%
+               source="analysis_ma") %>%
     add_trace(x=~deTab[deTab$DE != 0,]$avgLog2CPM,
               y=~deTab[deTab$DE != 0,]$avgLog2FC,
               color=as.character(deTab[deTab$DE != 0,]$DE),
@@ -473,17 +475,6 @@ ma_plot <- function(deTab, ps){
               text = rownames(deTab[deTab$DE != 0,]),
               hoverinfo = 'text',
               key = ~rownames(deTab[deTab$DE != 0,])) %>%
-    add_trace(data = deTab[rownames(deTab) %in% ps,],
-              x=~avgLog2CPM,
-              y=~avgLog2FC,
-              color="Selected",
-              marker = list(
-                color = '#d62728'
-              ),
-              alpha = 0.75,
-              text = rownames(deTab[rownames(deTab) %in% ps,]),
-              hoverinfo = 'text',
-              key = ~rownames(deTab[rownames(deTab) %in% ps,])) %>%
     add_trace(data = prediction,
               mode="lines",
               x = ~avgLog2CPM,
@@ -509,10 +500,10 @@ ma_plot <- function(deTab, ps){
            dragmode = "select") %>%
     config(
       toImageButtonOptions = list(
-        format = "svg",
+        format = "png",
         filename = "ma",
-        width = 750,
-        height = 500
+        width = 1500,
+        height = 1000
       )
     )
   p
@@ -529,7 +520,7 @@ volcanoPlot <- function(deTab, LogCut, PCut, ps){
                text = rownames(deTab[deTab$DE == 0,]),
                hoverinfo = 'text',
                key = ~rownames(deTab[deTab$DE == 0,]),
-               source="analysis_plots") %>%
+               source="analysis_volcano") %>%
     add_trace(x=~deTab[deTab$DE != 0,]$avgLog2FC,
               y=~-log10(deTab[deTab$DE != 0,]$adj.P.Val),
               color=as.character(deTab[deTab$DE != 0,]$DE),
@@ -537,17 +528,6 @@ volcanoPlot <- function(deTab, LogCut, PCut, ps){
               text = rownames(deTab[deTab$DE != 0,]),
               hoverinfo = 'text',
               key = ~rownames(deTab[deTab$DE != 0,])) %>%
-    add_trace(data = deTab[rownames(deTab) %in% ps,],
-              x=~avgLog2FC,
-              y=~-log10(adj.P.Val),
-              color="Selected",
-              marker = list(
-                color = '#d62728'
-              ),
-              alpha = 0.75,
-              text = rownames(deTab[rownames(deTab) %in% ps,]),
-              hoverinfo = 'text',
-              key = ~rownames(deTab[rownames(deTab) %in% ps,])) %>%
     plotly::layout(xaxis = list(title = 'Average Log2 FC'),
                    title = "Volcano",
            yaxis = list(title = '- Log10 P-Value'),
@@ -568,23 +548,22 @@ volcanoPlot <- function(deTab, LogCut, PCut, ps){
     ) %>%
     config(
       toImageButtonOptions = list(
-        format = "svg",
+        format = "png",
         filename = "volcano",
-        width = 750,
-        height = 500
+        width = 1500,
+        height = 1000
       )
     )
   p
 }
 
-barcodePlot <- function(deTab, dge, color, ps) {
+barcodePlot <- function(deTab, dge, color) {
   if (is.null(color)) {
     return(NULL)
   }
   
   sortdeTab <- deTab[order(rank(deTab$adj.P.Val)),]
   sortdeTab <- head(sortdeTab, 25)
-  sortdeTab <- unique(rbind(sortdeTab, deTab[rownames(deTab) %in% ps,]))
   getnorm <- dge[rownames(sortdeTab),]
   getnorm$counts <- getnorm$counts
   stack1 <- as.data.frame(stack(getnorm$counts))
@@ -608,10 +587,10 @@ barcodePlot <- function(deTab, dge, color, ps) {
                         autorange = "reversed")) %>%
     config(
       toImageButtonOptions = list(
-        format = "svg",
+        format = "png",
         filename = "barcode",
-        width = 750,
-        height = 500
+        width = 1500,
+        height = 1000
       )
     )
   p
@@ -630,10 +609,10 @@ pValuePlot <- function(deTab){
            yaxis = list(title = 'Count')) %>%
     config(
       toImageButtonOptions = list(
-        format = "svg",
+        format = "png",
         filename = "pvalue",
-        width = 750,
-        height = 500
+        width = 1500,
+        height = 1000
       )
     )
   p
@@ -682,10 +661,10 @@ biasPlot <- function(deTab, biasColumn, log) {
            yaxis = list(title = 'Average Log2 FC')) %>%
     config(
       toImageButtonOptions = list(
-        format = "svg",
+        format = "png",
         filename = "bias",
-        width = 750,
-        height = 500
+        width = 1500,
+        height = 1000
       )
     )
   p
