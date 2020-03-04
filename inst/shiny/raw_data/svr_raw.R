@@ -19,21 +19,46 @@ output[["dist_boxplot"]] <- renderPlotly({
   })
 })
 
+## Voom plot
+output[["raw_voom_plot"]] <- renderPlotly({
+  tryCatch({
+    checkReload()
+    counts <- get_raw_dge()
+    counts$counts <- counts$counts[!grepl('^__', rownames(counts$counts)),]
+    voomPlot(counts, "raw_voom")
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Selected data points raw_voom_plot
+output[["selected_raw_voom"]] <- DT::renderDataTable({
+  tryCatch({
+    checkReload()
+    s <- event_data(event = "plotly_selected", source = "raw_voom")
+    counts <- data.frame(get_raw_dge()$counts[!grepl('^__', rownames(get_raw_dge()$counts)),])
+    DT::datatable(counts[s$key,], options = list(pageLength = 15, scrollX = TRUE))
+  }, error = function(err) {
+    print(err)
+    return(NULL)
+  })
+})
+
 ## Multidimensional scaling 2D
 output[["un_cluster_2d"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    multidimensionalScaling2dPlot(get_raw_dge(), input$group_by1, "")
+    multidimensionalScaling2dPlot(get_raw_dge(), input$group_by1, "raw_mds2d")
   }, error = function(err) {
     return(NULL)
   })
 })
 
 ## Selected data points un_cluster_2d
-output[["un_cluster_2d_clicked"]] <- DT::renderDataTable({
+output[["selected_raw_mds2d"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
-    s <- event_data(event = "plotly_selected", source = "un_cluster_2d")
+    s <- event_data(event = "plotly_selected", source = "raw_mds2d")
     DT::datatable(data_samples()[s$key,], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(NULL)

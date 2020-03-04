@@ -20,10 +20,10 @@ output[["samples_pca_2d"]] <- renderPlotly({
 })
 
 ## Selected data points samples_pca_2d
-output[["samples_pca_2d_clicked"]] <- DT::renderDataTable({
+output[["selected_pca"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
-    s <- event_data(event = "plotly_selected", source = "samples_pca_2d")
+    s <- event_data(event = "plotly_selected", source = "pca_pca2d")
     DT::datatable(data_samples()[s$key,], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(NULL)

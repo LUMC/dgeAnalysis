@@ -24,13 +24,17 @@ tab_norm_data <- tabItem(
     ),
     tabPanel("Voom",
              HTML('<hr style="border-color: #0088cc;">'),
-             plotlyOutput("voom_plot", height = "600px") %>% withSpinner()
+             plotlyOutput("norm_voom_plot", height = "600px") %>% withSpinner(),
+             HTML('<hr style="border-color: #0088cc;">'),
+             DT::dataTableOutput("selected_norm_voom") %>% withSpinner(),
+             HTML('<hr style="border-color: #0088cc;">')
     ),
     tabPanel("Multidimensional scaling 2D",
              HTML('<hr style="border-color: #0088cc;">'),
              plotlyOutput("norm_un_cluster_2d", height = "600px") %>% withSpinner(),
              HTML('<hr style="border-color: #0088cc;">'),
-             DT::dataTableOutput("norm_un_cluster_2d_clicked") %>% withSpinner()
+             DT::dataTableOutput("selected_norm_mds2d") %>% withSpinner(),
+             HTML('<hr style="border-color: #0088cc;">')
     ),
     tabPanel("Multidimensional scaling 3D",
              HTML('<hr style="border-color: #0088cc;">'),

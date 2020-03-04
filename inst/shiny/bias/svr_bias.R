@@ -18,3 +18,27 @@ output[["len_bias"]] <- renderPlotly({
     return(NULL)
   })
 })
+
+## dropdown with all gc choices
+output[["selectGC"]] <- renderUI({
+  tryCatch({
+    checkReload()
+    selectInput("selectGC", "Show bias based on:",
+                grep('gc$', colnames(inUse_deTab), value=TRUE, ignore.case=TRUE)
+    )
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## dropdown with all length choices
+output[["selectLength"]] <- renderUI({
+  tryCatch({
+    checkReload()
+    selectInput("selectLength", "Show bias based on:",
+                grep('length$', colnames(inUse_deTab), value=TRUE, ignore.case=TRUE)
+    )
+  }, error = function(err) {
+    return(NULL)
+  })
+})

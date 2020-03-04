@@ -1,16 +1,15 @@
 
 server <- function(input, output, session) {
   
-  checkReload <- function(){
-    is.null(input$design_value)
-    is.null(input$matrix_value)
-    is.null(input$cpm_value)
-    is.null(input$alpha_value)
-    is.null(input$setGeneName)
-    is.null(input$analysis_method)
-    is.null(input$sample_data_rows_selected)
-    is.null(input$choose_analysis)
-    is.null(input$run_button)
+  checkReload <- function() {
+    is.null(input$app_mode)
+    is.null(input$file_samples)
+    is.null(input$file_counts)
+    is.null(input$file_annotation)
+    is.null(input$file_samples_view)
+    is.null(input$file_counts_view)
+    is.null(input$file_norm_view)
+    is.null(input$file_detab_view)
   }
 
   output[["sidebar_tabs"]] <- renderMenu({

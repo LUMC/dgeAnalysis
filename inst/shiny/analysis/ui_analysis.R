@@ -27,14 +27,22 @@ tab_analysis <- tabItem(
     ),
     tabPanel("MA",
              HTML('<hr style="border-color: #0088cc;">'),
-             plotlyOutput("ma_plot", height = "600px") %>% withSpinner()
+             plotlyOutput("ma_plot", height = "600px") %>% withSpinner(),
+             br(),
+             HTML('<hr style="border-color: #0088cc;">'),
+             DT::dataTableOutput("selected_ma") %>% withSpinner(),
+             HTML('<hr style="border-color: #0088cc;">')
     ),
     tabPanel("Volcano",
              HTML('<hr style="border-color: #0088cc;">'),
              numericInput("vulcanoLogCut", "LogFC Cutoff", 1, min = 0, max = 25, step=0.01),
              numericInput("vulcanoPCut", "P-Value Cutoff", 0.05, min = 0.001, max = 1, step=0.001),
              HTML('<hr style="border-color: #0088cc;">'),
-             plotlyOutput("volcano_plot", height = "600px") %>% withSpinner()
+             plotlyOutput("volcano_plot", height = "600px") %>% withSpinner(),
+             br(),
+             HTML('<hr style="border-color: #0088cc;">'),
+             DT::dataTableOutput("selected_volcano") %>% withSpinner(),
+             HTML('<hr style="border-color: #0088cc;">')
     ),
     tabPanel("Barcode",
              HTML('<hr style="border-color: #0088cc;">'),
@@ -44,9 +52,5 @@ tab_analysis <- tabItem(
              HTML('<hr style="border-color: #0088cc;">'),
              plotlyOutput("p_val_plot", height = "600px") %>% withSpinner()
     )
-  ),
-  br(),
-  HTML('<hr style="border-color: #0088cc;">'),
-  DT::dataTableOutput("selected_clicked_plots") %>% withSpinner(),
-  HTML('<hr style="border-color: #0088cc;">')
+  )
 )

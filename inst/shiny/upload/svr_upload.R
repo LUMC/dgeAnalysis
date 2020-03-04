@@ -3,13 +3,13 @@ observeEvent(input$app_mode, {
   if (input$app_mode == "new") {
     runjs('$("#show_view_analysis").css({"border-radius": "25px","border": "3px solid rgba(0,0,0,0)"});')
     runjs('$("#show_new_analysis").css({"border-radius": "25px", "border": "3px solid #0088cc"});')
-    inUse_normDge <- normDge
-    inUse_deTab <- deTab
+    inUse_normDge <<- normDge
+    inUse_deTab <<- deTab
   } else {
     runjs('$("#show_new_analysis").css({"border-radius": "25px", "border": "3px solid rgba(0,0,0,0)"});')
     runjs('$("#show_view_analysis").css({"border-radius": "25px", "border": "3px solid #0088cc"});')
-    inUse_normDge <- get_normDge()
-    inUse_deTab <- data_detab()
+    inUse_normDge <<- get_normDge()
+    inUse_deTab <<- data_detab()
   }
   toggle("hide_new_analysis")
   toggle("hide_view_analysis")
