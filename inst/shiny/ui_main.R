@@ -14,12 +14,14 @@ source("shiny/enrichment/reactome/ui_reactome.R", local = TRUE)
 source("shiny/enrichment/go/ui_go.R", local = TRUE)
 source("shiny/enrichment/do/ui_do.R", local = TRUE)
 source("shiny/export/ui_export.R", local = TRUE)
+source("shiny/about/ui_about.R", local = TRUE)
 
 
 ui <- dashboardPage(
   dashboardHeader(
     title = span(tagList(icon("dna"), "dgeAnalysis")),
-    titleWidth = 400
+    titleWidth = 400,
+    tags$li(class = "dropdown", tags$a(textOutput("current_page")))
   ),
   dashboardSidebar(
     collapsed = FALSE,
@@ -48,7 +50,8 @@ ui <- dashboardPage(
       tab_enrich_reactome,
       tab_enrich_go,
       tab_enrich_do,
-      tab_export
+      tab_export,
+      tab_about
     )
   )
 )

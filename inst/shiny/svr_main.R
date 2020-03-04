@@ -3,6 +3,7 @@ server <- function(input, output, session) {
   
   checkReload <- function() {
     is.null(input$app_mode)
+    
     is.null(input$file_samples)
     is.null(input$file_counts)
     is.null(input$file_annotation)
@@ -10,7 +11,36 @@ server <- function(input, output, session) {
     is.null(input$file_counts_view)
     is.null(input$file_norm_view)
     is.null(input$file_detab_view)
+    
+    is.null(input$run_button)
   }
+  
+  pages <- list(
+    home = "Home",
+    upload = "Data upload",
+    run_analysis = "Run Analysis",
+    alignment = "Alignment",
+    raw_data = "Raw Data",
+    norm_data = "Normalization",
+    pca = "PCA",
+    heatmaps = "Heatmaps",
+    analysis = "DE analysis",
+    bias = "Bias",
+    enrich_kegg = "KEGG Enrichment",
+    enrich_reactome = "Reactome Enrichment",
+    enrich_go = "Gene Ontology",
+    enrich_do = "Disease Ontology",
+    export = "Export",
+    about = "About"
+  )
+
+  output[["current_page"]] <- renderText({
+    tryCatch({
+      page_name <- pages[[input$sidebar]]
+    }, error = function(err) {
+      return(NULL)
+    })
+  })
 
   output[["sidebar_tabs"]] <- renderMenu({
     sidebarMenu(id = "sidebar",
@@ -35,6 +65,7 @@ server <- function(input, output, session) {
                menuSubItem("Disease Ontology", tabName = "enrich_do", icon = icon("bezier-curve"))
       ),
       menuItem("Export", tabName = "export", icon = icon("download")),
+      menuItem("About", tabName = "about", icon = icon("info-circle")),
       img(src="lumcLogo.png", width="200px")
     )
   })
@@ -55,5 +86,6 @@ server <- function(input, output, session) {
   source("shiny/enrichment/go/svr_go.R", local = TRUE)
   source("shiny/enrichment/do/svr_do.R", local = TRUE)
   source("shiny/export/svr_export.R", local = TRUE)
+  source("shiny/about/svr_about.R", local = TRUE)
 
 }
