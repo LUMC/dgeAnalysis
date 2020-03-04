@@ -1,7 +1,6 @@
 
 ## Set deTab table
 output[["detab_table"]] <- DT::renderDataTable({
-  print(dim(inUse_deTab))
   tryCatch({
     checkReload()
     if (input$setdeTab == "all") {
