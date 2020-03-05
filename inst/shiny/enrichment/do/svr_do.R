@@ -41,6 +41,17 @@ output[["do_barplot"]] <- renderPlotly({
   })
 })
 
+## barplot slider, set number of values
+output[["bar_do_slider"]] <- renderUI({
+  tryCatch({
+    checkReload()
+    enrich <- as.data.frame(get_do())
+    sliderInput("bar_do_slider", "Amount of shown pathways:", nrow(enrich)/2, min = 1, max = nrow(enrich), step=1)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
 ## create cnet plot with disease input
 output[["cnet_do_plot"]] <- renderPlotly({
   tryCatch({

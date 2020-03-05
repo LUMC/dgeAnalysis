@@ -11,7 +11,8 @@ tab_heatmaps <- tabItem(
       sidebarLayout(
         position = "right",
         sidebarPanel(
-          width = 3
+          width = 3,
+          uiOutput("heatmap_var_ngenes")
         ), 
         mainPanel(
           width = 9,
@@ -27,7 +28,8 @@ tab_heatmaps <- tabItem(
       sidebarLayout(
         position = "right",
         sidebarPanel(
-          width = 3
+          width = 3,
+          uiOutput("heatmap_dge_ngenes")
         ), 
         mainPanel(
           width = 9,

@@ -13,7 +13,47 @@ output[["variance_pca"]] <- renderPlotly({
 output[["samples_pca_2d"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    samplePca2dPlot(inUse_normDge, input$group_by3)
+    samplePca2dPlot(inUse_normDge, input$group_pca2d, input$set_pca2d_pc1, input$set_pca2d_pc2)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Set color of PCA 2d
+output[["group_pca2d"]] <- renderUI({
+  tryCatch({
+    selectInput("group_pca2d", "Color by:",
+                colnames(data_samples())
+    )
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Set color of PCA 2d
+output[["group_pca2d"]] <- renderUI({
+  tryCatch({
+    selectInput("group_pca2d", "Color by:",
+                colnames(data_samples())
+    )
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Set PCs for PCA 2d
+output[["setpc_pca2d"]] <- renderUI({
+  tryCatch({
+    all_pc <- sprintf("PC%s",seq(1:ncol(inUse_normDge$counts)))
+    tagList(
+      selectInput("set_pca2d_pc1", "Select X-axis PC:",
+                  all_pc
+      ),
+      selectInput("set_pca2d_pc2", "Select Y-axis PC:",
+                  all_pc,
+                  selected = "PC2"
+      )
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -35,7 +75,40 @@ output[["selected_pca"]] <- DT::renderDataTable({
 output$samples_pca_3d <- renderPlotly({
   tryCatch({
     checkReload()
-    samplePca3dPlot(inUse_normDge, input$group_by3)
+    samplePca3dPlot(inUse_normDge, input$group_pca3d, input$set_pca3d_pc1, input$set_pca3d_pc2, input$set_pca3d_pc3)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Set color of PCA 3d
+output[["group_pca3d"]] <- renderUI({
+  tryCatch({
+    selectInput("group_pca3d", "Color by:",
+                colnames(data_samples())
+    )
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Set PCs for PCA 3d
+output[["setpc_pca3d"]] <- renderUI({
+  tryCatch({
+    all_pc <- sprintf("PC%s",seq(1:ncol(inUse_normDge$counts)))
+    tagList(
+      selectInput("set_pca3d_pc1", "Select X-axis PC:",
+                  all_pc
+      ),
+      selectInput("set_pca3d_pc2", "Select Y-axis PC:",
+                  all_pc,
+                  selected = "PC2"
+      ),
+      selectInput("set_pca3d_pc3", "Select Z-axis PC:",
+                  all_pc,
+                  selected = "PC3"
+      )
+    )
   }, error = function(err) {
     return(NULL)
   })

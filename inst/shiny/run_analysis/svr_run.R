@@ -1,6 +1,10 @@
 
 ## Start an analysis
 observeEvent(input$run_button, {
+  if (input$app_mode != "new") {
+    showNotification(ui = 'Wrong analysis mode!', duration = 5, type = "error")
+    return(NULL)
+  }
   showModal(modalDialog("Analysis is running...",
                         footer=NULL))
   results <- tryCatch(
@@ -19,9 +23,11 @@ observeEvent(input$run_button, {
       load("markdown/analysis.RData", envir=.GlobalEnv)
       inUse_deTab <<- deTab
       inUse_normDge <<- normDge
+      showNotification(ui = "Analysis has been succesful!", duration = 10, type = "message")
     }, error = function(err) {
+      showNotification(ui = "The analysis failed with an error!", duration = 10, type = "error")
       print(err)
-      return(f)
+      return(NULL)
     }
   )
   removeModal()

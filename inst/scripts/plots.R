@@ -182,6 +182,7 @@ voomPlot <- function(dge, sourceId){
     add_trace(mode = "lines",
               x = v$voom.line$x,
               y = v$voom.line$y,
+              hoverinfo = 'none',
               line = list(color = "rgba(7, 164, 181, 1)"),
               name = "Voom average") %>%
     plotly::layout(xaxis = list(title = 'Average Log2 Count'),
@@ -248,9 +249,11 @@ multidimensionalScaling3dPlot <- function(dge, color){
           hoverinfo = 'text') %>%
     add_markers() %>%
     plotly::layout(title = paste("MDS Plot, Grouped By:", color),
-                   xaxis = list(title = 'MDS1'),
-                   yaxis = list(title = 'MDS2'),
-                   zaxis = list(title = 'MDS3')) %>%
+                   scene = list(
+                     xaxis = list(title = 'MDS1'),
+                     yaxis = list(title = 'MDS2'),
+                     zaxis = list(title = 'MDS3'))
+                    ) %>%
     config(
       toImageButtonOptions = list(
         format = "png",
@@ -291,7 +294,7 @@ variancePcaPlot <- function(dge){
   p
 }
 
-samplePca2dPlot <- function(dge, color){
+samplePca2dPlot <- function(dge, color, getPC1, getPC2){
   tdge <- t(dge$counts)
   tdge[!is.finite(tdge)] <- 0
   pca <- prcomp(tdge, center=TRUE)
@@ -299,11 +302,9 @@ samplePca2dPlot <- function(dge, color){
   pca <- data.frame(scale(tdge, center=T, scale=F)%*%pca$rotation)
   pca$group <- dge$samples[,color]
   
-  color <- "phenotype"
-  
   p <- plot_ly(pca,
-               x=~PC1,
-               y=~PC2, 
+               x=pca[[getPC1]],
+               y=pca[[getPC2]], 
                type = "scattergl",
                mode = "markers",
                color=~pca$group,
@@ -315,6 +316,8 @@ samplePca2dPlot <- function(dge, color){
                key = ~rownames(pca),
                source="pca_pca2d") %>%
     plotly::layout(title = 'PCA 2D',
+                   xaxis = list(title = getPC1),
+                   yaxis = list(title = getPC2),
            clickmode = "event+select",
            dragmode = "select") %>%
     config(
@@ -328,7 +331,7 @@ samplePca2dPlot <- function(dge, color){
   p
 }
 
-samplePca3dPlot <- function(dge, color){
+samplePca3dPlot <- function(dge, color, getPC1, getPC2, getPC3){
   tdge <- t(dge$counts)
   tdge[!is.finite(tdge)] <- 0
   pca <- prcomp(tdge, center=TRUE)
@@ -336,17 +339,20 @@ samplePca3dPlot <- function(dge, color){
   pca <- data.frame(scale(tdge, center=T, scale=F)%*%pca$rotation)
   pca$group <- dge$samples[,color]
   
-  color <- "phenotype"
-  
   p <- plot_ly(pca,
-               x=~PC1,
-               y=~PC2,
-               z=~PC3,
+               x=pca[[getPC1]],
+               y=pca[[getPC2]],
+               z=pca[[getPC3]],
                color=~pca$group,
                text = rownames(pca),
                hoverinfo = 'text') %>%
     add_markers(marker = list(size=5, opacity = 0.75)) %>%
-    plotly::layout(title = 'PCA 3D') %>%
+    plotly::layout(title = 'PCA 3D',
+                   scene = list(
+                     xaxis = list(title = getPC1),
+                     yaxis = list(title = getPC2),
+                     zaxis = list(title = getPC3))
+                   ) %>%
     config(
       toImageButtonOptions = list(
         format = "png",
@@ -362,11 +368,10 @@ samplePca3dPlot <- function(dge, color){
 
 ## ----- HEATMAPS PLOTS -----
 
-variableHeatmapPlot <- function(dge){
+variableHeatmapPlot <- function(dge, amount){
   lcpm <- dge$counts
   var_genes <- apply(lcpm, 1, var)
-  head(var_genes)
-  select_var <- names(sort(var_genes, decreasing=TRUE))[1:100]
+  select_var <- names(sort(var_genes, decreasing=TRUE))[1:amount]
   high_var_cpm <- lcpm[select_var,]
   
   p <- plot_ly(
@@ -376,7 +381,7 @@ variableHeatmapPlot <- function(dge){
           colorbar = list(title = "Log2CPM", len=1),
           type = "heatmap") %>%
     plotly::layout(xaxis = list(title = ''),
-                   title = "Top 100 most variable genes",
+                   title = "Most variable genes",
            yaxis = list(title = '')) %>%
     config(
       toImageButtonOptions = list(
@@ -389,9 +394,9 @@ variableHeatmapPlot <- function(dge){
   p
 }
 
-topDgeHeatmapPlot <- function(deTab, dge){
+topDgeHeatmapPlot <- function(deTab, dge, amount){
   sortdeTab <- deTab[order(rank(deTab$adj.P.Val)),]
-  sortdeTab <- head(sortdeTab, 100)
+  sortdeTab <- head(sortdeTab, amount)
   getnorm <- dge[rownames(sortdeTab),]
   getnorm <- getnorm$counts
   
@@ -402,7 +407,7 @@ topDgeHeatmapPlot <- function(deTab, dge){
     colorbar = list(title = "Log2CPM", len=1),
     type = "heatmap") %>%
     plotly::layout(xaxis = list(title = ''),
-                   title = "Top 100 most expressed genes",
+                   title = "Most expressed genes",
            yaxis = list(title = '',
                         categoryorder = "array",
                         autorange = "reversed")) %>%

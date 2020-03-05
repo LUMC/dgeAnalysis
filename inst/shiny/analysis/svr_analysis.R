@@ -67,7 +67,18 @@ output[["volcano_plot"]] <- renderPlotly({
 output[["barcode_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    barcodePlot(inUse_deTab, inUse_normDge, input$group_by4)
+    barcodePlot(inUse_deTab, inUse_normDge, input$group_analysis_bar)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Set color of barcode
+output[["group_analysis_bar"]] <- renderUI({
+  tryCatch({
+    selectInput("group_analysis_bar", "Color by:",
+                colnames(data_samples())
+    )
   }, error = function(err) {
     return(NULL)
   })

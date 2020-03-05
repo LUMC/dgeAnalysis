@@ -43,6 +43,17 @@ output[["reactome_barplot"]] <- renderPlotly({
   })
 })
 
+## barplot slider, set number of values
+output[["bar_reactome_slider"]] <- renderUI({
+  tryCatch({
+    checkReload()
+    enrich <- as.data.frame(get_reactome())
+    sliderInput("bar_reactome_slider", "Amount of shown pathways:", nrow(enrich)/2, min = 1, max = nrow(enrich), step=1)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
 ## create cnet plot with reactome input
 output[["cnet_reactome_plot"]] <- renderPlotly({
   tryCatch({

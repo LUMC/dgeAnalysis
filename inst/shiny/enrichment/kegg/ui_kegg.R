@@ -26,7 +26,7 @@ tab_enrich_kegg <- tabItem(
           uiOutput("bar_kegg_slider"),
           selectInput(
             inputId = "bar_kegg_value",
-            label = "Create plot with:",
+            label = "Color plot with:",
             selected = "pvalue",
             c("P-Value" = "pvalue",
               "Adjusted P-Value" = "p.adjust",

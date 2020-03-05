@@ -38,7 +38,7 @@ tab_enrich_go <- tabItem(
           uiOutput("bar_go_slider"),
           selectInput(
             inputId = "bar_go_value",
-            label = "Create plot with:",
+            label = "Color plot with:",
             selected = "pvalue",
             c("P-Value" = "pvalue",
               "Adjusted P-Value" = "p.adjust",

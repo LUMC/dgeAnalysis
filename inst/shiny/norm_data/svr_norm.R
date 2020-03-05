@@ -54,7 +54,18 @@ output[["selected_norm_voom"]] <- DT::renderDataTable({
 output[["norm_un_cluster_2d"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    multidimensionalScaling2dPlot(inUse_normDge, input$group_by2, "norm_mds2d")
+    multidimensionalScaling2dPlot(inUse_normDge, input$group_norm_mds2d, "norm_mds2d")
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Set color of mds 2d
+output[["group_norm_mds2d"]] <- renderUI({
+  tryCatch({
+    selectInput("group_norm_mds2d", "Color by:",
+                colnames(data_samples())
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -75,7 +86,18 @@ output[["selected_norm_mds2d"]] <- DT::renderDataTable({
 output[["norm_un_cluster_3d"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    multidimensionalScaling3dPlot(inUse_normDge, input$group_by2)
+    multidimensionalScaling3dPlot(inUse_normDge, input$group_norm_mds3d)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Set color of mds 3d
+output[["group_norm_mds3d"]] <- renderUI({
+  tryCatch({
+    selectInput("group_norm_mds3d", "Color by:",
+                colnames(data_samples())
+    )
   }, error = function(err) {
     return(NULL)
   })

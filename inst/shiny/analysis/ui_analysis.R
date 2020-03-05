@@ -64,8 +64,8 @@ tab_analysis <- tabItem(
         position = "right",
         sidebarPanel(
           width = 3,
-          numericInput("vulcanoLogCut", "LogFC Cutoff", 1, min = 0, max = 25, step=0.01),
-          numericInput("vulcanoPCut", "P-Value Cutoff", 0.05, min = 0.001, max = 1, step=0.001),
+          sliderInput("vulcanoLogCut", "LogFC Cutoff", 1, min = 0, max = 25, step=0.1),
+          sliderInput("vulcanoPCut", "P-Value Cutoff", 0.05, min = 0.01, max = 1, step=0.01),
         ), 
         mainPanel(
           width = 9,
@@ -83,7 +83,8 @@ tab_analysis <- tabItem(
       sidebarLayout(
         position = "right",
         sidebarPanel(
-          width = 3
+          width = 3,
+          uiOutput("group_analysis_bar")
         ), 
         mainPanel(
           width = 9,

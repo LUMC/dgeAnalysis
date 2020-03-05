@@ -43,7 +43,9 @@ tab_raw_data <- tabItem(
       sidebarLayout(
         position = "right",
         sidebarPanel(
-          width = 3
+          width = 3,
+          sliderInput("slider_raw_voom", "Set Log2CPM cutoff:", value = 1, min = 0,  max = 10, step=0.1),
+          uiOutput("raw_voom_ngenes")
         ), 
         mainPanel(
           width = 9,
@@ -61,7 +63,8 @@ tab_raw_data <- tabItem(
       sidebarLayout(
         position = "right",
         sidebarPanel(
-          width = 3
+          width = 3,
+          uiOutput("group_raw_mds2d")
         ), 
         mainPanel(
           width = 9,
@@ -79,7 +82,8 @@ tab_raw_data <- tabItem(
       sidebarLayout(
         position = "right",
         sidebarPanel(
-          width = 3
+          width = 3,
+          uiOutput("group_raw_mds3d")
         ), 
         mainPanel(
           width = 9,

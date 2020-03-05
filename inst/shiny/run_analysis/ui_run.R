@@ -21,22 +21,14 @@ tab_run_analysis <- tabItem(
   
   sliderInput(
     "alpha_value",
-    "Set alpha (P-Value cutoff):",
+    "Set FDR cutoff (adjusted P-Value):",
     value = 0.05,
     min = 0.01,
     max = 1,
     step=0.01
   ),
   
-  sliderInput(
-    "cpm_value",
-    "Set Log2CPM cutoff:",
-    value = 1,
-    min = 0,
-    max = 10,
-    step=0.1
-  ),
-  
+  sliderInput("cpm_value", "Set Log2CPM cutoff:", value = 1, min = 0,  max = 10, step=0.1),
   uiOutput("setGeneName"),
   
   br(),

@@ -43,6 +43,17 @@ output[["kegg_barplot"]] <- renderPlotly({
   })
 })
 
+## barplot slider, set number of values
+output[["bar_kegg_slider"]] <- renderUI({
+  tryCatch({
+    checkReload()
+    enrich <- as.data.frame(get_kegg())
+    sliderInput("bar_kegg_slider", "Amount of shown pathways:", nrow(enrich)/2, min = 1, max = nrow(enrich), step=1)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
 ## create cnet plot with kegg input
 output[["cnet_kegg_plot"]] <- renderPlotly({
   tryCatch({

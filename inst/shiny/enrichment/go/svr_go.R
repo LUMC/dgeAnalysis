@@ -47,6 +47,17 @@ output[["go_barplot"]] <- renderPlotly({
   })
 })
 
+## barplot slider, set number of values
+output[["bar_go_slider"]] <- renderUI({
+  tryCatch({
+    checkReload()
+    enrich <- as.data.frame(get_go())
+    sliderInput("bar_go_slider", "Amount of shown pathways:", nrow(enrich)/2, min = 1, max = nrow(enrich), step=1)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
 ## create cnet plot with gene ontology input
 output[["cnet_go_plot"]] <- renderPlotly({
   tryCatch({

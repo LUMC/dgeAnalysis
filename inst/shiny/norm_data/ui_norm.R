@@ -72,7 +72,8 @@ tab_norm_data <- tabItem(
       sidebarLayout(
         position = "right",
         sidebarPanel(
-          width = 3
+          width = 3,
+          uiOutput("group_norm_mds2d")
         ), 
         mainPanel(
           width = 9,
@@ -90,7 +91,8 @@ tab_norm_data <- tabItem(
       sidebarLayout(
         position = "right",
         sidebarPanel(
-          width = 3
+          width = 3,
+          uiOutput("group_norm_mds3d")
         ), 
         mainPanel(
           width = 9,

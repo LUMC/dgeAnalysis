@@ -27,7 +27,9 @@ tab_pca <- tabItem(
       sidebarLayout(
         position = "right",
         sidebarPanel(
-          width = 3
+          width = 3,
+          uiOutput("group_pca2d"),
+          uiOutput("setpc_pca2d")
         ), 
         mainPanel(
           width = 9,
@@ -45,7 +47,9 @@ tab_pca <- tabItem(
       sidebarLayout(
         position = "right",
         sidebarPanel(
-          width = 3
+          width = 3,
+          uiOutput("group_pca3d"),
+          uiOutput("setpc_pca3d")
         ), 
         mainPanel(
           width = 9,

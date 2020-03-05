@@ -26,7 +26,7 @@ tab_enrich_reactome <- tabItem(
           uiOutput("bar_reactome_slider"),
           selectInput(
             inputId = "bar_reactome_value",
-            label = "Create plot with:",
+            label = "Color plot with:",
             selected = "pvalue",
             c("P-Value" = "pvalue",
               "Adjusted P-Value" = "p.adjust",
