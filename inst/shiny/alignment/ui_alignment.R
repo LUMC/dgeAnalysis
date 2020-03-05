@@ -5,29 +5,48 @@ tab_alignment <- tabItem(
   br(),
   
   tabsetPanel(
-    tabPanel("Summary",
-             HTML('<hr style="border-color: #0088cc;">'),
-             radioButtons(
-               "setSummary",
-               "Set distribution:",
-               inline = TRUE,
-               c("Actual" = "actual",
-                 "Percentage" = "percent")
-             ),
-             plotlyOutput("align_sum", height = "600px") %>% withSpinner(),
-             HTML('<hr style="border-color: #0088cc;">')
+    tabPanel(
+      title = "Summary",
+      HTML('<hr style="border-color: #0088cc;">'),
+      sidebarLayout(
+        position = "right",
+        sidebarPanel(
+          width = 3,
+          radioButtons(
+            "setSummary",
+            "Set distribution:",
+            c("Actual" = "actual",
+              "Percentage" = "percent")
+          )
+        ),
+        mainPanel(
+          width = 9,
+          plotlyOutput("align_sum", height = "600px") %>% withSpinner(),
+        )
+      ),
+      HTML('<hr style="border-color: #0088cc;">')
     ),
-    tabPanel("Complexity",
-             HTML('<hr style="border-color: #0088cc;">'),
-             radioButtons(
-               "setComplexity",
-               "Set distribution:",
-               inline = TRUE,
-               c("Actual" = "actual",
-                 "Percentage" = "percent")
-             ),
-             plotlyOutput("complex", height = "600px") %>% withSpinner(),
-             HTML('<hr style="border-color: #0088cc;">')
+    
+    tabPanel(
+      title = "Complexity",
+      HTML('<hr style="border-color: #0088cc;">'),
+      sidebarLayout(
+        position = "right",
+        sidebarPanel(
+          width = 3,
+          radioButtons(
+            "setComplexity",
+            "Set distribution:",
+            c("Actual" = "actual",
+              "Percentage" = "percent")
+          )
+        ),
+        mainPanel(
+          width = 9,
+          plotlyOutput("complex", height = "600px") %>% withSpinner(),
+        )
+      ),
+      HTML('<hr style="border-color: #0088cc;">')
     )
   )
 )

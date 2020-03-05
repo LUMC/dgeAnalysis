@@ -5,15 +5,36 @@ tab_heatmaps <- tabItem(
   br(),
   
   tabsetPanel(
-    tabPanel("100 most variable genes",
-             HTML('<hr style="border-color: #0088cc;">'),
-             plotlyOutput("var_heat", height = "600px") %>% withSpinner(),
-             HTML('<hr style="border-color: #0088cc;">')
+    tabPanel(
+      title = "Most variable genes",
+      HTML('<hr style="border-color: #0088cc;">'),
+      sidebarLayout(
+        position = "right",
+        sidebarPanel(
+          width = 3
+        ), 
+        mainPanel(
+          width = 9,
+          plotlyOutput("var_heat", height = "600px") %>% withSpinner()
+        )
+      ),
+      HTML('<hr style="border-color: #0088cc;">')
     ),
-    tabPanel("100 most DE genes",
-             HTML('<hr style="border-color: #0088cc;">'),
-             plotlyOutput("dge_heat", height = "600px") %>% withSpinner(),
-             HTML('<hr style="border-color: #0088cc;">')
+    
+    tabPanel(
+      title = "Most DE genes",
+      HTML('<hr style="border-color: #0088cc;">'),
+      sidebarLayout(
+        position = "right",
+        sidebarPanel(
+          width = 3
+        ), 
+        mainPanel(
+          width = 9,
+          plotlyOutput("dge_heat", height = "600px") %>% withSpinner()
+        )
+      ),
+      HTML('<hr style="border-color: #0088cc;">')
     )
   )
 )

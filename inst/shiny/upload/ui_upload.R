@@ -80,6 +80,7 @@ tab_upload <- tabItem(
                ),
                HTML('<hr style="border-color: #0088cc;">')
       ),
+      
       tabPanel("Counts",
                HTML('<hr style="border-color: #0088cc;">'),
                fluidRow(
@@ -89,6 +90,7 @@ tab_upload <- tabItem(
                ),
                HTML('<hr style="border-color: #0088cc;">')
       ),
+      
       tabPanel("Annotation",
                HTML('<hr style="border-color: #0088cc;">'),
                fluidRow(
@@ -114,6 +116,7 @@ tab_upload <- tabItem(
                  ),
                  HTML('<hr style="border-color: #0088cc;">')
         ),
+        
         tabPanel("Counts",
                  HTML('<hr style="border-color: #0088cc;">'),
                  fluidRow(
@@ -123,6 +126,7 @@ tab_upload <- tabItem(
                  ),
                  HTML('<hr style="border-color: #0088cc;">')
         ),
+        
         tabPanel("Normalized Counts",
                  HTML('<hr style="border-color: #0088cc;">'),
                  fluidRow(
@@ -132,6 +136,7 @@ tab_upload <- tabItem(
                  ),
                  HTML('<hr style="border-color: #0088cc;">')
         ),
+        
         tabPanel("DE table",
                  HTML('<hr style="border-color: #0088cc;">'),
                  fluidRow(
