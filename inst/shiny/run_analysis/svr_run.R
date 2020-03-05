@@ -70,7 +70,29 @@ output[["matrix_value"]] <- renderUI({
   })
 })
 
-output$setGeneName <- renderUI({
+output[["excludeSamples"]] <- renderUI({
+  tryCatch({
+    box(
+      title = "Exclude samples",
+      status = "primary",
+      solidHeader = TRUE,
+      width = 10,
+      collapsible = TRUE,
+      collapsed = TRUE,
+      checkboxGroupInput(
+        inputId = "exclude_samples",
+        label = "",
+        inline = TRUE,
+        choices = rownames(data_samples())
+        
+      )
+    )
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+output[["setGeneName"]] <- renderUI({
   tryCatch({
     if (is.null(input$file_annotation)) {
       return(NULL)
