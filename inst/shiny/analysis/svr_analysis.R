@@ -9,7 +9,7 @@ output[["detab_table"]] <- DT::renderDataTable({
       DT::datatable(inUse_deTab[inUse_deTab$DE != 0,], options = list(pageLength = 50, scrollX = TRUE))
     }
   }, error = function(err) {
-    return(NULL)
+    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
   })
 })
 
@@ -24,8 +24,13 @@ output[["de_ratio"]] <- renderPlotly({
 })
 
 output[["selected_ma"]] <- DT::renderDataTable({
-  s <- event_data(event = "plotly_selected", source = "analysis_ma")
-  DT::datatable(inUse_deTab[s$key,], options = list(pageLength = 15, scrollX = TRUE))
+  tryCatch({
+    s <- event_data(event = "plotly_selected", source = "analysis_ma")
+    if(is.null(s)){s <- ""}
+    DT::datatable(inUse_deTab[s$key,], options = list(pageLength = 15, scrollX = TRUE))
+  }, error = function(err) {
+    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
+  })
 })
 
 ## Mean-Difference (MA) plots
@@ -39,8 +44,13 @@ output[["ma_plot"]] <- renderPlotly({
 })
 
 output[["selected_volcano"]] <- DT::renderDataTable({
-  s <- event_data(event = "plotly_selected", source = "analysis_volcano")
-  DT::datatable(inUse_deTab[s$key,], options = list(pageLength = 15, scrollX = TRUE))
+  tryCatch({
+    s <- event_data(event = "plotly_selected", source = "analysis_volcano")
+    if(is.null(s)){s <- ""}
+    DT::datatable(inUse_deTab[s$key,], options = list(pageLength = 15, scrollX = TRUE))
+  }, error = function(err) {
+    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
+  })
 })
 
 ## Volcano plots
@@ -59,7 +69,6 @@ output[["barcode_plot"]] <- renderPlotly({
     checkReload()
     barcodePlot(inUse_deTab, inUse_normDge, input$group_by4)
   }, error = function(err) {
-    print(err)
     return(NULL)
   })
 })

@@ -1,14 +1,6 @@
 
 ## Start an analysis
 observeEvent(input$run_button, {
-  tryCatch({
-    if (isTRUE(bookmark_loaded)) {
-      bookmark_loaded <<- FALSE
-      return(NULL)
-    }
-  }, error = function(err) {
-  })
-  
   showModal(modalDialog("Analysis is running...",
                         footer=NULL))
   results <- tryCatch(
@@ -27,18 +19,13 @@ observeEvent(input$run_button, {
       load("markdown/analysis.RData", envir=.GlobalEnv)
       inUse_deTab <<- deTab
       inUse_normDge <<- normDge
-      f <- "Analysis succesfull"
     }, error = function(err) {
-      f <- "Analysis failed with an error"
       print(err)
       return(f)
     }
   )
-  output$analysis_state <- renderText({
-    results
-  })
   removeModal()
-})
+},ignoreInit = TRUE)
 
 output[["design_value"]] <- renderUI({
   tryCatch({
@@ -77,5 +64,18 @@ output[["matrix_value"]] <- renderUI({
   })
 })
 
-
-
+output$setGeneName <- renderUI({
+  tryCatch({
+    if (is.null(input$file_annotation)) {
+      return(NULL)
+    }
+    
+    radioButtons("setGeneName", "Use gene ID or gene symbols:",
+                 inline = TRUE,
+                 c("Gene ID" = "id",
+                   "Gene Symbol" = "symbol")
+    )
+  }, error = function(err) {
+    return(NULL)
+  })
+})

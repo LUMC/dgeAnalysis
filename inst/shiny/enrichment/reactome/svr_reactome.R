@@ -28,7 +28,7 @@ output[["reactome_data_table"]] <- DT::renderDataTable({
     enrich <- enrich[ , -c(1, (ncol(enrich)-1):ncol(enrich))]
     DT::datatable(enrich, options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
-    return(NULL)
+    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
   })
 })
 
@@ -67,7 +67,7 @@ output[["cnet_reactome_table"]] <- DT::renderDataTable({
     graphData <- cnetPlotly(enrich, inUse_deTab, input$cnet_reactome_slider)
     DT::datatable(inUse_deTab[inUse_deTab$geneName %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
-    return(NULL)
+    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
   })
 })
 
@@ -105,7 +105,7 @@ output[["reactome_pathway_table"]] <- DT::renderDataTable({
     graphData <- viewPathwayPlot(inUse_deTab, 'reactome', s$key)
     DT::datatable(inUse_deTab[inUse_deTab$geneName %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
-    return(NULL)
+    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
   })
 })
 

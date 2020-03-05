@@ -5,7 +5,7 @@ output[["normalized_counts"]] <- DT::renderDataTable({
     checkReload()
     DT::datatable(inUse_normDge$counts, options = list(pageLength = 50, scrollX = TRUE))
   }, error = function(err) {
-    return(NULL)
+    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
   })
 })
 
@@ -46,8 +46,7 @@ output[["selected_norm_voom"]] <- DT::renderDataTable({
     s <- event_data(event = "plotly_selected", source = "norm_voom")
     DT::datatable(data.frame(inUse_normDge$counts)[s$key,], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
-    print(err)
-    return(NULL)
+    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
   })
 })
 

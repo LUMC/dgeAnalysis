@@ -23,9 +23,12 @@ output[["dist_boxplot"]] <- renderPlotly({
 output[["raw_voom_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    counts <- get_raw_dge()
-    counts$counts <- counts$counts[!grepl('^__', rownames(counts$counts)),]
-    voomPlot(counts, "raw_voom")
+    dge <- get_raw_dge()
+    dge$counts <- dge$counts[!grepl('^__', rownames(dge$counts)),]
+    selectedFeatures <- rownames( dge$counts )[ apply( dge$counts, 1, function( v ) sum( v >= 1 ) ) >= 1/4 * ncol( dge$counts ) ]
+    highExprDge <- dge[ selectedFeatures,, keep.lib.sizes = FALSE ]
+    
+    voomPlot(highExprDge, "raw_voom")
   }, error = function(err) {
     return(NULL)
   })
@@ -39,8 +42,7 @@ output[["selected_raw_voom"]] <- DT::renderDataTable({
     counts <- data.frame(get_raw_dge()$counts[!grepl('^__', rownames(get_raw_dge()$counts)),])
     DT::datatable(counts[s$key,], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
-    print(err)
-    return(NULL)
+    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
   })
 })
 
@@ -59,9 +61,10 @@ output[["selected_raw_mds2d"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
     s <- event_data(event = "plotly_selected", source = "raw_mds2d")
+    if(is.null(s)){s <- ""}
     DT::datatable(data_samples()[s$key,], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
-    return(NULL)
+    return(DT::datatable(data.frame(c("No data available")), rownames = FALSE, colnames = ""))
   })
 })
 

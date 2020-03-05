@@ -3,8 +3,12 @@ observeEvent(input$app_mode, {
   if (input$app_mode == "new") {
     runjs('$("#show_view_analysis").css({"border-radius": "25px","border": "3px solid rgba(0,0,0,0)"});')
     runjs('$("#show_new_analysis").css({"border-radius": "25px", "border": "3px solid #0088cc"});')
-    inUse_normDge <<- normDge
-    inUse_deTab <<- deTab
+    tryCatch({
+      inUse_normDge <<- normDge
+      inUse_deTab <<- deTab
+    }, error = function(err) {
+      return(NULL)
+    })
   } else {
     runjs('$("#show_new_analysis").css({"border-radius": "25px", "border": "3px solid rgba(0,0,0,0)"});')
     runjs('$("#show_view_analysis").css({"border-radius": "25px", "border": "3px solid #0088cc"});')
@@ -138,7 +142,7 @@ output[["sample_data"]] <- DT::renderDataTable({
   tryCatch({
     DT::datatable(data_samples(), options = list(pageLength = 50, scrollX = TRUE))
   }, error = function(err) {
-    return(NULL)
+    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
   })
 })
 
@@ -147,7 +151,7 @@ output[["count_data"]] <- DT::renderDataTable({
   tryCatch({
     DT::datatable(data_counts(), options = list(pageLength = 50, scrollX = TRUE))
   }, error = function(err) {
-    return(NULL)
+    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
   })
 })
 
@@ -156,7 +160,7 @@ output[["annotation_data"]] <- DT::renderDataTable({
   tryCatch({
     DT::datatable(data_annotation(), options = list(pageLength = 50, scrollX = TRUE))
   }, error = function(err) {
-    return(NULL)
+    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
   })
 })
 
@@ -169,7 +173,7 @@ output[["sample_data_view"]] <- DT::renderDataTable({
   tryCatch({
     DT::datatable(data_samples(), options = list(pageLength = 50, scrollX = TRUE))
   }, error = function(err) {
-    return(NULL)
+    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
   })
 })
 
@@ -178,7 +182,7 @@ output[["count_data_view"]] <- DT::renderDataTable({
   tryCatch({
     DT::datatable(data_counts(), options = list(pageLength = 50, scrollX = TRUE))
   }, error = function(err) {
-    return(NULL)
+    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
   })
 })
 
@@ -187,7 +191,7 @@ output[["norm_data_view"]] <- DT::renderDataTable({
   tryCatch({
     DT::datatable(data_norm(), options = list(pageLength = 50, scrollX = TRUE))
   }, error = function(err) {
-    return(NULL)
+    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
   })
 })
 
@@ -196,6 +200,6 @@ output[["detab_data_view"]] <- DT::renderDataTable({
   tryCatch({
     DT::datatable(data_detab(), options = list(pageLength = 50, scrollX = TRUE))
   }, error = function(err) {
-    return(NULL)
+    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
   })
 })
