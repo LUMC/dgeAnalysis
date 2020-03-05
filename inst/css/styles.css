@@ -235,12 +235,12 @@ table.dataTable tr.selected td{
 }
 
 /*radio button*/
-.radio-inline input[type="radio"] {
+.radio input[type="radio"], .radio-inline input[type="radio"] {
   opacity: 0;
   position: fixed;
   width: 0;
 }
-.radio-inline span {
+.radio span, .radio-inline span {
   display: inline-block;
   background-color: #737373;
   color: white;
@@ -251,12 +251,12 @@ table.dataTable tr.selected td{
   border: 1px solid #737373;
   border-radius: 4px;
 }
-.radio-inline input[type="radio"]:checked + span {
+.radio input[type="radio"]:checked + span, .radio-inline input[type="radio"]:checked + span {
   font-weight: bold;
   background-color: #0088cc;
   color: white;
 }
-.radio-inline span:hover {
+.radio span:hover, .radio-inline span:hover {
   background-color: white;
   color: #0088cc;
   border: 1px solid #0088cc;
@@ -265,7 +265,7 @@ table.dataTable tr.selected td{
   display: flex;
   justify-content: space-around;
 }
-#app_mode .checkbox-inline, .radio-inline {
+#app_mode .radio-inline, {
   padding-left: unset;
 }
 
@@ -295,6 +295,18 @@ table.dataTable tr.selected td{
   background-color: white;
   color: #0088cc;
   border: 1px solid #0088cc;
+}
+.checkbox-inline+.checkbox-inline, .radio-inline+.radio-inline {
+  margin-top: 1px;
+  margin-left: unset;
+}
+
+.box.box-solid.box-primary>.box-header {
+  background: #0088cc;
+  background-color: #0088cc;
+}
+.col-sm-10 {
+  float: unset;
 }
 
 /* --- widgets */
