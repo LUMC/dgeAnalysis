@@ -186,13 +186,13 @@ deTab <- rename(deTab, "P.Value" = "PValue")
 ```{r changeToSymbol}
 # CHANGE GENE ID TO SYMBOL IF NESSECARY
 
-#if (setGeneName == "symbol" && !is.null(data_annotation)) {
-#  tempCol <- rownames(deTab)
-#  rownames(deTab) <- make.names(deTab$geneName, unique=TRUE)
-#  deTab$geneName <- tempCol
-#  colnames(deTab)[1] <- "geneId"
-#  rownames(normDge$counts) <- rownames(deTab)
-#}
+if (setGeneName == "symbol" && !is.null(data_annotation)) {
+  tempCol <- rownames(deTab)
+  rownames(deTab) <- make.names(deTab$geneName, unique=TRUE)
+  deTab$geneName <- tempCol
+  colnames(deTab)[1] <- "geneId"
+  rownames(normDge$counts) <- rownames(deTab)
+}
 
 ```
 
