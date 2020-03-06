@@ -4,6 +4,12 @@ tab_enrich_kegg <- tabItem(
   align="center",
   br(),
   
+  radioButtons("choose_kegg", "Select enrichment type:",
+               inline = TRUE,
+               c("Gene set enrichment" = "gse",
+                 "Over represented enrichment" = "enrich")
+  ),
+  
   tabsetPanel(
     tabPanel(
       title = "Enrichment table",

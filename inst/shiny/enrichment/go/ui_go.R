@@ -5,6 +5,12 @@ tab_enrich_go <- tabItem(
   align = "center",
   br(),
   
+  radioButtons("choose_go", "Select enrichment type:",
+               inline = TRUE,
+               c("Gene set enrichment" = "gse",
+                 "Over represented enrichment" = "enrich")
+  ),
+  
   radioButtons(
     inputId = "selectOntology",
     label = "Selected a sub-ontology:",

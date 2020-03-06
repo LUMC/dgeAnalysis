@@ -4,10 +4,14 @@ get_kegg <- reactive({
   tryCatch({
     checkReload()
     organism <- get_organismID(inUse_deTab)
-    org <- list(ENS="hsa",
-                ENSMUS="mmu")
+    org <- list(ENSCEL="cel",
+                ENSCAF="cfa",
+                ENSDAR="dre",
+                ENS="hsa",
+                ENSMUS="mmu",
+                ENSRNO="rno")
     organism <- org[[organism]]
-    if (isTRUE(input$choose_kegg)) {
+    if (input$choose_kegg == "enrich") {
       enrich <- clusterProfiler::enrichKEGG(inUse_deTab$entrez[inUse_deTab$DE!=0], organism=organism, pvalueCutoff=0.05)
     } else {
       set.seed(1234)

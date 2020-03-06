@@ -5,7 +5,7 @@
 get_do <- reactive({
   tryCatch({
     checkReload()
-    if (isTRUE(input$choose_do)) {
+    if (input$choose_do == "enrich") {
       enrich <- DOSE::enrichDO(inUse_deTab$entrez[inUse_deTab$DE!=0], pvalueCutoff=0.05)
     } else {
       set.seed(1234)

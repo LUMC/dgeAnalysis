@@ -4,10 +4,12 @@ get_reactome <- reactive({
   tryCatch({
     checkReload()
     organism <- get_organismID(inUse_deTab)
-    org <- list(ENS="human",
-                ENSMUS="mouse")
+    org <- list(ENSCEL="celegans",
+                ENS="human",
+                ENSMUS="mouse",
+                ENSRNO="rat")
     organism <- org[[organism]]
-    if (isTRUE(input$choose_reactome)) {
+    if (input$choose_reactome == "enrich") {
       enrich <- ReactomePA::enrichPathway(inUse_deTab$entrez[inUse_deTab$DE!=0], organism=organism, pvalueCutoff=0.05)
     } else {
       set.seed(1234)

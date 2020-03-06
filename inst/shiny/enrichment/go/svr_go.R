@@ -3,6 +3,8 @@
 ## Cellular Component (CC)
 ## Molecular Function (MF)
 
+# ONLY SUPPORTS HUMAN and MOUSE (depending on provided databases)!!!
+
 ## get and create gene ontology enrichment
 get_go <- reactive({
   tryCatch({
@@ -11,7 +13,7 @@ get_go <- reactive({
     org <- list(ENS="org.Hs.eg.db",
                 ENSMUS="org.Mm.eg.db")
     organism <- org[[organism]]
-    if (isTRUE(input$choose_go)) {
+    if (input$choose_go == "enrich") {
       enrich <- clusterProfiler::enrichGO(inUse_deTab$entrez[inUse_deTab$DE!=0],  ont = input$selectOntology, organism, pvalueCutoff=0.05)
     } else {
       set.seed(1234)
