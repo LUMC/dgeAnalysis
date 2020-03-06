@@ -5,6 +5,7 @@ observeEvent(input$run_button, {
     showNotification(ui = 'Wrong analysis mode!', duration = 5, type = "error")
     return(NULL)
   }
+  print(input$exclude_samples)
   showModal(modalDialog("Analysis is running...",
                         footer=NULL))
   results <- tryCatch(
@@ -13,7 +14,7 @@ observeEvent(input$run_button, {
                         params = list(data_samples = data_samples(),
                                       data_counts = data_counts(),
                                       data_annotation = data_annotation(),
-                                      #excluded_samples = rownames(excluded_selected()),
+                                      excluded_samples = input$exclude_samples,
                                       setGeneName = input$setGeneName,
                                       cpm_value = input$cpm_value,
                                       design_value = paste("~0 +", gsub(",", " +", toString(c(input$design_value)))),
@@ -65,7 +66,6 @@ output[["matrix_value"]] <- renderUI({
                 choices = choice
     )
   }, error = function(err) {
-    print(err)
     return(NULL)
   })
 })
