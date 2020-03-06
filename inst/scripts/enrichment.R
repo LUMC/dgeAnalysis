@@ -46,9 +46,10 @@ list2graph <- function(inputList) {
 
 list2df <- function(inputList) {
   ldf <- lapply(1:length(inputList), function(i) {
-    data.frame(categoryID=rep(names(inputList[i]),
-                              length(inputList[[i]])),
-               Gene=inputList[[i]])
+    data.frame(
+      categoryID=rep(names(inputList[i]),
+                     length(inputList[[i]])),
+      Gene=inputList[[i]])
   })
   
   do.call('rbind', ldf)
@@ -76,25 +77,31 @@ enrichBarplot <- function(enrich, amount, value){
   }, error = function(err) {
     value <<- sub("s$", "", value)
   })
-  enrich$Description <- factor(enrich$Description, levels = unique(enrich$Description)[order(enrich[[value]], enrich$Description, decreasing = TRUE)])
-  color <- seq(from=min(enrich[[value]]), to=max(enrich[[value]]), length.out = 10)[2:9]
-  p <- plot_ly(enrich,
-               x = ~Count,
-               y = ~Description,
-               orientation='h',
-               type = "bar",
-               marker=list(color=-enrich[[value]],
-                           colorscale='Viridis',
-                           colorbar=list(title=value,
-                                         tickmode="array",
-                                         tickvals=-color,
-                                         ticktext=floor(color) + signif(color %% 1, 4)),
-                           reversescale=FALSE)
-                                         
-               ) %>% 
-    plotly::layout(xaxis = list(title = 'Counts'),
-                   title = "Enrichment barplot",
-           yaxis = list(title = '')) %>%
+  enrich$Description <- factor(enrich$Description,
+                               levels = unique(enrich$Description)[order(enrich[[value]],
+                                                                         enrich$Description,
+                                                                         decreasing = TRUE)])
+  color <- seq(from=min(enrich[[value]]),
+               to=max(enrich[[value]]),
+               length.out = 10)[2:9]
+  p <- plot_ly(
+    enrich,
+    x = ~Count,
+    y = ~Description,
+    orientation='h',
+    type = "bar",
+    marker=list(color=-enrich[[value]],
+                colorscale='Viridis',
+                colorbar=list(
+                  title=value,
+                  tickmode="array",
+                  tickvals=-color,
+                  ticktext=floor(color) + signif(color %% 1, 4)),
+                reversescale=FALSE)) %>% 
+    plotly::layout(
+      xaxis = list(title = 'Counts'),
+      title = "Enrichment barplot",
+      yaxis = list(title = '')) %>%
     config(
       toImageButtonOptions = list(
         format = "png",
@@ -146,8 +153,12 @@ emap_plotly <- function(enrich){
 
 viewPathwayPlot <- function(deTab, db, pwName){
   organism <- get_organismID(deTab)
-  org2org <- list(ENS="hsapiens",
-                  ENSMUS="mmusculus")
+  org2org <- list(ENSCEL="celegans",
+                  ENSCAF="cfamiliaris",
+                  ENSDAR="drerio",
+                  ENS="hsapiens",
+                  ENSMUS="mmusculus",
+                  ENSRNO="rnorvegicus")
   pathways <- eval(parse(text="pathways"))
   pw <- pathways(org2org[[organism]], db)[[pwName]]
   pw <- suppressMessages(convertIdentifiers(pw, "symbol"))
@@ -197,18 +208,19 @@ plotlyGraph <- function(g, pwName, getColor, cnet){
   L_genes <- L[(cnet+1):nrow(L),][names(vs)[!is.na(vs$color)],]
   L_genesNA <- L[names(vs)[is.na(vs$color)],]
   vs <- vs[!is.na(vs$color)]
-    
+  
   Ne <- length(es[1]$V1)
   network <- plot_ly(
     x = ~L_genesNA$V1,
     y = ~L_genesNA$V2,
     type = "scattergl",
     mode = "markers",
-    marker=list(size=12,
-                color="white",
-                line = list(color = '#999999',
-                            width = 1),
-                colorbar=FALSE),
+    marker=list(
+      size=12,
+      color="white",
+      line = list(color = '#999999',
+                  width = 1),
+      colorbar=FALSE),
     text = rownames(L_genesNA),
     key = rownames(L_genesNA),
     hoverinfo = "text",
@@ -219,10 +231,11 @@ plotlyGraph <- function(g, pwName, getColor, cnet){
       y = ~L_genes$V2,
       type = "scattergl",
       mode = "markers",
-      marker=list(size=12,
-                  color=as.numeric(vs$color),
-                  colorscale='Viridis',
-                  colorbar=list(title=getColor)),
+      marker=list(
+        size=12,
+        color=as.numeric(vs$color),
+        colorscale='Viridis',
+        colorbar=list(title=getColor)),
       text = rownames(L_genes),
       key = rownames(L_genes),
       hoverinfo = "text",
@@ -231,9 +244,10 @@ plotlyGraph <- function(g, pwName, getColor, cnet){
     add_trace(
       x = L_cnet$V1,
       y = L_cnet$V2,
-      marker=list(size=20,
-                  color="red",
-                  colorbar=FALSE),
+      marker=list(
+        size=20,
+        color="red",
+        colorbar=FALSE),
       text = rownames(L_cnet),
       key = rownames(L_cnet),
       hoverinfo = "text",
@@ -266,8 +280,7 @@ plotlyGraph <- function(g, pwName, getColor, cnet){
     title = pwName,
     shapes = edge_shapes,
     xaxis = axis,
-    yaxis = axis
-  ) %>%
+    yaxis = axis) %>%
     config(
       toImageButtonOptions = list(
         format = "png",
@@ -278,6 +291,7 @@ plotlyGraph <- function(g, pwName, getColor, cnet){
     )
   p
 }
+
 #add_annotations(
 #  x = L[as.character(es$V2),]$V1,
 #  y = L[as.character(es$V2),]$V2,
