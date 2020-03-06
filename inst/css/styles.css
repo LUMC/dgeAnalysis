@@ -265,8 +265,14 @@ table.dataTable tr.selected td{
   display: flex;
   justify-content: space-around;
 }
-#app_mode .radio-inline, {
+#app_mode .radio-inline {
   padding-left: unset;
+}
+#app_mode .control-label {
+  font-size: 20px;
+}
+.control-label {
+  padding-right: 20px;
 }
 
 /*checkbox*/
@@ -299,6 +305,10 @@ table.dataTable tr.selected td{
 .checkbox-inline+.checkbox-inline, .radio-inline+.radio-inline {
   margin-top: 1px;
   margin-left: unset;
+}
+.checkbox-inline, .radio-inline, .radio label, .checkbox label {
+  padding-left: unset;
+  padding-right: 20px;
 }
 
 .box.box-solid.box-primary>.box-header {
