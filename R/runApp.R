@@ -5,32 +5,41 @@
 #' @import shinyWidgets
 #' @import shinycssloaders
 #' @import shinyjs
+#' @import BiocManager
+#' @import knitr
+#' @import SummarizedExperiment
+#' @import edgeR
+#' @import limma
+#' @import DESeq2
+#' @import tidyr
+#' @import scales
+#' @import broom
+#' @import plotly
+#' @import clusterProfiler
+#' @import DOSE
+#' @import graphite
+#' @import ReactomePA
+#' @import igraph
+#' @import org.Hs.eg.db
+#' @import org.Mm.eg.db
+#' @import reshape2
+#' 
 #' #' @examples
 #' if ( interactive() ) {
 #'   startApp()
 #' }
 startApp <- function() {
-  print(system.file(
-    'shiny/mainUI.R',
-    package = "dgeAnalysis"
-  ))
-  source(
-    system.file(
-      'shiny/mainUI.R',
-      package = "dgeAnalysis"
-      ),
-    local = TRUE
-  )
-  print("test1")
-  source(
-    system.file(
-      'shiny/mainServer.R',
-      package = "dgeAnalysis"),
-    local = TRUE
-  )
-  print("test2")
+  source("shiny/ui_main.R", local = TRUE)
+  source("shiny/svr_main.R", local = TRUE)
+  source("scripts/de.R", local = TRUE)
+  source("scripts/enrichment.R", local = TRUE)
+  source("scripts/markdown.R", local = TRUE)
+  source("scripts/plots.R", local = TRUE)
   
-  shiny::shinyApp(ui = ui, server = server)
+  options(shiny.maxRequestSize = 50*1024^2)
+  options(spinner.color="#0088cc")
+  # suppressWarnings(rm(list=c("deTab", "normDge", "inUse_deTab", "inUse_normDge"), envir=.GlobalEnv))
+  # options(warn = -1)
   
-  #shiny::runApp(appDir, host="0.0.0.0", port=1402, launch.browser=TRUE)
+  shiny::shinyApp(ui = ui, server = server, options=list(host="0.0.0.0", port=1402, launch.browser=TRUE))
 }
