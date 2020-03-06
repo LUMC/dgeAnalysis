@@ -6,7 +6,7 @@ tab_upload <- tabItem(
   
   radioButtons(
     inputId = "app_mode",
-    label = "Analysis mode",
+    label = "Set analysis mode",
     inline = TRUE,
     c("New analysis" = "new",
       "View analysis" = "view")

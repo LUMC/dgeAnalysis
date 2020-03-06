@@ -18,6 +18,9 @@ source("shiny/about/ui_about.R", local = TRUE)
 
 
 ui <- dashboardPage(
+  skin = "blue",
+  title = "dgeAnalysis",
+  
   dashboardHeader(
     title = span(tagList(icon("dna"), "dgeAnalysis")),
     titleWidth = 400,
