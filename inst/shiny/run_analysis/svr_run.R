@@ -5,7 +5,7 @@ observeEvent(input$run_button, {
     showNotification(ui = 'Wrong analysis mode!', duration = 5, type = "error")
     return(NULL)
   }
-  print(input$exclude_samples)
+  
   showModal(modalDialog("Analysis is running...",
                         footer=NULL))
   results <- tryCatch(
