@@ -29,12 +29,12 @@
 #'   startApp()
 #' }
 startApp <- function() {
-  source("shiny/ui_main.R", local = TRUE)
-  source("shiny/svr_main.R", local = TRUE)
-  source("scripts/de.R", local = TRUE)
-  source("scripts/enrichment.R", local = TRUE)
-  source("scripts/markdown.R", local = TRUE)
-  source("scripts/plots.R", local = TRUE)
+  source(system.file("shiny/ui_main.R", package = "dgeAnalysis"), local = TRUE)
+  source(system.file("shiny/svr_main.R", package = "dgeAnalysis"), local = TRUE)
+  source(system.file("scripts/de.R", package = "dgeAnalysis"), local = TRUE)
+  source(system.file("scripts/enrichment.R", package = "dgeAnalysis"), local = TRUE)
+  source(system.file("scripts/markdown.R", package = "dgeAnalysis"), local = TRUE)
+  source(system.file("scripts/plots.R", package = "dgeAnalysis"), local = TRUE)
   
   options(shiny.maxRequestSize = 50*1024^2)
   options(spinner.color="#0088cc")
