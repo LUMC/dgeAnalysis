@@ -37,6 +37,7 @@ ui <- dashboardPage(
   dashboardBody(
     useShinyjs(),
     includeCSS("css/styles.css", local = TRUE),
+    tags$head(tags$link(rel="shortcut icon", href="lumcFavicon.png")),
     
     tabItems(
       tab_home,
