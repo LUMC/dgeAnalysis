@@ -5,15 +5,17 @@ output:
   html_document: default
 always_allow_html: true
 params:
-  data_samples:     "" #"~/Desktop/test_data_view310_with3/meta2.csv"
-  data_counts:      "" #"~/Desktop/test_data_view310_with3/all_samples.fragments_per_gene.tsv"
-  data_annotation:  "" #"~/Desktop/test_data_view310_with3/gene_annotation.tsv"
-  setGeneName:      "" #"id"/"symbol"
-  cpm_value:        "" #1
-  excluded_samples: "" #"sample_3_minus"
-  design_value:     "" #"~0 + group + subject"
-  matrix_value:     "" #"plus - minus"
-  alpha:            "" #0.05
+  data_samples:     ""
+  data_counts:      ""
+  data_annotation:  ""
+  setGeneName:      ""
+  cpm_value:        ""
+  excluded_samples: ""
+  design_base:      ""
+  design_value:     ""
+  matrix_v1:        ""
+  matrix_v2:        ""
+  alpha:            ""
 ---
 
 
@@ -41,12 +43,11 @@ data_annotation <- params$data_annotation
 setGeneName <- params$setGeneName
 cpm_value <- params$cpm_value
 excluded_samples <- params$excluded_samples
+design_base <- params$design_base
 design_value <- params$design_value
-matrix_value <- params$matrix_value
+matrix_v1 <- params$matrix_v1
+matrix_v2 <- params$matrix_v2
 alpha <- params$alpha
-
-# Get desgin
-design_value <- reOrderDesign(matrix_value, design_value, data_samples)
 
 ```
 
@@ -66,9 +67,11 @@ data_counts <- data_counts[,!colnames(data_counts) %in% excluded_samples]
 
 cpm_value
 excluded_samples
-design_value
-matrix_value
 alpha
+design_base
+design_value
+matrix_v1
+matrix_v2
 
 ```
 
@@ -145,12 +148,19 @@ variancePcaPlot(tempDge)
 ```{r design}
 # CREATE DESIGN
 
-design <- model.matrix(eval(parse(text=design_value)), normDge$samples)
-design <- reNameDesign(design, normDge)
+get_design <- createDesign(normDge$samples, design_base, design_value, matrix_v1, matrix_v2)
+get_design
+normDge <- relevelSamples(normDge, design_base, design_value, matrix_v1, matrix_v2)
+design <- model.matrix(eval(parse(text=get_design)), normDge$samples)
+design
 
-matrix_value <- strsplit(matrix_value, ",")[[1]]
-contr.matrix <- makeContrasts(contrasts = matrix_value, levels=design)
-contr.matrix
+get_matrix1 <- createMatrix(normDge, design_base, design_value, matrix_v1)
+get_matrix2 <- createMatrix(normDge, design_base, design_value, matrix_v2)
+get_matrix1
+get_matrix2
+
+contrast <- createContrast(design, get_matrix1, get_matrix2)
+contrast
 
 ```
 
@@ -160,7 +170,7 @@ contr.matrix
 
 normDge <- estimateDisp(normDge, design)
 edfit <- glmFit(normDge, design)
-efit <- glmLRT(edfit, contrast = contr.matrix)
+efit <- glmLRT(edfit, contrast = contrast)
 
 efit$DE <- decideTests(efit, p.value = alpha)
 summary(efit$DE)
@@ -199,7 +209,6 @@ if (setGeneName == "symbol" && !is.null(data_annotation)) {
 
 ```{r showDGEResult}
 # SHOW DGE RESULTS
-
 ma_plot(deTab)
 pValuePlot(deTab)
 

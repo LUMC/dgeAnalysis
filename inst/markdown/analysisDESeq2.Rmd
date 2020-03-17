@@ -5,15 +5,17 @@ output:
   html_document: default
 always_allow_html: true
 params:
-  data_samples:     "" #"~/Desktop/test_data_view310_with3/meta2.csv"
-  data_counts:      "" #"~/Desktop/test_data_view310_with3/all_samples.fragments_per_gene.tsv"
-  data_annotation:  "" #"~/Desktop/test_data_view310_with3/gene_annotation.tsv"
-  setGeneName:      "" #"id"/"symbol"
-  cpm_value:        "" #1
-  excluded_samples: "" #"sample_3_minus"
-  design_value:     "" #"~0 + group + subject"
-  matrix_value:     "" #"plus - minus"
-  alpha:            "" #0.05
+  data_samples:     ""
+  data_counts:      ""
+  data_annotation:  ""
+  setGeneName:      ""
+  cpm_value:        ""
+  excluded_samples: ""
+  design_base:      ""
+  design_value:     ""
+  matrix_v1:        ""
+  matrix_v2:        ""
+  alpha:            ""
 ---
 
 
@@ -41,12 +43,11 @@ data_annotation <- params$data_annotation
 setGeneName <- params$setGeneName
 cpm_value <- params$cpm_value
 excluded_samples <- params$excluded_samples
+design_base <- params$design_base
 design_value <- params$design_value
-matrix_value <- params$matrix_value
+matrix_v1 <- params$matrix_v1
+matrix_v2 <- params$matrix_v2
 alpha <- params$alpha
-
-# Get desgin
-design_value <- reOrderDesign(matrix_value, design_value, data_samples)
 
 ```
 
@@ -66,9 +67,11 @@ data_counts <- data_counts[,!colnames(data_counts) %in% excluded_samples]
 
 cpm_value
 excluded_samples
-design_value
-matrix_value
 alpha
+design_base
+design_value
+matrix_v1
+matrix_v2
 
 ```
 
@@ -108,7 +111,13 @@ dge <- DGEList(counts = assay(se), samples = colData(se))
 ```{r selectedFeatures}
 # GET SELECTED FEATURES
 
-analysis <- DESeqDataSet(se, design = as.formula(design_value))
+get_design <- createDesign(dge$samples, design_base, design_value, matrix_v1, matrix_v2)
+get_design
+dge <- relevelSamples(dge, design_base, design_value, matrix_v1, matrix_v2)
+design <- model.matrix(eval(parse(text=get_design)), dge$samples)
+design
+
+analysis <- DESeqDataSet(se, design = design)
 analysis <- analysis[ rowSums( abs( assay(analysis) ) ) > 1, ]
 
 # FILTER IF NESSECARY
@@ -131,7 +140,7 @@ analysis <- DESeq(analysis)
 
 getSize <- estimateSizeFactors(analysis)
 normCounts <- cpm(data.frame(counts(getSize, normalized=TRUE)))
-normDge <- DGEList(counts = normCounts, samples = colData(se))
+normDge <- DGEList(counts = normCounts, samples = dge$samples)
 normDge$counts <- log2(normDge$counts)
 
 countDistributionLinePlot(normDge)
@@ -143,7 +152,15 @@ variancePcaPlot(normDge)
 ```{r getResults}
 # GET RESULTS
 
-deTab <- results(analysis, alpha = alpha)
+get_matrix1 <- createMatrix(normDge, design_base, design_value, matrix_v1)
+get_matrix2 <- createMatrix(normDge, design_base, design_value, matrix_v2)
+get_matrix1
+get_matrix2
+
+contrast <- createContrast(design, get_matrix1, get_matrix2)
+contrast
+
+deTab <- results(analysis, contrast = contrast, alpha = alpha)
 summary(deTab)
 
 ```
