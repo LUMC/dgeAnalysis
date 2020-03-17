@@ -1,21 +1,88 @@
 
 ## ----- MARKDOWN FUNCTIONS -----
 
-reOrderDesign <- function(matrix_value, design_value, data_samples) {
-  check_matrix <- strsplit(matrix_value, " - ", fixed = TRUE)[[1]]
-  check_design <- strsplit(design_value, " + ", fixed = TRUE)[[1]]
+createDesign <- function(dge, dbase, dvalue, matrix_v1, matrix_v2) {
+  columns <- c(dbase, dvalue)
   
-  get_column <- which(check_matrix[1] == data_samples, arr.ind=TRUE)[,2][[1]]
-  column <- colnames(data_samples[get_column])
-  remove_design_items <- c("~0", column)
-  new_design <- setdiff(check_design, remove_design_items)
-  
-  if (length(new_design) != 0) {
-    new_design <- paste("~0 +", column, "+", gsub(",", " +", toString(c(new_design))))
-  } else {
-    new_design <- paste("~0 +", column)
+  matrix <- NULL
+  for (value in c(matrix_v1, matrix_v2)) {
+    matrix <- c(matrix, paste0(na.omit(columns[which(dge == value, arr.ind=T)[, "col"]]), value))
   }
-  new_design
+  
+  getdesign <- "~"
+  
+  tryCatch({
+    if (isTRUE(all.equal(sort(unique(matrix)), sort(as.vector(paste0(dbase, unique(dge[[dbase]]))))))) {
+      getdesign <- "~0+"
+    }
+  }, error = function(err) {
+    return(NULL)
+  })
+  
+  for (value in columns) {
+    if (all(value == columns[1])) {
+      getdesign <- c(getdesign, value)
+    } else {
+      isPresent <- FALSE
+      for (mat in matrix) {
+        if (mat %in% dge[[value]]) {
+          isPresent <- TRUE
+        }
+      }
+      if (isPresent) {
+        getdesign <- c(getdesign, paste0("+", columns[1], ":", value))
+      } else {
+        getdesign <- c(getdesign, paste0("+", value))
+      }
+    }
+  }
+  getdesign <- paste(getdesign, collapse = '')
+  getdesign
+}
+
+relevelSamples <- function(dge, dbase, dvalue, matrix_v1, matrix_v2) {
+  columns <- c(dbase, dvalue)
+  for (value in columns) {
+    newRef <- as.character(dge$samples[[value]][!dge$samples[[value]] %in% c(matrix_v1, matrix_v2)][1])
+    if (is.na(newRef)) {
+      newRef <- as.character(dge$samples[[value]][1])
+    }
+    dge$samples[[value]] <- relevel(as.factor(dge$samples[[value]]), ref = newRef)
+  }
+  dge
+}
+
+createMatrix <- function(dge, dbase, dvalue, matrix) {
+  getbase <- NULL
+  for (value in matrix) {
+    if (value %in% dge$samples[[dbase]]) {
+      getbase <- c(getbase, paste0(dbase, value))
+    }
+  }
+  
+  getmatrix <- NULL
+  for (column1 in getbase) {
+    for (column2 in dvalue) {
+      for (value in matrix) {
+        if (value %in% dge$samples[[column2]]) {
+          getmatrix <- c(getmatrix, paste0(column1, ":", column2, value))
+        }
+      }
+    }
+  }
+  
+  if (is.null(getmatrix)) {
+    getmatrix <- getbase
+  }
+  
+  getmatrix
+}
+
+createContrast <- function(design, matrix_v1, matrix_v2) {
+  contrast = integer(length(colnames(design)))
+  contrast[match(matrix_v1, colnames(design))] <- -1
+  contrast[match(matrix_v2, colnames(design))] <- 1
+  contrast
 }
 
 highExpressedFeatures <- function(method, dge, design_value, cpm_value) {
@@ -42,15 +109,6 @@ filterDge <- function(normDge, excluded_samples, data_samples, se) {
   tempDge <- DGEList(counts = normDge$counts, samples = colData(se), genes = normDge$genes)
   tempDge <- calcNormFactors( tempDge, method = "TMM")
   tempDge
-}
-
-reNameDesign <- function(design, normDge) {
-  for (sample_column in rev(colnames(normDge$samples))) {
-    if (startsWith(colnames(design)[1], sample_column)) {
-      colnames(design) <- sub(sample_column, "", colnames(design))
-    }
-  }
-  design
 }
 
 ## --------------------------------------------------------------------------
