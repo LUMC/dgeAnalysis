@@ -93,7 +93,7 @@ The raw data is processed and pre-filtered, to remove non feature counts. The da
 se <- readCountsFromTable(data_counts, data_samples)
 
 alignmentSummaryPlot(se)
-complexityPlot(se)
+complexityPlot(se, TRUE, 1000)
 
 ```
 
