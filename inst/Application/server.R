@@ -1348,8 +1348,7 @@ server <- function(input, output, session) {
                    inline = TRUE,
                    selected = "analysisEdgeR",
                    c("Limma/Voom" = "analysisLimma",
-                     "EdgeR" = "analysisEdgeR",
-                     "DESeq2" = "analysisDESeq2")
+                     "EdgeR" = "analysisEdgeR")
       ),
       uiOutput("design_value"),
       uiOutput("matrix_value"),
