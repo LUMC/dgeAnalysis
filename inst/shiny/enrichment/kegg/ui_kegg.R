@@ -37,7 +37,10 @@ tab_enrich_kegg <- tabItem(
             c("P-Value" = "pvalue",
               "Adjusted P-Value" = "p.adjust",
               "Q-Value" = "qvalues")
-          )
+          ),
+          br(),
+          uiOutput("kegg_barplot_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
         ), 
         mainPanel(
           width = 9,
@@ -55,6 +58,9 @@ tab_enrich_kegg <- tabItem(
         sidebarPanel(
           width = 3,
           sliderInput("cnet_kegg_slider", "Amount of shown pathways:", 5, min = 1, max = 15, step=1),
+          br(),
+          uiOutput("cnet_kegg_plot_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
         ), 
         mainPanel(
           width = 9,
@@ -73,9 +79,20 @@ tab_enrich_kegg <- tabItem(
     tabPanel(
       title = "Pathway network",
       HTML('<hr style="border-color: #0088cc;">'),
-      plotlyOutput("gsea_kegg_plot", height = "600px") %>% withSpinner(),
-      HTML('<hr style="border-color: #0088cc;">'),
-      plotlyOutput("kegg_pathway", height = "600px") %>% withSpinner(),
+      sidebarLayout(
+        position = "right",
+        sidebarPanel(
+          width = 3,
+          uiOutput("kegg_network_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
+        ), 
+        mainPanel(
+          width = 9,
+          plotlyOutput("gsea_kegg_plot", height = "600px") %>% withSpinner(),
+          HTML('<hr style="border-color: #0088cc;">'),
+          plotlyOutput("kegg_pathway", height = "600px") %>% withSpinner()
+        )
+      ),
       HTML('<hr style="border-color: #0088cc;">'),
       fluidRow(
         column(

@@ -22,7 +22,9 @@ tab_norm_data <- tabItem(
       sidebarLayout(
         position = "right",
         sidebarPanel(
-          width = 3
+          width = 3,
+          uiOutput("norm_dist_line_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
         ), 
         mainPanel(
           width = 9,
@@ -38,7 +40,9 @@ tab_norm_data <- tabItem(
       sidebarLayout(
         position = "right",
         sidebarPanel(
-          width = 3
+          width = 3,
+          uiOutput("norm_dist_boxplot_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
         ), 
         mainPanel(
           width = 9,
@@ -54,7 +58,9 @@ tab_norm_data <- tabItem(
       sidebarLayout(
         position = "right",
         sidebarPanel(
-          width = 3
+          width = 3,
+          uiOutput("norm_voom_plot_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
         ), 
         mainPanel(
           width = 9,
@@ -73,7 +79,10 @@ tab_norm_data <- tabItem(
         position = "right",
         sidebarPanel(
           width = 3,
-          uiOutput("group_norm_mds2d")
+          uiOutput("group_norm_mds2d"),
+          br(),
+          uiOutput("norm_un_cluster_2d_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
         ), 
         mainPanel(
           width = 9,
@@ -92,7 +101,10 @@ tab_norm_data <- tabItem(
         position = "right",
         sidebarPanel(
           width = 3,
-          uiOutput("group_norm_mds3d")
+          uiOutput("group_norm_mds3d"),
+          br(),
+          uiOutput("norm_un_cluster_3d_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
         ), 
         mainPanel(
           width = 9,

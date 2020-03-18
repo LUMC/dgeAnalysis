@@ -148,3 +148,31 @@ output[["pathway_from_reactome"]] <- renderUI({
     return(NULL)
   })
 })
+
+output[["reactome_barplot_info"]] <- renderUI({
+  infoText <- "The bar plot shows a sorted list of the most enriched terms. The bar plot is sorted based on
+        the selected value (p-value, q-value or adjusted p-value). The colors of the bars are also
+        generated based on the earlier selected value. On the X-axis, the amount of genes linked to
+        the pathway is shown."
+  informationBox(infoText)
+})
+
+output[["cnet_reactome_plot_info"]] <- renderUI({
+  infoText <- "The concept network can show which genes are involved in the most significant terms. The
+        most enriched terms together with all corresponding genes are collected and shown in a
+        network plot. Some pathways may contain some matching genes. These genes will also be
+        connected. The color given to genes is based on the log fold change determined after the
+        expression analysis. In the end, this plot shows the connection of genes between the most
+        significant pathways."
+  informationBox(infoText)
+})
+
+output[["reactome_network_info"]] <- renderUI({
+  infoText <- "The pathway network shows connections between all found pathways. Every dot that the
+        plot shows represents a pathway. The color given to the pathways is based on the adjusted
+        p-value. When a particular pathway is clicked, all genes linked to that specific pathway will 
+        be shown together with the interactions between those genes. The genes are colored based on the
+        log fold change calculated by the analysis. If a gene is not present in the analysis dataset it
+        will be colored white."
+  informationBox(infoText)
+})

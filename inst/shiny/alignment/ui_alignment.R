@@ -17,11 +17,14 @@ tab_alignment <- tabItem(
             "Set distribution:",
             c("Actual" = "actual",
               "Percentage" = "percent")
-          )
+          ),
+          br(),
+          uiOutput("align_sum_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
         ),
         mainPanel(
           width = 9,
-          plotlyOutput("align_sum", height = "600px") %>% withSpinner(),
+          plotlyOutput("align_sum", height = "600px") %>% withSpinner()
         )
       ),
       HTML('<hr style="border-color: #0088cc;">')
@@ -39,11 +42,15 @@ tab_alignment <- tabItem(
             "Set distribution:",
             c("Actual" = "actual",
               "Percentage" = "percent")
-          )
+          ),
+          sliderInput("comp_rank", "Set number of ranks (Genes):", value = 1000,  min = 10,  max = 10000, step=10),
+          br(),
+          uiOutput("complex_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
         ),
         mainPanel(
           width = 9,
-          plotlyOutput("complex", height = "600px") %>% withSpinner(),
+          plotlyOutput("complex", height = "600px") %>% withSpinner()
         )
       ),
       HTML('<hr style="border-color: #0088cc;">')

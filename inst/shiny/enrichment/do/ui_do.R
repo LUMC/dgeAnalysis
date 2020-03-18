@@ -37,7 +37,10 @@ tab_enrich_do <- tabItem(
             c("P-Value" = "pvalue",
               "Adjusted P-Value" = "p.adjust",
               "Q-Value" = "qvalues")
-          )
+          ),
+          br(),
+          uiOutput("do_barplot_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
         ), 
         mainPanel(
           width = 9,
@@ -54,7 +57,10 @@ tab_enrich_do <- tabItem(
         position = "right",
         sidebarPanel(
           width = 3,
-          sliderInput("cnet_do_slider", "Amount of shown pathways:", 5, min = 1, max = 15, step=1)
+          sliderInput("cnet_do_slider", "Amount of shown pathways:", 5, min = 1, max = 15, step=1),
+          br(),
+          uiOutput("cnet_do_plot_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
         ), 
         mainPanel(
           width = 9,
@@ -73,7 +79,18 @@ tab_enrich_do <- tabItem(
     tabPanel(
       title = "Pathway network",
       HTML('<hr style="border-color: #0088cc;">'),
-      plotlyOutput("gsea_do_plot", height = "600px") %>% withSpinner(),
+      sidebarLayout(
+        position = "right",
+        sidebarPanel(
+          width = 3,
+          uiOutput("do_network_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
+        ), 
+        mainPanel(
+          width = 9,
+          plotlyOutput("gsea_do_plot", height = "600px") %>% withSpinner()
+        )
+      ),
       HTML('<hr style="border-color: #0088cc;">')
     ),
     

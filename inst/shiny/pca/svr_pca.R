@@ -72,7 +72,7 @@ output[["selected_pca"]] <- DT::renderDataTable({
 })
 
 ## samples PCA 3D
-output$samples_pca_3d <- renderPlotly({
+output[["samples_pca_3d"]] <- renderPlotly({
   tryCatch({
     checkReload()
     samplePca3dPlot(inUse_normDge, input$group_pca3d, input$set_pca3d_pc1, input$set_pca3d_pc2, input$set_pca3d_pc3)
@@ -112,4 +112,25 @@ output[["setpc_pca3d"]] <- renderUI({
   }, error = function(err) {
     return(NULL)
   })
+})
+
+## INFORMATION BOXES
+
+output[["variance_pca_info"]] <- renderUI({
+  infoText <- "This plot shows the variances of the PCA (Principal Components Analysis) components.
+        A scree plot shows the 'eigenvalues' from the PCA and can be used to decide how many components
+        can be kept for the PCA analysis."
+  informationBox(infoText)
+})
+
+output[["samples_pca_2d_info"]] <- renderUI({
+  infoText <- "The 2D PCA plot shows the samples based on the two components. A PCA plot shows important
+        information from a multivariate data table and shows the result as new variables (Principal Components)."
+  informationBox(infoText)
+})
+
+output[["samples_pca_3d_info"]] <- renderUI({
+  infoText <- "The 3D PCA plot shows the samples based on the three components. A PCA plot shows important
+        information from a multivariate data table and shows the result as new variables (Principal Components)."
+  informationBox(infoText)
 })

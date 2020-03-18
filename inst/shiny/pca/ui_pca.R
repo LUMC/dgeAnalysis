@@ -11,7 +11,9 @@ tab_pca <- tabItem(
       sidebarLayout(
         position = "right",
         sidebarPanel(
-          width = 3
+          width = 3,
+          uiOutput("variance_pca_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
         ), 
         mainPanel(
           width = 9,
@@ -29,7 +31,10 @@ tab_pca <- tabItem(
         sidebarPanel(
           width = 3,
           uiOutput("group_pca2d"),
-          uiOutput("setpc_pca2d")
+          uiOutput("setpc_pca2d"),
+          br(),
+          uiOutput("samples_pca_2d_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
         ), 
         mainPanel(
           width = 9,
@@ -49,7 +54,10 @@ tab_pca <- tabItem(
         sidebarPanel(
           width = 3,
           uiOutput("group_pca3d"),
-          uiOutput("setpc_pca3d")
+          uiOutput("setpc_pca3d"),
+          br(),
+          uiOutput("samples_pca_3d_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
         ), 
         mainPanel(
           width = 9,

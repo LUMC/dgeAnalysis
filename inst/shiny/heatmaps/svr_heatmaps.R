@@ -49,3 +49,21 @@ output[["heatmap_dge_ngenes"]] <- renderUI({
     return(NULL)
   })
 })
+
+## INFORMATION BOXES
+
+output[["var_heat_info"]] <- renderUI({
+  infoText <- "This heatmap is based on the most variable genes. This is calculated
+        by getting the average Log2CPM difference of a gene between all samples. The
+        genes are then sorted based on the calculated difference. The genes with the
+        biggest difference between Log2CPM values between all samples are listed as
+        'The most variable' and are shown in the heatmap."
+  informationBox(infoText)
+})
+
+output[["dge_heat_info"]] <- renderUI({
+  infoText <- "This heatmap is based on the most differentially expressed genes. This 
+        is defined by sorting all genes based on the adjusted p-value. The genes with
+        the lowest adjusted p-values are considered 'most expressed'."
+  informationBox(infoText)
+})

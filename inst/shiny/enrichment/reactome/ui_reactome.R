@@ -37,7 +37,10 @@ tab_enrich_reactome <- tabItem(
             c("P-Value" = "pvalue",
               "Adjusted P-Value" = "p.adjust",
               "Q-Value" = "qvalues")
-          )
+          ),
+          br(),
+          uiOutput("reactome_barplot_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
         ), 
         mainPanel(
           width = 9,
@@ -54,7 +57,10 @@ tab_enrich_reactome <- tabItem(
         position = "right",
         sidebarPanel(
           width = 3,
-          sliderInput("cnet_reactome_slider", "Amount of shown pathways:", 5, min = 1, max = 15, step=1)
+          sliderInput("cnet_reactome_slider", "Amount of shown pathways:", 5, min = 1, max = 15, step=1),
+          br(),
+          uiOutput("cnet_reactome_plot_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
         ), 
         mainPanel(
           width = 9,
@@ -73,9 +79,20 @@ tab_enrich_reactome <- tabItem(
     tabPanel(
       title = "Pathway network",
       HTML('<hr style="border-color: #0088cc;">'),
-      plotlyOutput("gsea_reactome_plot", height = "600px") %>% withSpinner(),
-      HTML('<hr style="border-color: #0088cc;">'),
-      plotlyOutput("reactome_pathway", height = "600px") %>% withSpinner(),
+      sidebarLayout(
+        position = "right",
+        sidebarPanel(
+          width = 3,
+          uiOutput("reactome_network_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
+        ), 
+        mainPanel(
+          width = 9,
+          plotlyOutput("gsea_reactome_plot", height = "600px") %>% withSpinner(),
+          HTML('<hr style="border-color: #0088cc;">'),
+          plotlyOutput("reactome_pathway", height = "600px") %>% withSpinner()
+        )
+      ),
       HTML('<hr style="border-color: #0088cc;">'),
       fluidRow(
         column(

@@ -12,7 +12,10 @@ tab_bias <- tabItem(
         position = "right",
         sidebarPanel(
           width = 3,
-          uiOutput("selectGC")
+          uiOutput("selectGC"),
+          br(),
+          uiOutput("gc_bias_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
         ), 
         mainPanel(
           width = 9,
@@ -29,7 +32,10 @@ tab_bias <- tabItem(
         position = "right",
         sidebarPanel(
           width = 3,
-          uiOutput("selectLength")
+          uiOutput("selectLength"),
+          br(),
+          uiOutput("len_bias_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
         ), 
         mainPanel(
           width = 9,
