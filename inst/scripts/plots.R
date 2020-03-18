@@ -60,9 +60,8 @@ alignmentSummaryPlot <- function(se, perc=T){
   p
 }
 
-complexityPlot <- function(se, perc=T) {
-  maxRank=1000
-  compData <- complexityData(se, maxRank)
+complexityPlot <- function(se, perc, rank) {
+  compData <- complexityData(se, rank)
   
   if (perc){
     p <- plot_ly(
@@ -732,3 +731,26 @@ biasPlot <- function(deTab, biasColumn, log) {
 
 ## --------------------------------------------------------------------------
 
+## ----- INFORMATION BOX -----
+
+informationBox <- function(infoText) {
+  tryCatch({
+    box(
+      title = "Information",
+      status = "primary",
+      solidHeader = TRUE,
+      width = 12,
+      collapsible = TRUE,
+      collapsed = FALSE,
+      span(
+        infoText,
+        style = "padding-left: 5px; text-align: justify; display: block;"
+      ),
+      style = "padding-left: unset;"
+    )
+  }, error = function(err) {
+    return(NULL)
+  })
+}
+
+## --------------------------------------------------------------------------
