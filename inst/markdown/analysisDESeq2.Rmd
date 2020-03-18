@@ -1,8 +1,17 @@
 ---
-title: "Shiny analysis - DESeq2"
-author: "Tom Kuipers"
+title: "dgeAnalysis - DESeq2"
+author:
+- "Developed by LUMC-SASC team:"
+- "- Tom Kuipers"
+- "- Leon Mei"
+- "- Davy Cats"
+date: "`r format(Sys.time(), '%d %B %Y')`"
 output:
-  html_document: default
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    theme: paper
 always_allow_html: true
 params:
   data_samples:     ""
@@ -18,9 +27,8 @@ params:
   alpha:            ""
 ---
 
-
-## R Markdown
-
+# Reading packages and variables
+Required packages are loaded and the input variables are set. The used input settings are shown.
 
 ```{r setup}
 
@@ -61,6 +69,7 @@ data_counts <- data_counts[,!colnames(data_counts) %in% excluded_samples]
 
 ```
 
+## Input values
 
 ```{r showVariables}
 # SHOW VALUES OF VARIABLES
@@ -75,6 +84,8 @@ matrix_v2
 
 ```
 
+# Process raw data
+The raw data is processed and pre-filtered, to remove non feature counts. The data is placed in a format (DGE list) which can be used for later analsis.
 
 ```{r showRawData}
 # SHOW RAW DATA
@@ -86,6 +97,7 @@ complexityPlot(se)
 
 ```
 
+## Create DGE list
 
 ```{r filesIntoSE}
 # READ ALL FILES INTO SE
@@ -107,6 +119,8 @@ dge <- DGEList(counts = assay(se), samples = colData(se))
 
 ```
 
+# Create design and prepare analysis
+The design matrix is created and the raw data is filtered based on the input values provided.
 
 ```{r selectedFeatures}
 # GET SELECTED FEATURES
@@ -126,6 +140,8 @@ analysis <- analysis[selectedFeatures,]
 
 ```
 
+# Perform analysis
+The analysis is performed with the filtered data using DESeq2.
 
 ```{r startAnalysis}
 # START ANALYSIS
@@ -134,6 +150,8 @@ analysis <- DESeq(analysis)
 
 ```
 
+# Normalization
+Extract the normalized data from the analysis results.
 
 ```{r getNormalizedCounts}
 # GET NORMALIZED COUNTS
@@ -148,6 +166,8 @@ variancePcaPlot(normDge)
 
 ```
 
+# Collect DE results
+Create the contrast matrix and collect DE results based on this matrix.
 
 ```{r getResults}
 # GET RESULTS
@@ -165,6 +185,7 @@ summary(deTab)
 
 ```
 
+## Format DE output table
 
 ```{r create_deTab}
 # CREATE deTab TABLE
@@ -183,6 +204,7 @@ deTab$DE[deTab$adj.P.Val < alpha & deTab$avgLog2FC > 0] <- 1
 
 ```
 
+## Add annotation to DE table
 
 ```{r addAnnotation}
 # ADD ANNOTATION TO deTab
@@ -213,6 +235,7 @@ if (setGeneName == "symbol" && !is.null(data_annotation)) {
 
 ```
 
+## DE results
 
 ```{r showDGEResult}
 # SHOW DGE RESULTS
@@ -222,6 +245,8 @@ pValuePlot(deTab)
 
 ```
 
+# Save results
+Results are saved, so they can be retrieved by the application.
 
 ```{r save}
 # SAVE ANALYSIS
@@ -230,6 +255,8 @@ save(deTab, normDge, file="analysis.RData")
 
 ```
 
+# Session info
+Showing all used packages including version numbers.
 
 ```{r session}
 #INFO
