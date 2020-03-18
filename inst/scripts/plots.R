@@ -321,6 +321,8 @@ samplePca2dPlot <- function(dge, color, getPC1, getPC2){
   tdge <- t(dge$counts)
   tdge[!is.finite(tdge)] <- 0
   pca <- prcomp(tdge, center=TRUE)
+  percent <- data.frame(summary( pca )$importance[2,])
+  colnames(percent) <- "percent"
   
   pca <- data.frame(scale(tdge, center=T, scale=F)%*%pca$rotation)
   pca$group <- dge$samples[,color]
@@ -341,8 +343,8 @@ samplePca2dPlot <- function(dge, color, getPC1, getPC2){
     source = "pca_pca2d") %>%
     plotly::layout(
       title = 'PCA 2D',
-      xaxis = list(title = getPC1),
-      yaxis = list(title = getPC2),
+      xaxis = list(title = paste0(getPC1, " (", round(percent[getPC1,]*100, 2), "%)")),
+      yaxis = list(title = paste0(getPC2, " (", round(percent[getPC2,]*100, 2), "%)")),
       clickmode = "event+select",
       dragmode = "select") %>%
     config(
@@ -360,6 +362,8 @@ samplePca3dPlot <- function(dge, color, getPC1, getPC2, getPC3){
   tdge <- t(dge$counts)
   tdge[!is.finite(tdge)] <- 0
   pca <- prcomp(tdge, center=TRUE)
+  percent <- data.frame(summary( pca )$importance[2,])
+  colnames(percent) <- "percent"
   
   pca <- data.frame(scale(tdge, center=T, scale=F)%*%pca$rotation)
   pca$group <- dge$samples[,color]
@@ -376,9 +380,9 @@ samplePca3dPlot <- function(dge, color, getPC1, getPC2, getPC3){
     plotly::layout(
       title = 'PCA 3D',
       scene = list(
-        xaxis = list(title = getPC1),
-        yaxis = list(title = getPC2),
-        zaxis = list(title = getPC3))
+        xaxis = list(title = paste0(getPC1, " (", round(percent[getPC1,]*100, 2), "%)")),
+        yaxis = list(title = paste0(getPC2, " (", round(percent[getPC2,]*100, 2), "%)")),
+        zaxis = list(title = paste0(getPC3, " (", round(percent[getPC3,]*100, 2), "%)")))
     ) %>%
     config(
       toImageButtonOptions = list(
