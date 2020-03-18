@@ -10,7 +10,13 @@ tab_about <- tabItem(
   br(),
   br(),
   h3("Version:", as.character(packageVersion("dgeAnalysis"))),
-  h3("Author: Tom Kuipers"),
+  h2("Developed by LUMC-SASC team"),
+  h3("Tom Kuipers"),
+  h4(
+    "Leon Mei", tags$br(),
+    "Davy Cats", tags$br()
+  ),
+  br(),
   h3(a(href="https://github.com/LUMC/DGE_analysis", "GitHub page")),
   img(src="lumcLogo.png", width="300px"),
   br(),br(),br(),
