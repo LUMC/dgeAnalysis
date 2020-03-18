@@ -122,11 +122,13 @@ output[["show_matrix"]] <- renderUI({
   if (!is.null(input$vs_mode)) {
     tagList(
       "Find genes that respond to:",
+      br(),
       matrix_vs_mode()
     )
   } else {
     tagList(
-      "Find genes that respond diffently to:",
+      "Find genes that respond differently to:",
+      br(),
       matrix_single()
     )
   }
