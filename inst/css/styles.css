@@ -272,6 +272,7 @@ table.dataTable tr.selected td{
   font-size: 20px;
 }
 .control-label {
+  padding-left: 20px;
   padding-right: 20px;
 }
 
@@ -307,9 +308,12 @@ table.dataTable tr.selected td{
   margin-left: unset;
 }
 .checkbox-inline, .radio-inline, .radio label, .checkbox label {
-  padding-left: unset;
   padding-right: 20px;
 }
+
+/* --- widgets */
+
+/* box (infobox) --- */
 
 .box.box-solid.box-primary>.box-header {
   background: #0088cc;
@@ -319,7 +323,17 @@ table.dataTable tr.selected td{
   float: unset;
 }
 
-/* --- widgets */
+.col-sm-12 {
+  padding-right: unset;
+  padding-left: unset;
+}
+
+.well {
+  padding: 5px;
+  padding-top: 19px;
+}
+
+/* --- box (infobox) */
 
 
 /* switch --- */
