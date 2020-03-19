@@ -15,7 +15,10 @@ tab_home <- tabItem(
   HTML('<hr style="border-color: #0088cc;">'),
   
   h1("Flowchart of the application"),
-  br(),
-  img(src="programFlow.png", width="80%"),
-  br()
+  div(
+    br(),
+    img(src="programFlow.png", width="90%"),
+    br(), br(),
+    style = "background-color: #f5f5f5; border: 1px solid #e3e3e3; width: 90%"
+  )
 )
