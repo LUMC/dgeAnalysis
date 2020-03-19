@@ -1,7 +1,7 @@
 
 
 ## Install or import required packages ##
-if (!require("shiny")) devtools::install_github('tomkuipers1402/shiny')
+if (!require("shiny")) install.packages("shiny")
 if (!require("shinydashboard")) install.packages("shinydashboard")
 if (!require("shinyWidgets")) install.packages("shinyWidgets")
 if (!require("shinycssloaders")) install.packages("shinycssloaders")
