@@ -376,6 +376,13 @@ table.dataTable tr.selected td{
   font-size: 25px;
 }
 
+#shiny-notification-panel {
+  bottom: unset;
+  top: 90px;
+  width: 25%;
+  text-align: center;
+}
+
 /* --- modal popup */
 
 /* image scroll --- */
