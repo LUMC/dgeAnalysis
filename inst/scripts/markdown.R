@@ -3,12 +3,7 @@
 
 createDesign <- function(dge, dbase, dvalue, matrix_v1, matrix_v2) {
   columns <- c(dbase, dvalue)
-  
-  matrix <- NULL
-  for (value in c(matrix_v1, matrix_v2)) {
-    matrix <- c(matrix, paste0(na.omit(columns[which(dge == value, arr.ind=T)[, "col"]]), value))
-  }
-  
+  matrix <- c(matrix_v1, matrix_v2)
   getdesign <- "~"
   
   tryCatch({

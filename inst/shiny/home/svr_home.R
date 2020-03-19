@@ -28,7 +28,7 @@ output[["get_started"]] <- renderUI({
   fluidRow(
     column(
       width = 6,
-      h2("Run new analysis"),
+      h2("New analysis"),
       div(
         br(),
         span(

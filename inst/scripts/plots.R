@@ -736,7 +736,7 @@ biasPlot <- function(deTab, biasColumn, log) {
 informationBox <- function(infoText) {
   tryCatch({
     box(
-      title = "Information",
+      title = icon("info-circle"),
       status = "primary",
       solidHeader = TRUE,
       width = 12,
