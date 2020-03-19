@@ -267,6 +267,7 @@ table.dataTable tr.selected td{
 }
 #app_mode .radio-inline {
   padding-left: unset;
+  padding-right: unset;
 }
 #app_mode .control-label {
   font-size: 20px;
