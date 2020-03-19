@@ -27,9 +27,10 @@ observeEvent(input$run_button, {
     load("markdown/analysis.RData", envir=.GlobalEnv)
     inUse_deTab <<- deTab
     inUse_normDge <<- normDge
-    showNotification(ui = "Analysis has been succesful!", duration = 10, type = "message")
+    showNotification(ui = "Analysis has been succesful!", duration = 5, type = "message")
   }, error = function(err) {
-    showNotification(ui = "The analysis failed with an error!", duration = 10, type = "error")
+    showNotification(ui = "The analysis failed with an error!", duration = 5, type = "error")
+    showNotification(ui = as.character(err), duration = 10, type = "error")
     print(err)
     return(NULL)
   }
@@ -41,7 +42,7 @@ output[["design_base"]] <- renderUI({
   tryCatch({
     if (is.null(input$file_samples)){return(NULL)}
     
-    selectInput("design_base", "Set base column for comparison:",
+    selectInput("design_base", "Select base column for comparison:",
                 colnames(data_samples())
     )
   }, error = function(err) {
@@ -53,7 +54,7 @@ output[["design_value"]] <- renderUI({
   tryCatch({
     if (is.null(input$design_base)){return(NULL)}
     checkboxGroupInput("design_value",
-                       "Select columns for comparison (pairwise analysis):",
+                       "Select nested columns, relative to base column:",
                        choices = colnames(data_samples())[!colnames(data_samples()) %in% input$design_base],
                        inline = TRUE
     )
@@ -115,29 +116,25 @@ output[["show_design"]] <- renderUI({
   } else {
     design <- createDesign(data_samples(), input$design_base, input$design_value, NULL, input$matrix_val2)
   }
+  design <- gsub("\\+", " + ", design)
+  if (design == "~") {
+    design <- "No values selected"
+  }
   design
 })
 
 output[["show_matrix"]] <- renderUI({
   if (!is.null(input$vs_mode)) {
-    tagList(
-      "Find genes that respond to:",
-      br(),
-      matrix_vs_mode()
-    )
+    matrix_vs_mode()
   } else {
-    tagList(
-      "Find genes that respond differently to:",
-      br(),
-      matrix_single()
-    )
+    matrix_single()
   }
 })
 
 matrix_single <- reactive({
   columns <- c(input$design_base, input$design_value)
   
-  total_matrix2 <- NULL
+  total_matrix <- NULL
   for (column in columns) {
     temp2 <- NULL
     for (value in input$matrix_val2) {
@@ -146,10 +143,14 @@ matrix_single <- reactive({
       }
     }
     if (!is.null(temp2)) {
-      total_matrix2 <- c(total_matrix2, paste(temp2, collapse = ", "))
+      total_matrix <- c(total_matrix, paste(temp2, collapse = ", "))
     }
   }
-  total_matrix2 <- paste(total_matrix2, collapse = " and ")
+  if (is.null(total_matrix)) {
+    total_matrix <- "No values selected"
+  }
+  
+  total_matrix <- paste(total_matrix, collapse = " in ")
 })
 
 matrix_vs_mode <- reactive({
@@ -177,11 +178,17 @@ matrix_vs_mode <- reactive({
       total_matrix2 <- c(total_matrix2, paste(temp2, collapse = ", "))
     }
   }
-  total_matrix1 <- paste(total_matrix1, collapse = " and ")
-  total_matrix2 <- paste(total_matrix2, collapse = " and ")
-  if (total_matrix1 == total_matrix2 && total_matrix1 != "") {
-    showNotification(ui = "This is not a good comparison!", duration = 3, type = "message")
+  
+  total_matrix1 <- paste(total_matrix1, collapse = " in ")
+  total_matrix2 <- paste(total_matrix2, collapse = " in ")
+  
+  if (total_matrix1 == "") {
+    total_matrix1 <- "No values selected"
   }
+  if (total_matrix2 == "") {
+    total_matrix2 <- "No values selected"
+  }
+  
   total_matrix <- paste(total_matrix1, total_matrix2, sep = " VS ")
 })
 
