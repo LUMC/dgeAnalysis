@@ -27,10 +27,7 @@ tab_enrich_go <- tabItem(
     tabPanel(
       title = "Enrichment table",
       HTML('<hr style="border-color: #0088cc;">'),
-      fluidRow(column(
-        12,
-        DT::dataTableOutput("go_data_table") %>% withSpinner()
-      )),
+      DT::dataTableOutput("go_data_table") %>% withSpinner(),
       HTML('<hr style="border-color: #0088cc;">')
     ),
     
@@ -80,10 +77,7 @@ tab_enrich_go <- tabItem(
         )
       ),
       HTML('<hr style="border-color: #0088cc;">'),
-      fluidRow(column(
-        12,
-        DT::dataTableOutput("cnet_go_table") %>% withSpinner()
-      )),
+      DT::dataTableOutput("cnet_go_table") %>% withSpinner(),
       HTML('<hr style="border-color: #0088cc;">')
     ),
     

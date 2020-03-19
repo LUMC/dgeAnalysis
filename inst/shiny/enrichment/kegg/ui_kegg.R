@@ -14,11 +14,7 @@ tab_enrich_kegg <- tabItem(
     tabPanel(
       title = "Enrichment table",
       HTML('<hr style="border-color: #0088cc;">'),
-      fluidRow(
-        column(
-          12,
-          DT::dataTableOutput("kegg_data_table") %>% withSpinner())
-      ),
+      DT::dataTableOutput("kegg_data_table") %>% withSpinner(),
       HTML('<hr style="border-color: #0088cc;">')
     ),
     
@@ -68,11 +64,7 @@ tab_enrich_kegg <- tabItem(
         )
       ),
       HTML('<hr style="border-color: #0088cc;">'),
-      fluidRow(
-        column(
-          12,
-          DT::dataTableOutput("cnet_kegg_table") %>% withSpinner())
-      ),
+      DT::dataTableOutput("cnet_kegg_table") %>% withSpinner(),
       HTML('<hr style="border-color: #0088cc;">')
     ),
     
@@ -94,11 +86,7 @@ tab_enrich_kegg <- tabItem(
         )
       ),
       HTML('<hr style="border-color: #0088cc;">'),
-      fluidRow(
-        column(
-          12,
-          DT::dataTableOutput("kegg_pathway_table") %>% withSpinner())
-      ),
+      DT::dataTableOutput("kegg_pathway_table") %>% withSpinner(),
       HTML('<hr style="border-color: #0088cc;">')
     ),
     

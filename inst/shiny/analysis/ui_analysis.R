@@ -15,11 +15,7 @@ tab_analysis <- tabItem(
         c("All genes" = "all",
           "DE genes" = "deg")
       ),
-      fluidRow(
-        column(
-          12,
-          DT::dataTableOutput("detab_table") %>% withSpinner())
-      ),
+      DT::dataTableOutput("detab_table") %>% withSpinner(),
       HTML('<hr style="border-color: #0088cc;">')
     ),
     
