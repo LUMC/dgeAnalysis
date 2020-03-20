@@ -127,8 +127,8 @@ createMatrix <- function(dge, dbase, dvalue, matrix) {
 
 createContrast <- function(design, matrix_v1, matrix_v2) {
   contrast = integer(length(colnames(design)))
-  contrast[match(matrix_v1, colnames(design))] <- -1
-  contrast[match(matrix_v2, colnames(design))] <- 1
+  contrast[match(matrix_v1, colnames(design))] <- 1
+  contrast[match(matrix_v2, colnames(design))] <- -1
   contrast
 }
 
