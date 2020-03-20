@@ -88,6 +88,7 @@ tab_analysis <- tabItem(
         sidebarPanel(
           width = 3,
           uiOutput("group_analysis_bar"),
+          sliderInput("slider_barcode", "Set the number of genes to show:", value = 25, min = 1,  max = 50, step = 1),
           br(),
           uiOutput("barcode_plot_info"),
           span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
