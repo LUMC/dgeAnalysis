@@ -1,6 +1,22 @@
 
 ## ----- MARKDOWN FUNCTIONS -----
 
+
+## createDesign()
+##  Create vector from two design values and two matrix values
+##  Check if all values are the same then design will start with ~0
+##  Get column names based on corresponding values in matrix
+##  Paste column names together with +
+##  Create String from vector seprated by ''
+## Parameters:
+##  dge = DGE list object, containing samples and counts
+##  dbase = Vector, base design column
+##  dvalue = Vector, other design columns
+##  matrix_v1 = Vector, containing the left matrix values
+##  matrix_v2 = Vector, containing the right matrix values
+## Returns:
+##  getdesign = String, String with the design formula
+
 createDesign <- function(dge, dbase, dvalue, matrix_v1, matrix_v2) {
   columns <- c(dbase, dvalue)
   matrix <- c(matrix_v1, matrix_v2)
@@ -35,6 +51,19 @@ createDesign <- function(dge, dbase, dvalue, matrix_v1, matrix_v2) {
   getdesign
 }
 
+
+## relevelSamples()
+##  Create vector from two matrix values
+##  Try to relevel samples on values that are not present in matrix
+## Parameters:
+##  dge = DGE list object, containing samples and counts
+##  dbase = Vector, base design column
+##  dvalue = Vector, other design columns
+##  matrix_v1 = Vector, containing the left matrix values
+##  matrix_v2 = Vector, containing the right matrix values
+## Returns:
+##  dge = DGE list object, containing samples and counts
+
 relevelSamples <- function(dge, dbase, dvalue, matrix_v1, matrix_v2) {
   columns <- c(dbase, dvalue)
   for (value in columns) {
@@ -46,6 +75,18 @@ relevelSamples <- function(dge, dbase, dvalue, matrix_v1, matrix_v2) {
   }
   dge
 }
+
+
+## createMatrix()
+##  Getbase column and use this to create right matrix
+##  Loop through base, nested columns and matrix to create full matrix
+## Parameters:
+##  dge = DGE list object, containing samples and counts
+##  dbase = Vector, base design column
+##  dvalue = Vector, other design columns
+##  matrix = Vector, containing the matrix values
+## Returns:
+##  dge = DGE list object, containing samples and counts
 
 createMatrix <- function(dge, dbase, dvalue, matrix) {
   getbase <- NULL
@@ -73,37 +114,22 @@ createMatrix <- function(dge, dbase, dvalue, matrix) {
   getmatrix
 }
 
+
+## createContrast()
+##  Create contrast by finding matrix values in the design matrix
+##  Values are assigned based if present in matrix (v1 or v2) else 0
+## Parameters:
+##  design = String, in use design matrix
+##  matrix_v1 = Vector, containing the left matrix values
+##  matrix_v2 = Vector, containing the right matrix values
+## Returns:
+##  contrast = vector, containing the contrasts (0, 1, -1)
+
 createContrast <- function(design, matrix_v1, matrix_v2) {
   contrast = integer(length(colnames(design)))
   contrast[match(matrix_v1, colnames(design))] <- -1
   contrast[match(matrix_v2, colnames(design))] <- 1
   contrast
-}
-
-highExpressedFeatures <- function(method, dge, design_value, cpm_value) {
-  if (method == "edger") {
-    edger <- calcNormFactors( dge, method = "TMM")
-    counts <- cpm(edger, log = TRUE)
-    selectedFeatures <- rownames( edger )[ apply( counts, 1, function( v ) sum( v >= cpm_value ) ) >= 1/4 * ncol( counts ) ]
-    
-  } else {
-    selectedFeatures <- filterByExpr(dge, model.matrix(eval(parse(text=design_value)), dge$samples ))
-    
-  }
-  selectedFeatures
-}
-
-## NOT IN USE ANYMORE
-filterDge <- function(normDge, excluded_samples, data_samples, se) {
-  normDge$counts <- normDge$counts[,!colnames(normDge$counts) %in% excluded_samples]
-  data_samples <- data_samples[!rownames(data_samples) %in% excluded_samples, ]
-  data_samples <- droplevels(data_samples)
-  
-  se <- addSamplesFromTableToSE(se, data_samples)
-  
-  tempDge <- DGEList(counts = normDge$counts, samples = colData(se), genes = normDge$genes)
-  tempDge <- calcNormFactors( tempDge, method = "TMM")
-  tempDge
 }
 
 ## --------------------------------------------------------------------------

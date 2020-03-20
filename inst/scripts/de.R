@@ -1,14 +1,30 @@
 
 ## ----- Read files -----
 
-## Add counts to se
+
+## readCountsFromTable()
+##  Add all counts that are in samples in SummerizedExperiment
+## Parameters:
+##  data_counts = Dataframe, Containing all raw count data
+##  data_samples = Dataframe, Containing all sample data
+## Returns:
+##  se = SummerizedExperiment, With counts
+
 readCountsFromTable <- function(data_counts, data_samples) {
   out <- as.matrix(data_counts[, colnames(data_counts) %in% rownames(data_samples)])
   se <- SummarizedExperiment(assays=list(counts=out))
   se
 }
 
-## Add samples to se
+
+## addSamplesFromTableToSE()
+##  Add samples to the SummerizedExperiment
+## Parameters:
+##  se = SummerizedExperiment, With counts
+##  data_samples = Dataframe, Containing all sample data
+## Returns:
+##  se = SummerizedExperiment, With samples and counts
+
 addSamplesFromTableToSE <- function(se, data_samples){
   data_samples <- droplevels(data_samples)
   samples <- intersect(colnames(se), rownames(data_samples))
@@ -18,7 +34,15 @@ addSamplesFromTableToSE <- function(se, data_samples){
   se
 }
 
-## Add annotation to se
+
+## addAnnotationsFromTableToSE()
+##  Add annotation to the SummerizedExperiment
+## Parameters:
+##  se = SummerizedExperiment, With samples and counts
+##  data_annotation = Dataframe, Containing all annotation data
+## Returns:
+##  se = SummerizedExperiment, With samples, counts and annotation
+
 addAnnotationsFromTableToSE <- function(se, data_annotation){
   features <- intersect(rownames(se), rownames(data_annotation))
   se <- se[features,]
@@ -30,6 +54,15 @@ addAnnotationsFromTableToSE <- function(se, data_annotation){
 
 ## ----- Analysis utility -----
 
+
+## getCount()
+##  Count the read counts per feature to find number of reads that are aligned, not aligned, etc.
+## Parameters:
+##  x = String, Containing the value on which to count reads
+##  raw = Dataframe, Containing count data
+## Returns:
+##  Integer, With total counted reads
+
 getCount <- function(x, raw){
   if (x["feature"] %in% rownames(raw)) {
     return(raw[x["feature"], x["sample"]])
@@ -39,6 +72,14 @@ getCount <- function(x, raw){
   }
 }
 
+
+## alignmentSummary()
+##  Creates dataframe with counts per mapping feature (aligned, not aligned, etc.)
+## Parameters:
+##  se = SummerizedExperiment, With samples, counts (and annotation)
+## Returns:
+##  out = Dataframe, With total counts per available mapping feature
+
 alignmentSummary <- function(se){
   specialFeatures <- rownames(se)[ grepl( "^__", rownames(se) ) ]
   out <- expand.grid(feature=c("aligned", specialFeatures), sample=colnames(se))
@@ -46,7 +87,16 @@ alignmentSummary <- function(se){
   out
 }
 
-complexityData <- function(se, max=1000){
+
+## complexityData()
+##  Creates dataframe with number of reads per gene, ordered on genes with the most reads assigned.
+## Parameters:
+##  se = SummerizedExperiment, With samples, counts (and annotation)
+##  max = Integer, The maximum rank that is used
+## Returns:
+##  out = Dataframe, With total read counts per gene
+
+complexityData <- function(se, max){
   features <- rownames(se)[ ! grepl( "^__", rownames(se) ) ]
   ranks <- c(1:max)
   out <- expand.grid(rank=ranks, sample=colnames(se))
@@ -60,11 +110,29 @@ complexityData <- function(se, max=1000){
   out
 }
 
+
+## stackDge()
+##  Stacks total DGE counts based on: mapping feature (aligned, not aligned, etc.), sample and LogCPM
+## Parameters:
+##  dge = DGE list object, containing samples and counts
+## Returns:
+##  count = Dataframe, With mapping feature, sample and LogCPM
+
 stackDge <- function(dge){
   count <- stack(dge$counts)
   names(count) <- c("feature", "sample", "logCPM")
   count
 }
+
+
+## gamConfidenceFit()
+##  Calculates a confidence fit for various plots.
+##  Model used is GAM to calculate predictions
+## Parameters:
+##  deTab = Dataframe, with all analysis results
+##  biasColumn = String, Value on which to calculate confidence
+## Returns:
+##  prediction = Vector, With coordinates of prediction locations (line plot)
 
 gamConfidenceFit <- function(deTab, biasColumn) {
   method.args = list()

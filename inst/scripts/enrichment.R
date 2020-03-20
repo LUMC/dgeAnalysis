@@ -1,7 +1,16 @@
 
-## ----- GENE SET ENRICHMENT -----
+## ----- UTIL FUNCTIONS GENE SET ENRICHMENT -----
 
-# util functions needed for enrichment ---
+
+## get_geneList()
+##  Get LogFC from deTab
+##  Add entrez id to geneList
+##  Sort geneList based on LogFC (decreasing)
+##  Remove NA and duplicate names
+## Parameters:
+##  deTab = Dataframe, with all analysis results
+## Returns:
+##  geneList = Vector, Named vector containing gene names and LogFC values
 
 get_geneList <- function(deTab){
   geneList <- deTab$avgLog2FC
@@ -12,12 +21,21 @@ get_geneList <- function(deTab){
   geneList
 }
 
+
+## update_n()
+##  Sets a new n value
+##  n stands for the number of pathways to show
+## Parameters:
+##  x = Enrichment object, containing enrichment results
+##  showCategory = Integer, number of pathways
+## Returns:
+##  n = Integer, Updated number of pathways to show
+
 update_n <- function(x, showCategory) {
   if (!is.numeric(showCategory)) {
     return(showCategory)
   }
   
-  ## geneSets <- geneInCategory(x) ## use core gene for gsea result
   n <- showCategory
   if (nrow(x) < n) {
     n <- nrow(x)
@@ -26,23 +44,53 @@ update_n <- function(x, showCategory) {
   return(n)
 }
 
+
+## extract_geneSet()
+##  Sets a new n value
+##  n stands for the number of pathways to show
+##  Gets genes from x (enrichment results)
+##  geneSets names are set based on ID and description
+## Parameters:
+##  x = Enrichment object, containing enrichment results
+##  n = Integer, Updated number of pathways to show
+## Returns:
+##  geneSets = vector, Genes found in corresponding pathways
+
 extract_geneSets <- function(x, n) {
   n <- update_n(x, n)
-  geneSets <- geneInCategory(x) ## use core gene for gsea result
+  geneSets <- geneInCategory(x)
   y <- as.data.frame(x)
   geneSets <- geneSets[y$ID]
   names(geneSets) <- y$Description
   if (is.numeric(n)) {
     return(geneSets[1:n])
   }
-  return(geneSets[n]) ## if n is a vector of Description
+  return(geneSets[n])
 }
+
+
+## list2graph()
+##  The inputList is converted to a graph format
+##  Igraph object is created based on a vector/list
+## Parameters:
+##  inputList = Vector, containing Gene names and LogFC
+## Returns:
+##  g = Igraph object, Graph with links between genes
 
 list2graph <- function(inputList) {
   x <- list2df(inputList)
   g <- igraph::graph.data.frame(x, directed=FALSE)
   return(g)
 }
+
+
+## list2df()
+##  The inputList is converted to a dataframe format
+##  Dataframe object is created based on a vector/list
+## Parameters:
+##  inputList = Vector, containing Gene names and LogFC
+## Returns:
+##  ldf = Dataframe, With all in use genes
 
 list2df <- function(inputList) {
   ldf <- lapply(1:length(inputList), function(i) {
@@ -55,19 +103,62 @@ list2df <- function(inputList) {
   do.call('rbind', ldf)
 }
 
+
+## overlap_ratio()
+##  Overlap is calculated and define between x and y
+##  The number of overlaps is returned
+## Parameters:
+##  x = Vector, genes relative to x axis 
+##  y = Vector, genes relative to y axis 
+## Returns:
+##  n = Integer, Number of overlapping values
+
 overlap_ratio <- function(x, y) {
   x <- unlist(x)
   y <- unlist(y)
-  length(intersect(x, y))/length(unique(c(x,y)))
+  n <- length(intersect(x, y))/length(unique(c(x,y)))
+  n
 }
 
-get_organismID <- function(deTab){
-  id <- rownames(deTab)[nrow(deTab)]
-  id <- gsub("[^A-Za-z]","", id)
-  id <- sub(".{1}$", "", id)
-  id
+
+## get_organismID()
+##  The gene IDs are gathered from DE table
+##  The first part of the ID name is kept
+## Parameters:
+##  deTab = Dataframe, with all analysis results
+## Returns:
+##  id = String, Organism ID value
+
+get_organismID <- function(deTab, app_mode){
+  tryCatch({
+    if (app_mode == "symbol") {
+      id <- deTab$geneId[nrow(deTab)]
+    } else {
+      id <- rownames(deTab)[nrow(deTab)]
+    }
+    id <- gsub("[^A-Za-z]","", id)
+    id <- sub(".{1}$", "", id)
+    id
+  }, error = function(err) {
+    return(NULL)
+  })
 }
-# --- util functions needed for enrichment
+
+## --------------------------------------------------------------------------
+
+## ----- PLOT FUNCTIONS GENE SET ENRICHMENT -----
+
+
+## enrichBarplot()
+##  The enrichment results is filtered based on the number shown of pathways
+##  Descriptions of the pathways are added and the color scale is calculated
+##  A Barplot is created with a bar per pathway
+## Parameters:
+##  enrich = Enrich result, A enrichment results
+##  amount = Integer, Value with the number of pathways to show
+##  value = String, Value with the column name to be used (p-, q- or adjP value)
+## Returns:
+##  p = Plotly object
 
 enrichBarplot <- function(enrich, amount, value){
   enrich <- na.omit(enrich[0:amount,])
@@ -113,6 +204,16 @@ enrichBarplot <- function(enrich, amount, value){
   p
 }
 
+
+## emap_plotly()
+##  Pathways are gathered from enrichment result with pathway description
+##  A Igraph object is created with links between pathways
+##  Colors of dots are based on p-value
+## Parameters:
+##  enrich = Enrich result, A enrichment results
+## Returns:
+##  g = Igraph object, containing links between pathways
+
 emap_plotly <- function(enrich){
   geneSets <- geneInCategory(enrich)
   if (is.null(dim(enrich)) | nrow(enrich) == 1) {
@@ -139,7 +240,6 @@ emap_plotly <- function(enrich){
     g <- graph.data.frame(wd[,-3], directed=FALSE)
     E(g)$width=sqrt(wd[,3] * 5)
     g <- delete.edges(g, E(g)[wd[,3] < 0.2])
-    ## g <- delete.edges(g, E(g)[wd[,3] < 0.05])
     idx <- unlist(sapply(V(g)$name, function(x) which(x == enrich$Description)))
     
     cnt <- sapply(geneSets[idx], length)
@@ -150,6 +250,19 @@ emap_plotly <- function(enrich){
   }
   g
 }
+
+
+## viewPathwayPlot()
+##  Genes are gathered from enrichment result from specific pathway
+##  The geneList is prepared with the right LogFC values and links between genes in the pathway
+##  Igraph object is made to create links between genes in a pathway
+##  Colors of dots are based on p-value.
+## Parameters:
+##  deTab = Dataframe, with all analysis results
+##  db = String, Current database in use (kegg, reactome, go or do)
+##  pwName = String, Name of the pathway
+## Returns:
+##  gg = Igraph object, containing links between genes
 
 viewPathwayPlot <- function(deTab, db, pwName){
   organism <- get_organismID(deTab)
@@ -179,6 +292,20 @@ viewPathwayPlot <- function(deTab, db, pwName){
   gg
 }
 
+
+## cnetPlotly()
+##  Genes are gathered from enrichment result from specific pathway
+##  The geneList is prepared with the right LogFC values and links of genes between multiple pathways
+##  The number of pathways that are shown is defined with cnet_slider
+##  Igraph object is made to create links of genes between multiple pathways
+##  Colors of dots are based on LogFC
+## Parameters:
+##  enrich = Enrich result, A enrichment results
+##  deTab = Dataframe, with all analysis results
+##  cnet_slider = Integer, Number of pathways to show
+## Returns:
+##  g = Igraph object, containing links of genes multiple pathways
+
 cnetPlotly <- function(enrich, deTab, cnet_slider){
   setGeneList <- deTab$avgLog2FC
   names(setGeneList) <- as.character(deTab$geneName)
@@ -196,6 +323,23 @@ cnetPlotly <- function(enrich, deTab, cnet_slider){
   
   g
 }
+
+
+## plotlyGraph()
+##  Graph layout is set with kamada kawai (kk)
+##  Plots are created with dots as a gene or pathway
+##  Lines between dots show connection of these genes and/or pathways
+##  The geneList is prepared with the right LogFC values and links between genes between multiple pathways
+##  The number of pathways that are shown is defined with cnet_slider
+##  Igraph object is made to create links of genes between multiple pathways
+##  Colors of dots are based on LogFC or P-value
+## Parameters:
+##  g = Igraph object, containing graph data from genes and/or pathays
+##  pwName = String, Name of the shown pathway
+##  getColor = String, Color given to dots (LogFC or P-Values)
+##  cnet = Integer, Number of cnet pathways to show
+## Returns:
+##  p = Plotly object
 
 plotlyGraph <- function(g, pwName, getColor, cnet){
   G <- g
@@ -309,4 +453,3 @@ plotlyGraph <- function(g, pwName, getColor, cnet){
 #)
 
 ## --------------------------------------------------------------------------
-

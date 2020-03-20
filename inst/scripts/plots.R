@@ -1,6 +1,17 @@
 
 ## ----- ALIGNMENT PLOTS -----
 
+
+## alignmentSummaryPlot()
+##  Calculates Log values in the function alignmentSummary()
+##  If percentages == TRUE percentages are calculated
+##  A stacked bar plot is created based on sample read counts
+## Parameters:
+##  se = SummerizedExperiment object, containing samples and counts
+##  perc = Boolean, Data in percentages (default=TRUE)
+## Returns:
+##  p = Plotly object
+
 alignmentSummaryPlot <- function(se, perc=T){
   lse <- alignmentSummary(se)
   lse$feature <- gsub("_", " ", gsub("__", "", lse$feature))
@@ -60,6 +71,18 @@ alignmentSummaryPlot <- function(se, perc=T){
   p
 }
 
+
+## complexityPlot()
+##  Calculates count data per rank in the function complexityData()
+##  If percentages == TRUE percentages are calculated
+##  A dot line plot is created based on the number of reads at rank
+## Parameters:
+##  se = SummerizedExperiment object, containing samples and counts
+##  perc = Boolean, Data in percentages (default=TRUE)
+##  rank = The number of genes/rank (min=10)
+## Returns:
+##  p = Plotly object
+
 complexityPlot <- function(se, perc, rank) {
   compData <- complexityData(se, rank)
   
@@ -115,6 +138,15 @@ complexityPlot <- function(se, perc, rank) {
 
 ## ----- RAW DATA PLOTS / NORMALIZATION PLOTS -----
 
+
+## countDistributionLinePlot()
+##  Stacks count data from dge list in the function stackDge()
+##  A line plot is created based on Log2CPM and the density of the counts
+## Parameters:
+##  dge = DGE list object, containing samples and counts
+## Returns:
+##  p = Plotly object
+
 countDistributionLinePlot <- function(dge){
   stackCounts <- data.frame(stackDge(dge))
   
@@ -150,6 +182,15 @@ countDistributionLinePlot <- function(dge){
   p
 }
 
+
+## countDistributionBoxPlot()
+##  Stacks count data from dge list in the function stackDge()
+##  A box plot is created based on Log2CPM counts of the samples
+## Parameters:
+##  dge = DGE list object, containing samples and counts
+## Returns:
+##  p = Plotly object
+
 countDistributionBoxPlot <- function(dge){
   stackCounts <- data.frame(stackDge(dge))
   
@@ -178,6 +219,16 @@ countDistributionBoxPlot <- function(dge){
   }
   p
 }
+
+
+## voomPlot()
+##  Calculates required values with 'voom' method
+##  The plot is created with plotly with values retrieved from the voom object
+## Parameters:
+##  dge = DGE list object, containing samples and counts
+##  sourceId = plot ID, depends on raw/normalized counts
+## Returns:
+##  p = Plotly object
 
 voomPlot <- function(dge, sourceId){
   v <- voom(2^(dge$counts), save.plot = TRUE)
@@ -217,6 +268,18 @@ voomPlot <- function(dge, sourceId){
   p
 }
 
+
+## multidimensionalScaling2dPlot()
+##  Calculates required values with 'plotMDS' method
+##  The plot is created with plotly with values retrieved from the mds object
+##  Plot is colored based on the selected column
+## Parameters:
+##  dge = DGE list object, containing samples and counts
+##  color = String, Column on wich colors should be based
+##  sourceId = plot ID, depends on raw/normalized counts
+## Returns:
+##  p = Plotly object
+
 multidimensionalScaling2dPlot <- function(dge, color, sourceId){
   logFC <- plotMDS(dge$counts, ndim = ncol(dge)-1)
   for_plots <- data.frame(logFC$cmdscale.out)
@@ -252,6 +315,17 @@ multidimensionalScaling2dPlot <- function(dge, color, sourceId){
     )
   p
 }
+
+
+## multidimensionalScaling3dPlot()
+##  Calculates required values with 'plotMDS' method
+##  The plot is created with plotly with values retrieved from the mds object
+##  Plot is colored based on the selected column
+## Parameters:
+##  dge = DGE list object, containing samples and counts
+##  color = String, Column on wich colors should be based
+## Returns:
+##  p = Plotly object
 
 multidimensionalScaling3dPlot <- function(dge, color){
   logFC <- plotMDS(dge$counts, ndim = ncol(dge)-1)
@@ -289,6 +363,17 @@ multidimensionalScaling3dPlot <- function(dge, color){
 
 ## ----- PCA PLOTS -----
 
+
+## variancePcaPlot()
+##  Columns and rows from DGE list are turned
+##  PCA is calculated with prcomp
+##  PC percentages are calulated
+##  Barplot is created with PC percentages
+## Parameters:
+##  dge = DGE list object, containing samples and counts
+## Returns:
+##  p = Plotly object
+
 variancePcaPlot <- function(dge){
   tdge <- t(dge$counts)
   tdge[!is.finite(tdge)] <- 0
@@ -315,6 +400,20 @@ variancePcaPlot <- function(dge){
     )
   p
 }
+
+
+## samplePca2dPlot()
+##  Columns and rows from DGE list are turned
+##  PCA is calculated with prcomp
+##  PC percentages are calulated
+##  Scatter plot is created based on selected PCs
+## Parameters:
+##  dge = DGE list object, containing samples and counts
+##  color = String, Column on wich colors should be based
+##  getPC1 = String, Selected PC to be plotted on x-axis
+##  getPC2 = String, Selected PC to be plotted on y-axis
+## Returns:
+##  p = Plotly object
 
 samplePca2dPlot <- function(dge, color, getPC1, getPC2){
   tdge <- t(dge$counts)
@@ -357,6 +456,21 @@ samplePca2dPlot <- function(dge, color, getPC1, getPC2){
   p
 }
 
+
+## samplePca3dPlot()
+##  Columns and rows from DGE list are turned
+##  PCA is calculated with prcomp
+##  PC percentages are calulated
+##  Scatter plot is created based on selected PCs
+## Parameters:
+##  dge = DGE list object, containing samples and counts
+##  color = String, Column on wich colors should be based
+##  getPC1 = String, Selected PC to be plotted on x-axis
+##  getPC2 = String, Selected PC to be plotted on y-axis
+##  getPC3 = String, Selected PC to be plotted on z-axis
+## Returns:
+##  p = Plotly object
+
 samplePca3dPlot <- function(dge, color, getPC1, getPC2, getPC3){
   tdge <- t(dge$counts)
   tdge[!is.finite(tdge)] <- 0
@@ -398,6 +512,17 @@ samplePca3dPlot <- function(dge, color, getPC1, getPC2, getPC3){
 
 ## ----- HEATMAPS PLOTS -----
 
+
+## variableHeatmapPlot()
+##  LogCPM values of counts are calculated
+##  Variance is calculated and the first x genes are kept
+##  Heatmap with the values left in high_var_cpm
+## Parameters:
+##  dge = DGE list object, containing samples and counts
+##  amount = Integer, The number of genes shown in plot
+## Returns:
+##  p = Plotly object
+
 variableHeatmapPlot <- function(dge, amount){
   lcpm <- dge$counts
   var_genes <- apply(lcpm, 1, var)
@@ -427,6 +552,19 @@ variableHeatmapPlot <- function(dge, amount){
     )
   p
 }
+
+
+## topDgeHeatmapPlot()
+##  The DE table is sorted on FDR/adjPvalue
+##  The first x genes are kept
+##  Normalized values are extracted based on the DE genes still present
+##  Heatmap with the normalized values of genes is created
+## Parameters:
+##  deTab = Dataframe, with all analysis results
+##  dge = DGE list object, containing samples and counts
+##  amount = Integer, The number of genes shown in plot
+## Returns:
+##  p = Plotly object
 
 topDgeHeatmapPlot <- function(deTab, dge, amount){
   sortdeTab <- deTab[order(rank(deTab$adj.P.Val)),]
@@ -462,6 +600,16 @@ topDgeHeatmapPlot <- function(deTab, dge, amount){
 
 ## ----- ANALYSIS PLOTS -----
 
+
+## deRatioPlot()
+##  The number of unique values in column 'DE' are extracted
+##  Percentages of these values are calculated and renamed
+##  Barplot is created with DE results based on percentages
+## Parameters:
+##  deTab = Dataframe, with all analysis results
+## Returns:
+##  p = Plotly object
+
 deRatioPlot <- function(deTab){
   defeatures <- aggregate(deTab$DE, by=list(category=deTab$DE), FUN=length)
   defeatures$perc <- defeatures[,2]/sum(defeatures[,2])
@@ -495,6 +643,16 @@ deRatioPlot <- function(deTab){
     )
   p
 }
+
+
+## ma_plot()
+##  The confidence prediction calculated in the function gamConfidenceFit()
+##  Confidence is calculated based on avgLog2CPM
+##  Scatterplot is created with DE results and a line showing confidence
+## Parameters:
+##  deTab = Dataframe, with all analysis results
+## Returns:
+##  p = Plotly object
 
 ma_plot <- function(deTab){
   prediction <- gamConfidenceFit(deTab, "avgLog2CPM")
@@ -556,7 +714,18 @@ ma_plot <- function(deTab){
   p
 }
 
-volcanoPlot <- function(deTab, LogCut, PCut, ps){
+
+## volcanoPlot()
+##  Creates scatter plot with avgLog2FC vs -log10(adj.P.Val)
+##  Two lines are generated indicating LogFC cutoff and p value cutoff
+## Parameters:
+##  deTab = Dataframe, with all analysis results
+##  LogCut = Integer, LogFC cutoff for line
+##  PCut = Intege, Pvalue cutoff for line
+## Returns:
+##  p = Plotly object
+
+volcanoPlot <- function(deTab, LogCut, PCut){
   p <- plot_ly(
     data = deTab[deTab$DE == 0,],
     x = ~avgLog2FC,
@@ -607,13 +776,28 @@ volcanoPlot <- function(deTab, LogCut, PCut, ps){
   p
 }
 
-barcodePlot <- function(deTab, dge, color) {
+
+## barcodePlot()
+##  The DE table is sorted on FDR/adjPvalue
+##  The first x genes are kept
+##  Normalized values are extracted based on the DE genes still present
+##  normalized values are stacked
+##  Scatter plot is created with LogCPM values per gene per sample
+## Parameters:
+##  deTab = Dataframe, with all analysis results
+##  dge = DGE list object, containing samples and counts
+##  color = String, Column on wich colors should be based
+##  amount = Integer, The number of genes shown in plot
+## Returns:
+##  p = Plotly object
+
+barcodePlot <- function(deTab, dge, color, amount) {
   if (is.null(color)) {
     return(NULL)
   }
   
   sortdeTab <- deTab[order(rank(deTab$adj.P.Val)),]
-  sortdeTab <- head(sortdeTab, 25)
+  sortdeTab <- head(sortdeTab, amount)
   getnorm <- dge[rownames(sortdeTab),]
   getnorm$counts <- getnorm$counts
   stack1 <- as.data.frame(stack(getnorm$counts))
@@ -623,7 +807,7 @@ barcodePlot <- function(deTab, dge, color) {
     type = "scattergl",
     mode = "markers",
     marker = list(symbol = "line-ns-open",
-                  size = 12,
+                  size = 250/amount,
                   line = list(width=2)))
   p <- add_trace(
     p,
@@ -637,7 +821,8 @@ barcodePlot <- function(deTab, dge, color) {
       xaxis = list(title = 'Log2 CPM'),
       yaxis = list(title = '',
                    categoryorder = "array",
-                   autorange = "reversed")) %>%
+                   autorange = "reversed"),
+      autosize = T) %>%
     config(
       toImageButtonOptions = list(
         format = "png",
@@ -648,6 +833,16 @@ barcodePlot <- function(deTab, dge, color) {
     )
   p
 }
+
+
+## pValuePlot()
+##  The Pvalues are rounded on two decimals
+##  All occurences of pvalues are counted
+##  Bar plot is created with the p value vs occurence
+## Parameters:
+##  deTab = Dataframe, with all analysis results
+## Returns:
+##  p = Plotly object
 
 pValuePlot <- function(deTab){
   pvalue <- round(deTab$P.Value, digits=2)
@@ -676,6 +871,18 @@ pValuePlot <- function(deTab){
 ## --------------------------------------------------------------------------
 
 ## ----- BIAS PLOT -----
+
+
+## biasPlot()
+##  The confidence prediction calculated in the function gamConfidenceFit()
+##  Confidence is calculated based on the GC or length
+##  Scatterplot is created with avgLog2FC and corresponding bias value
+## Parameters:
+##  deTab = Dataframe, with all analysis results
+##  biasColumn = String, Column indicating bias values (GC or length)
+##  log = Boolean, Show plot in Log scale
+## Returns:
+##  p = Plotly object
 
 biasPlot <- function(deTab, biasColumn, log) {
   if (is.null(biasColumn)) {
@@ -732,6 +939,14 @@ biasPlot <- function(deTab, biasColumn, log) {
 ## --------------------------------------------------------------------------
 
 ## ----- INFORMATION BOX -----
+
+
+## informationBox()
+##  Template for plot information
+## Parameters:
+##  infoText = String, Explanation of a plot
+## Returns:
+##  Shiny Box object
 
 informationBox <- function(infoText) {
   tryCatch({

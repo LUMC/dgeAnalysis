@@ -1,5 +1,4 @@
 
-
 ## Install or import required packages ##
 if (!require("shiny")) install.packages("shiny")
 if (!require("shinydashboard")) install.packages("shinydashboard")
@@ -28,13 +27,3 @@ if (!require("igraph")) install.packages("igraph")
 if (!require("org.Hs.eg.db")) BiocManager::install("org.Hs.eg.db")
 if (!require("org.Mm.eg.db")) BiocManager::install("org.Mm.eg.db")
 if (!require("reshape2")) install.packages("reshape2")
-
-#tinytex voor pdf files
-#Using shiny from my own repository from github
-#dit omdat er een fout zit in bookmarken van de applicatie
-#meerdere file inputs worden onder dezelfde naam opgeslagen en bij inlezen overschreven
-#dit is gefixt door de naam een unieke naam mee te geven.
-#in github: shiny -> R -> fileupload.R
-#filename <- file.path(.dir, paste0(as.character(length(.files$name)), maybeGetExtension(fileBasename)))
-#into:
-#filename <- file.path(.dir, paste0(as.character(createUniqueId(10)), maybeGetExtension(fileBasename)))
