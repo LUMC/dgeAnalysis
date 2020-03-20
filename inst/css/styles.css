@@ -378,7 +378,7 @@ table.dataTable tr.selected td{
 
 #shiny-notification-panel {
   bottom: unset;
-  top: 90px;
+  top: 0px;
   width: 25%;
   text-align: center;
 }
