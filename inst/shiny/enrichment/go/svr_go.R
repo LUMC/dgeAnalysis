@@ -9,7 +9,7 @@
 get_go <- reactive({
   tryCatch({
     checkReload()
-    organism <- get_organismID(inUse_deTab)
+    organism <- get_organismID(inUse_deTab, input$setGeneName)
     org <- list(ENS="org.Hs.eg.db",
                 ENSMUS="org.Mm.eg.db")
     organism <- org[[organism]]
@@ -20,8 +20,12 @@ get_go <- reactive({
       geneList <- get_geneList(inUse_deTab)
       enrich <- clusterProfiler::gseGO(geneList, ont = input$selectOntology, organism, nPerm=10000, pvalueCutoff=0.05, verbose=FALSE, seed=TRUE)
     }
+    showNotification(ui = "GO enrichment has been succesful!", duration = 5, type = "message")
     enrich
   }, error = function(err) {
+    showNotification(ui = "GO enrichment failed with an error!", duration = 5, type = "error")
+    showNotification(ui = as.character(err), duration = 10, type = "error")
+    print(err)
     return(NULL)
   })
 })

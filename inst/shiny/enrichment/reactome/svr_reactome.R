@@ -3,7 +3,7 @@
 get_reactome <- reactive({
   tryCatch({
     checkReload()
-    organism <- get_organismID(inUse_deTab)
+    organism <- get_organismID(inUse_deTab, input$setGeneName)
     org <- list(ENSCEL="celegans",
                 ENS="human",
                 ENSMUS="mouse",
@@ -16,8 +16,12 @@ get_reactome <- reactive({
       geneList <- get_geneList(inUse_deTab)
       enrich <- ReactomePA::gsePathway(geneList, organism=organism, nPerm=10000, pvalueCutoff=0.05, verbose=FALSE, seed=TRUE)
     }
+    showNotification(ui = "Reactome enrichment has been succesful!", duration = 5, type = "message")
     enrich
   }, error = function(err) {
+    showNotification(ui = "Reactome enrichment failed with an error!", duration = 5, type = "error")
+    showNotification(ui = as.character(err), duration = 10, type = "error")
+    print(err)
     return(NULL)
   })
 })

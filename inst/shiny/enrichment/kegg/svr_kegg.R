@@ -3,7 +3,7 @@
 get_kegg <- reactive({
   tryCatch({
     checkReload()
-    organism <- get_organismID(inUse_deTab)
+    organism <- get_organismID(inUse_deTab, input$setGeneName)
     org <- list(ENSCEL="cel",
                 ENSCAF="cfa",
                 ENSDAR="dre",
@@ -18,8 +18,12 @@ get_kegg <- reactive({
       geneList <- get_geneList(inUse_deTab)
       enrich <- clusterProfiler::gseKEGG(geneList, organism=organism, nPerm=10000, pvalueCutoff=0.05, verbose=FALSE, seed=TRUE)
     }
+    showNotification(ui = "KEGG enrichment has been succesful!", duration = 5, type = "message")
     enrich
   }, error = function(err) {
+    showNotification(ui = "KEGG enrichment failed with an error!", duration = 5, type = "error")
+    showNotification(ui = as.character(err), duration = 10, type = "error")
+    print(err)
     return(NULL)
   })
 })

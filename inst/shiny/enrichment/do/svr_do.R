@@ -12,8 +12,12 @@ get_do <- reactive({
       geneList <- get_geneList(inUse_deTab)
       enrich <- DOSE::gseDO(geneList, nPerm=10000, pvalueCutoff=0.05, verbose=FALSE, seed=TRUE)
     }
+    showNotification(ui = "DO enrichment has been succesful!", duration = 5, type = "message")
     enrich
   }, error = function(err) {
+    showNotification(ui = "DO enrichment failed with an error!", duration = 5, type = "error")
+    showNotification(ui = as.character(err), duration = 10, type = "error")
+    print(err)
     return(NULL)
   })
 })
