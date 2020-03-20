@@ -42,6 +42,7 @@ output$downloadXLSX <- downloadHandler(
   }
 )
 
+## Download markdown HTML report
 output[["downloadMHTML"]] <- downloadHandler(
   filename = paste(input$analysis_method, '_', gsub('-', '', Sys.Date()), '.html', sep=''),
   content <- function(file) {

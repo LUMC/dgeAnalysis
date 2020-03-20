@@ -3,13 +3,7 @@ tab_export <- tabItem(
   tabName = "export",
   align="center",
   br(),
-  
-  #h2("Bookmark current state of application"),
-  #bookmarkButton(),
-  #br(),
-  #br(),
   br(),
-  HTML('<hr style="border-color: #0088cc;">'),
   br(),
   h2("Download tables"),
   selectInput("dataset_select", "",

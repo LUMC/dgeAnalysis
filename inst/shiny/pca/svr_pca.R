@@ -1,5 +1,5 @@
 
-## variance PCA
+## Variance PCA
 output[["variance_pca"]] <- renderPlotly({
   tryCatch({
     checkReload()

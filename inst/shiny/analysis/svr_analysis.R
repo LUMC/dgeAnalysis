@@ -33,6 +33,7 @@ output[["ma_plot"]] <- renderPlotly({
   })
 })
 
+## Genes selected in MA plot
 output[["selected_ma"]] <- DT::renderDataTable({
   tryCatch({
     s <- event_data(event = "plotly_selected", source = "analysis_ma")
@@ -53,6 +54,7 @@ output[["volcano_plot"]] <- renderPlotly({
   })
 })
 
+## Genes selected in volcano plot
 output[["selected_volcano"]] <- DT::renderDataTable({
   tryCatch({
     s <- event_data(event = "plotly_selected", source = "analysis_volcano")
@@ -67,7 +69,7 @@ output[["selected_volcano"]] <- DT::renderDataTable({
 output[["barcode_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    barcodePlot(inUse_deTab, inUse_normDge, input$group_analysis_bar)
+    barcodePlot(inUse_deTab, inUse_normDge, input$group_analysis_bar, input$slider_barcode)
   }, error = function(err) {
     return(NULL)
   })

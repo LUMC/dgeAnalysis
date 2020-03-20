@@ -38,6 +38,7 @@ observeEvent(input$run_button, {
   removeModal()
 },ignoreInit = TRUE)
 
+## Render base column for design
 output[["design_base"]] <- renderUI({
   tryCatch({
     if (is.null(input$file_samples)){return(NULL)}
@@ -50,6 +51,7 @@ output[["design_base"]] <- renderUI({
   })
 })
 
+## Render nested design values
 output[["design_value"]] <- renderUI({
   tryCatch({
     if (is.null(input$design_base)){return(NULL)}
@@ -67,6 +69,7 @@ AllInputs <- reactive({
   x <- reactiveValuesToList(input)
 })
 
+## Show matrix selectizes in current mode
 output[["matrix"]] <- renderUI({
   if (!is.null(input$vs_mode)){
     fluidRow(
@@ -88,6 +91,7 @@ output[["matrix"]] <- renderUI({
   }
 })
 
+## Select items for left matrix
 output[["matrix_value1"]] <- renderUI({
   columns <- c(input$design_base, input$design_value)
   
@@ -99,6 +103,7 @@ output[["matrix_value1"]] <- renderUI({
   )
 })
 
+## Select items for right/main matrix
 output[["matrix_value2"]] <- renderUI({
   columns <- c(input$design_base, input$design_value)
   
@@ -110,6 +115,7 @@ output[["matrix_value2"]] <- renderUI({
   )
 })
 
+## Show the current design in use
 output[["show_design"]] <- renderUI({
   if (!is.null(input$vs_mode)) {
     design <- createDesign(data_samples(), input$design_base, input$design_value, input$matrix_val1, input$matrix_val2)
@@ -123,6 +129,7 @@ output[["show_design"]] <- renderUI({
   design
 })
 
+## Show the current matrix in use
 output[["show_matrix"]] <- renderUI({
   if (!is.null(input$vs_mode)) {
     matrix_vs_mode()
@@ -131,6 +138,7 @@ output[["show_matrix"]] <- renderUI({
   }
 })
 
+## Get matrix from single input
 matrix_single <- reactive({
   columns <- c(input$design_base, input$design_value)
   
@@ -153,6 +161,7 @@ matrix_single <- reactive({
   total_matrix <- paste(total_matrix, collapse = " in ")
 })
 
+## Get matrix from vs input
 matrix_vs_mode <- reactive({
   columns <- c(input$design_base, input$design_value)
   
@@ -192,6 +201,7 @@ matrix_vs_mode <- reactive({
   total_matrix <- paste(total_matrix1, total_matrix2, sep = " VS ")
 })
 
+## Exclude samples box
 output[["excludeSamples"]] <- renderUI({
   tryCatch({
     box(
@@ -213,6 +223,7 @@ output[["excludeSamples"]] <- renderUI({
   })
 })
 
+## Use genename or geneID
 output[["setGeneName"]] <- renderUI({
   tryCatch({
     if (is.null(input$file_annotation)) {

@@ -43,10 +43,10 @@ output[["raw_voom_plot"]] <- renderPlotly({
   })
 })
 
-## Show amount of genes ledt after filtering
+## Show amount of genes left after filtering
 output[["raw_voom_ngenes"]] <- renderUI({
   tryCatch({
-    h2("After filtering:", br(), nrow(get_pre_voom()), "Genes")
+    h2("Predicted after filtering:", br(), nrow(get_pre_voom()), "Genes")
   }, error = function(err) {
     return(NULL)
   })

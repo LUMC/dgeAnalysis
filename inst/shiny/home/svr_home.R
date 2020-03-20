@@ -1,4 +1,5 @@
 
+## Welcome text
 output[["welcome"]] <- renderUI({
   tagList(
     div(
@@ -24,6 +25,7 @@ output[["welcome"]] <- renderUI({
   )
 })
 
+## Basic explanation of New and View analysis
 output[["get_started"]] <- renderUI({
   fluidRow(
     column(

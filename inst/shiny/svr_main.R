@@ -1,8 +1,13 @@
 
 server <- function(input, output, session) {
   
+  ## Check if objects need to reload
   checkReload <- function() {
     is.null(input$app_mode)
+    if (input$app_mode == "view") {
+      inUse_normDge <<- get_normDge()
+      inUse_deTab <<- data_detab()
+    }
     
     is.null(input$file_samples)
     is.null(input$file_counts)
@@ -15,6 +20,7 @@ server <- function(input, output, session) {
     is.null(input$run_button)
   }
   
+  ## All page names
   pages <- list(
     home = "Home",
     upload = "Data upload",
@@ -33,7 +39,8 @@ server <- function(input, output, session) {
     export = "Export",
     about = "About"
   )
-
+  
+  ## Render current page name to ui
   output[["current_page"]] <- renderText({
     tryCatch({
       page_name <- pages[[input$sidebar]]
@@ -41,7 +48,8 @@ server <- function(input, output, session) {
       return(NULL)
     })
   })
-
+  
+  ## Render navigation bar to ui
   output[["sidebar_tabs"]] <- renderMenu({
     sidebarMenu(id = "sidebar",
       menuItem("Home", tabName = "home",icon = icon("home")),

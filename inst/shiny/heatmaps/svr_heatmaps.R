@@ -29,7 +29,6 @@ output[["heatmap_var_sort"]] <- renderUI({
   })
 })
 
-
 ## DGE heatmap
 output[["dge_heat"]] <- renderPlotly({
   tryCatch({

@@ -1,4 +1,5 @@
 
+## Change application mode New <-> View
 observeEvent(input$app_mode, {
   if (input$app_mode == "new") {
     runjs('$("#show_view_analysis").css({"border-radius": "25px","border": "3px solid rgba(0,0,0,0)"});')
@@ -25,7 +26,7 @@ observeEvent(input$app_mode, {
 
 ## ----- Read files -----
 
-## Read sample data file ##
+## Read sample data file
 data_samples <- reactive({
   if (input$app_mode == "new") {
     if (is.null(input$file_samples$datapath)){return(NULL)}
@@ -44,7 +45,7 @@ data_samples <- reactive({
   data_samples
 })
 
-## Read count data file ##
+## Read count data file
 data_counts <- reactive({
   if (input$app_mode == "new") {
     if (is.null(input$file_counts$datapath)){return(NULL)}
@@ -63,7 +64,7 @@ data_counts <- reactive({
   data_counts
 })
 
-## Read annotation data file ##
+## Read annotation data file
 data_annotation <- reactive({
   if (is.null(input$file_annotation$datapath)){return(NULL)}
   data_annotation <- read.csv(input$file_annotation$datapath, row.names=1, header = TRUE, sep = "\t", check.names = FALSE)
@@ -73,7 +74,7 @@ data_annotation <- reactive({
   data_annotation
 })
 
-## Read normalized data file ##
+## Read normalized data file
 data_norm <- reactive({
   if (is.null(input$file_norm_view$datapath)){return(NULL)}
   data_norm <- read.csv(input$file_norm_view$datapath, row.names=1, header = TRUE, sep = "\t", check.names = FALSE)
@@ -83,7 +84,7 @@ data_norm <- reactive({
   data_norm
 })
 
-## Read detab data file ##
+## Read detab data file
 data_detab <- reactive({
   if (is.null(input$file_detab_view$datapath)){return(NULL)}
   data_detab <- read.csv(input$file_detab_view$datapath, row.names=1, header = TRUE, sep = "\t", check.names = FALSE)
@@ -97,7 +98,7 @@ data_detab <- reactive({
 
 ## ----- Create data objects -----
 
-## Create normDge from table. if an error occurs (mostly because negative numbers) -> log2 values is converted with 2^
+## Create normDge from table
 get_normDge <- reactive({
   tryCatch({
     se <- readCountsFromTable(data_norm(),
