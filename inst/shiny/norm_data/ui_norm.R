@@ -59,6 +59,8 @@ tab_norm_data <- tabItem(
         position = "right",
         sidebarPanel(
           width = 3,
+          uiOutput("norm_voom_ngenes"),
+          br(),
           uiOutput("norm_voom_plot_info"),
           span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
         ), 

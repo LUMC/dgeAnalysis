@@ -39,6 +39,15 @@ output[["norm_voom_plot"]] <- renderPlotly({
   })
 })
 
+## Show amount of genes ledt after filtering
+output[["norm_voom_ngenes"]] <- renderUI({
+  tryCatch({
+    h2("After filtering:", br(), nrow(normDge$counts), "Genes")
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
 ## Selected data points norm_voom_plot
 output[["selected_norm_voom"]] <- DT::renderDataTable({
   tryCatch({
