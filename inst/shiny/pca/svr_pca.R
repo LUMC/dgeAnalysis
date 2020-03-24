@@ -114,6 +114,19 @@ output[["setpc_pca3d"]] <- renderUI({
   })
 })
 
+## PC values per gene (table)
+pc_gene_table <- reactive({
+  tryCatch({
+    tdge <- t(inUse_normDge$counts)
+    tdge[!is.finite(tdge)] <- 0
+    pca <- prcomp(tdge, center=TRUE)
+    pca <- pca$rotation
+    pca
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
 ## INFORMATION BOXES
 
 output[["variance_pca_info"]] <- renderUI({

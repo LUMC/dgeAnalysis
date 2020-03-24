@@ -6,6 +6,7 @@ datasetInput <- reactive({
          "normCounts" = inUse_normDge$counts,
          "deTab" = inUse_deTab,
          "deg" = inUse_deTab[inUse_deTab$DE != 0,],
+         "pcGene" = pc_gene_table(),
          "kegg" = as.data.frame(get_kegg())[ , -c(1, 10, 11)],
          "reactome" = as.data.frame(get_reactome())[ , -c(1, 10, 11)],
          "go" = as.data.frame(get_go())[ , -c(1, 10, 11)],
@@ -29,16 +30,6 @@ output$downloadTSV <- downloadHandler(
   },
   content = function(file) {
     write.table(datasetInput(), file, row.names = TRUE, col.names=NA, sep = "\t")
-  }
-)
-
-## create filename and save data as XLSX
-output$downloadXLSX <- downloadHandler(
-  filename = function() {
-    paste("shiny_analysis_", gsub(" ", "_", tolower(input$dataset_select)), ".xlsx", sep = "")
-  },
-  content = function(file) {
-    write.table(datasetInput(), file, row.names = TRUE, col.names=NA)
   }
 )
 
