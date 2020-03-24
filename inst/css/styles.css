@@ -374,6 +374,12 @@ table.dataTable tr.selected td{
   top: 100px;
   background-color: #f9f9f9;
   font-size: 25px;
+  border-radius: 20px;
+  border: 5px solid #0088cc;
+}
+
+.modal-content {
+  border-radius: 20px;
 }
 
 #shiny-notification-panel {
