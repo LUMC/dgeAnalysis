@@ -23,7 +23,7 @@ createDesign <- function(dge, dbase, dvalue, matrix_v1, matrix_v2) {
   getdesign <- "~"
   
   tryCatch({
-    if (isTRUE(all.equal(sort(unique(matrix)), sort(as.vector(paste0(dbase, unique(dge[[dbase]]))))))) {
+    if (isTRUE(all.equal(sort(unique(matrix)), sort(as.vector(unique(dge[[dbase]])))))) {
       getdesign <- "~0+"
     }
   }, error = function(err) {
