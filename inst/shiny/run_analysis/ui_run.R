@@ -26,14 +26,14 @@ tab_run_analysis <- tabItem(
     column(
       width = 6,
       uiOutput("design_base"),
-      uiOutput("design_value"),
-      checkboxGroupInput(
-        "vs_mode",
+      radioButtons(
+        "design_type",
         "",
         inline = TRUE,
-        selected = "vs",
-        c("VS" = "vs")
+        c("Basic design" = "basic",
+          "Advanced design" = "advanced")
       ),
+      uiOutput("design_value"),
       uiOutput("matrix")
     )
   ),

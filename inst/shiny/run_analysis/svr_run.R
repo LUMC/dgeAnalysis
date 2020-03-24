@@ -1,13 +1,19 @@
 
 ## Start an analysis
 observeEvent(input$run_button, {
-  if (input$app_mode != "new") {
-    showNotification(ui = 'Wrong analysis mode!', duration = 5, type = "error")
+  if (!is.null(preMarkdownChecks())) {
+    showNotification(ui = preMarkdownChecks(), duration = 5, type = "error")
     return(NULL)
   }
   
-  showModal(modalDialog("Analysis is running...",
-                        footer=NULL))
+  showModal(
+    modalDialog(
+      h1("Analysis is running..."),
+      img(src="loading.gif", width = "50%"),
+      footer=NULL
+    )
+  )
+  
   results <- tryCatch({
     rmarkdown::render(
       paste("markdown/", input$analysis_method, ".Rmd", sep=''),
@@ -36,7 +42,21 @@ observeEvent(input$run_button, {
   }
   )
   removeModal()
-},ignoreInit = TRUE)
+}, ignoreInit = TRUE)
+
+## This reactive checks if input values are valid
+preMarkdownChecks <- reactive ({
+  if (input$app_mode == "view") {
+    return("Wrong analysis mode!")
+  } else if (is.null(input$matrix_val1) | is.null(input$matrix_val2)) {
+    return("One of the contrast is empty!")
+  } else if (input$matrix_val1 == input$matrix_val2) {
+      return("Contrasts cant be the same!")
+  } else if (input$setGeneName == "symbol" & !("geneName" %in% colnames(data_annotation()))) {
+    return("The annotation file is missing a column: 'geneName'!")
+  }
+  return(NULL)
+})
 
 ## Render base column for design
 output[["design_base"]] <- renderUI({
@@ -55,40 +75,46 @@ output[["design_base"]] <- renderUI({
 output[["design_value"]] <- renderUI({
   tryCatch({
     if (is.null(input$design_base)){return(NULL)}
-    checkboxGroupInput("design_value",
-                       "Select nested columns, relative to base column:",
-                       choices = colnames(data_samples())[!colnames(data_samples()) %in% input$design_base],
-                       inline = TRUE
-    )
+    if (input$design_type == "basic"){
+      checkboxGroupInput("design_value",
+                         "",
+                         choices = character(0),
+                         inline = TRUE
+      )
+    } else {
+      showNotification(ui = "WARNING: This type of analysis is 'more advanced'! Make sure you know what you are doing!", duration = 5, type = "warning")
+      checkboxGroupInput("design_value",
+                         "Select nested columns, relative to base column:",
+                         choices = colnames(data_samples())[!colnames(data_samples()) %in% input$design_base],
+                         inline = TRUE
+      )
+    }
   }, error = function(err) {
     return(NULL)
   })
 })
 
+## All input values currently active
 AllInputs <- reactive({
   x <- reactiveValuesToList(input)
 })
 
 ## Show matrix selectizes in current mode
 output[["matrix"]] <- renderUI({
-  if (!is.null(input$vs_mode)){
-    fluidRow(
-      column(
-        width = 5,
-        uiOutput("matrix_value1")
-      ),
-      column(
-        width = 2,
-        h2("VS")
-      ),
-      column(
-        width = 5,
-        uiOutput("matrix_value2")
-      )
+  fluidRow(
+    column(
+      width = 5,
+      uiOutput("matrix_value1")
+    ),
+    column(
+      width = 2,
+      h2("VS")
+    ),
+    column(
+      width = 5,
+      uiOutput("matrix_value2")
     )
-  } else {
-    uiOutput("matrix_value2")
-  }
+  )
 })
 
 ## Select items for left matrix
@@ -117,13 +143,9 @@ output[["matrix_value2"]] <- renderUI({
 
 ## Show the current design in use
 output[["show_design"]] <- renderUI({
-  if (!is.null(input$vs_mode)) {
-    design <- createDesign(data_samples(), input$design_base, input$design_value, input$matrix_val1, input$matrix_val2)
-  } else {
-    design <- createDesign(data_samples(), input$design_base, input$design_value, NULL, input$matrix_val2)
-  }
+  design <- createDesign(data_samples(), input$design_base, input$design_value, input$matrix_val1, input$matrix_val2)
   design <- gsub("\\+", " + ", design)
-  if (design == "~") {
+  if (design == "~" | design == "~0 + ") {
     design <- "No values selected"
   }
   design
@@ -131,38 +153,6 @@ output[["show_design"]] <- renderUI({
 
 ## Show the current matrix in use
 output[["show_matrix"]] <- renderUI({
-  if (!is.null(input$vs_mode)) {
-    matrix_vs_mode()
-  } else {
-    matrix_single()
-  }
-})
-
-## Get matrix from single input
-matrix_single <- reactive({
-  columns <- c(input$design_base, input$design_value)
-  
-  total_matrix <- NULL
-  for (column in columns) {
-    temp2 <- NULL
-    for (value in input$matrix_val2) {
-      if (grepl(value, data_samples()[column])) {
-        temp2 <- c(temp2, value)
-      }
-    }
-    if (!is.null(temp2)) {
-      total_matrix <- c(total_matrix, paste(temp2, collapse = ", "))
-    }
-  }
-  if (is.null(total_matrix)) {
-    total_matrix <- "No values selected"
-  }
-  
-  total_matrix <- paste(total_matrix, collapse = " in ")
-})
-
-## Get matrix from vs input
-matrix_vs_mode <- reactive({
   columns <- c(input$design_base, input$design_value)
   
   total_matrix1 <- NULL
