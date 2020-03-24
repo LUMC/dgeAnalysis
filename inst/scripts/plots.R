@@ -788,17 +788,18 @@ volcanoPlot <- function(deTab, LogCut, PCut){
 ##  dge = DGE list object, containing samples and counts
 ##  color = String, Column on wich colors should be based
 ##  amount = Integer, The number of genes shown in plot
+##  selected = Vector, Extra selected rownames
 ## Returns:
 ##  p = Plotly object
 
-barcodePlot <- function(deTab, dge, color, amount) {
+barcodePlot <- function(deTab, dge, color, amount, selected) {
   if (is.null(color)) {
     return(NULL)
   }
   
   sortdeTab <- deTab[order(rank(deTab$adj.P.Val)),]
   sortdeTab <- head(sortdeTab, amount)
-  getnorm <- dge[rownames(sortdeTab),]
+  getnorm <- dge[c(rownames(sortdeTab), selected),]
   getnorm$counts <- getnorm$counts
   stack1 <- as.data.frame(stack(getnorm$counts))
   stack1$group <- getnorm$samples[[color]][stack1$col]
@@ -807,7 +808,7 @@ barcodePlot <- function(deTab, dge, color, amount) {
     type = "scattergl",
     mode = "markers",
     marker = list(symbol = "line-ns-open",
-                  size = 250/amount,
+                  size = 250/(amount+length(selected)),
                   line = list(width=2)))
   p <- add_trace(
     p,

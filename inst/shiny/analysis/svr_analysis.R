@@ -69,7 +69,7 @@ output[["selected_volcano"]] <- DT::renderDataTable({
 output[["barcode_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    barcodePlot(inUse_deTab, inUse_normDge, input$group_analysis_bar, input$slider_barcode)
+    barcodePlot(inUse_deTab, inUse_normDge, input$group_analysis_bar, input$slider_barcode, input$selected_analysis_bar)
   }, error = function(err) {
     return(NULL)
   })
@@ -78,8 +78,22 @@ output[["barcode_plot"]] <- renderPlotly({
 ## Set color of barcode
 output[["group_analysis_bar"]] <- renderUI({
   tryCatch({
-    selectInput("group_analysis_bar", "Color by:",
-                colnames(data_samples())
+    selectInput(inputId = "group_analysis_bar",
+                label = "Color by:",
+                choices = colnames(data_samples())
+    )
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Add specific gene to barplot
+output[["analysis_bar_select_gene"]] <- renderUI({
+  tryCatch({
+    selectInput(inputId = "selected_analysis_bar",
+                label = "Add specific genes:",
+                multiple = TRUE,
+                choices = rownames(inUse_deTab)
     )
   }, error = function(err) {
     return(NULL)
