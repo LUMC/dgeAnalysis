@@ -12,12 +12,7 @@ startApp <- function() {
   options(warn = -1)
   
   suppressWarnings(rm(list=c("deTab", "normDge", "inUse_deTab", "inUse_normDge"), envir=.GlobalEnv))
-  suppressMessages(source(system.file("src/scripts/libraries.R", package = "dgeAnalysis")))
-  
-  source(system.file("src/scripts/de.R", package = "dgeAnalysis"), local = TRUE)
-  source(system.file("src/scripts/enrichment.R", package = "dgeAnalysis"), local = TRUE)
-  source(system.file("src/scripts/markdown.R", package = "dgeAnalysis"), local = TRUE)
-  source(system.file("src/scripts/plots.R", package = "dgeAnalysis"), local = TRUE)
+  suppressMessages(source(system.file("src/lib/libraries.R", package = "dgeAnalysis")))
   
   shiny::runApp(appDir, host="0.0.0.0", port=1402, launch.browser=TRUE)
 }
