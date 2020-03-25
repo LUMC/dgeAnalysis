@@ -12,13 +12,17 @@ get_kegg <- reactive({
                 ENSRNO="rno")
     organism <- org[[organism]]
     if (input$choose_kegg == "enrich") {
-      enrich <- clusterProfiler::enrichKEGG(inUse_deTab$entrez[inUse_deTab$DE!=0], organism=organism, pvalueCutoff=0.05)
+      suppressMessages(enrich <- clusterProfiler::enrichKEGG(inUse_deTab$entrez[inUse_deTab$DE!=0], organism=organism, pvalueCutoff=0.05))
     } else {
       set.seed(1234)
       geneList <- get_geneList(inUse_deTab)
-      enrich <- clusterProfiler::gseKEGG(geneList, organism=organism, nPerm=10000, pvalueCutoff=0.05, verbose=FALSE, seed=TRUE)
+      suppressMessages(enrich <- clusterProfiler::gseKEGG(geneList, organism=organism, nPerm=10000, pvalueCutoff=0.05, verbose=FALSE, seed=TRUE))
     }
-    showNotification(ui = "KEGG enrichment has been succesful!", duration = 5, type = "message")
+    if (nrow(as.data.frame(enrich)) == 0) {
+      showNotification(ui = "KEGG enrichment has not found any enriched terms!", duration = 5, type = "warning")
+    } else {
+      showNotification(ui = "KEGG enrichment has been succesful!", duration = 5, type = "message")
+    }
     enrich
   }, error = function(err) {
     showNotification(ui = "KEGG enrichment failed with an error!", duration = 5, type = "error")

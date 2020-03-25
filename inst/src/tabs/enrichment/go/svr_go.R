@@ -14,13 +14,17 @@ get_go <- reactive({
                 ENSMUS="org.Mm.eg.db")
     organism <- org[[organism]]
     if (input$choose_go == "enrich") {
-      enrich <- clusterProfiler::enrichGO(inUse_deTab$entrez[inUse_deTab$DE!=0],  ont = input$selectOntology, organism, pvalueCutoff=0.05)
+      suppressMessages(enrich <- clusterProfiler::enrichGO(inUse_deTab$entrez[inUse_deTab$DE!=0],  ont = input$selectOntology, organism, pvalueCutoff=0.05))
     } else {
       set.seed(1234)
       geneList <- get_geneList(inUse_deTab)
-      enrich <- clusterProfiler::gseGO(geneList, ont = input$selectOntology, organism, nPerm=10000, pvalueCutoff=0.05, verbose=FALSE, seed=TRUE)
+      suppressMessages(enrich <- clusterProfiler::gseGO(geneList, ont = input$selectOntology, organism, nPerm=10000, pvalueCutoff=0.05, verbose=FALSE, seed=TRUE))
     }
-    showNotification(ui = "GO enrichment has been succesful!", duration = 5, type = "message")
+    if (nrow(as.data.frame(enrich)) == 0) {
+      showNotification(ui = "GO enrichment has not found any enriched terms!", duration = 5, type = "warning")
+    } else {
+      showNotification(ui = "GO enrichment has been succesful!", duration = 5, type = "message")
+    }
     enrich
   }, error = function(err) {
     showNotification(ui = "GO enrichment failed with an error!", duration = 5, type = "error")

@@ -1,4 +1,6 @@
 
+options(warn = -1)
+
 server <- function(input, output, session) {
   
   ## Check if objects need to reload
@@ -74,26 +76,26 @@ server <- function(input, output, session) {
       ),
       menuItem("Export", tabName = "export", icon = icon("download")),
       menuItem("About", tabName = "about", icon = icon("info-circle")),
-      img(src="lumcLogo.png", width="200px")
+      img(src = "lumcLogo.png", width="200px")
     )
   })
 
   
-  source("shiny/home/svr_home.R", local = TRUE)
-  source("shiny/upload/svr_upload.R", local = TRUE)
-  source("shiny/run_analysis/svr_run.R", local = TRUE)
-  source("shiny/alignment/svr_alignment.R", local = TRUE)
-  source("shiny/raw_data/svr_raw.R", local = TRUE)
-  source("shiny/norm_data/svr_norm.R", local = TRUE)
-  source("shiny/pca/svr_pca.R", local = TRUE)
-  source("shiny/heatmaps/svr_heatmaps.R", local = TRUE)
-  source("shiny/analysis/svr_analysis.R", local = TRUE)
-  source("shiny/bias/svr_bias.R", local = TRUE)
-  source("shiny/enrichment/kegg/svr_kegg.R", local = TRUE)
-  source("shiny/enrichment/reactome/svr_reactome.R", local = TRUE)
-  source("shiny/enrichment/go/svr_go.R", local = TRUE)
-  source("shiny/enrichment/do/svr_do.R", local = TRUE)
-  source("shiny/export/svr_export.R", local = TRUE)
-  source("shiny/about/svr_about.R", local = TRUE)
+  source("tabs/home/svr_home.R", local = TRUE)
+  source("tabs/upload/svr_upload.R", local = TRUE)
+  source("tabs/run_analysis/svr_run.R", local = TRUE)
+  source("tabs/alignment/svr_alignment.R", local = TRUE)
+  source("tabs/raw_data/svr_raw.R", local = TRUE)
+  source("tabs/norm_data/svr_norm.R", local = TRUE)
+  source("tabs/pca/svr_pca.R", local = TRUE)
+  source("tabs/heatmaps/svr_heatmaps.R", local = TRUE)
+  source("tabs/analysis/svr_analysis.R", local = TRUE)
+  source("tabs/bias/svr_bias.R", local = TRUE)
+  source("tabs/enrichment/kegg/svr_kegg.R", local = TRUE)
+  source("tabs/enrichment/reactome/svr_reactome.R", local = TRUE)
+  source("tabs/enrichment/go/svr_go.R", local = TRUE)
+  source("tabs/enrichment/do/svr_do.R", local = TRUE)
+  source("tabs/export/svr_export.R", local = TRUE)
+  source("tabs/about/svr_about.R", local = TRUE)
 
 }

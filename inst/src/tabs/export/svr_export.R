@@ -37,6 +37,6 @@ output$downloadTSV <- downloadHandler(
 output[["downloadMHTML"]] <- downloadHandler(
   filename = paste(input$analysis_method, '_', gsub('-', '', Sys.Date()), '.html', sep=''),
   content <- function(file) {
-    file.copy(paste("markdown/",input$analysis_method, '.html', sep=''), file)
+    file.copy(paste0("markdown/",input$analysis_method, '.html'), file)
   }
 )

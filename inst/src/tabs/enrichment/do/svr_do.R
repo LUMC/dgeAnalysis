@@ -6,13 +6,17 @@ get_do <- reactive({
   tryCatch({
     checkReload()
     if (input$choose_do == "enrich") {
-      enrich <- DOSE::enrichDO(inUse_deTab$entrez[inUse_deTab$DE!=0], pvalueCutoff=0.05)
+      suppressMessages(enrich <- DOSE::enrichDO(inUse_deTab$entrez[inUse_deTab$DE!=0], pvalueCutoff=0.05))
     } else {
       set.seed(1234)
       geneList <- get_geneList(inUse_deTab)
-      enrich <- DOSE::gseDO(geneList, nPerm=10000, pvalueCutoff=0.05, verbose=FALSE, seed=TRUE)
+      suppressMessages(enrich <- DOSE::gseDO(geneList, nPerm=10000, pvalueCutoff=0.05, verbose=FALSE, seed=TRUE))
     }
-    showNotification(ui = "DO enrichment has been succesful!", duration = 5, type = "message")
+    if (nrow(as.data.frame(enrich)) == 0) {
+      showNotification(ui = "DO enrichment has not found any enriched terms!", duration = 5, type = "warning")
+    } else {
+      showNotification(ui = "DO enrichment has been succesful!", duration = 5, type = "message")
+    }
     enrich
   }, error = function(err) {
     showNotification(ui = "DO enrichment failed with an error!", duration = 5, type = "error")

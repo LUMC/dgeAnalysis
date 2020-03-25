@@ -10,13 +10,17 @@ get_reactome <- reactive({
                 ENSRNO="rat")
     organism <- org[[organism]]
     if (input$choose_reactome == "enrich") {
-      enrich <- ReactomePA::enrichPathway(inUse_deTab$entrez[inUse_deTab$DE!=0], organism=organism, pvalueCutoff=0.05)
+      suppressMessages(enrich <- ReactomePA::enrichPathway(inUse_deTab$entrez[inUse_deTab$DE!=0], organism=organism, pvalueCutoff=0.05))
     } else {
       set.seed(1234)
       geneList <- get_geneList(inUse_deTab)
-      enrich <- ReactomePA::gsePathway(geneList, organism=organism, nPerm=10000, pvalueCutoff=0.05, verbose=FALSE, seed=TRUE)
+      suppressMessages(enrich <- ReactomePA::gsePathway(geneList, organism=organism, nPerm=10000, pvalueCutoff=0.05, verbose=FALSE, seed=TRUE))
     }
-    showNotification(ui = "Reactome enrichment has been succesful!", duration = 5, type = "message")
+    if (nrow(as.data.frame(enrich)) == 0) {
+      showNotification(ui = "Reactome enrichment has not found any enriched terms!", duration = 5, type = "warning")
+    } else {
+      showNotification(ui = "Reactome enrichment has been succesful!", duration = 5, type = "message")
+    }
     enrich
   }, error = function(err) {
     showNotification(ui = "Reactome enrichment failed with an error!", duration = 5, type = "error")
