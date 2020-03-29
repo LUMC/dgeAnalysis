@@ -300,7 +300,7 @@ multidimensionalScaling2dPlot <- function(dge, color, sourceId){
     key = ~rownames(for_plots),
     source=sourceId) %>%
     plotly::layout(
-      title = paste("MDS Plot, Grouped By:", color),
+      title = paste("MDS Plot 2D"),
       xaxis = list(title = 'MDS1'),
       yaxis = list(title = 'MDS2'),
       clickmode = "event+select",
@@ -342,7 +342,7 @@ multidimensionalScaling3dPlot <- function(dge, color){
     hoverinfo = 'text') %>%
     add_markers(marker = list(size=5, opacity = 0.75)) %>%
     plotly::layout(
-      title = paste("MDS Plot, Grouped By:", color),
+      title = paste("MDS Plot 3D"),
       scene = list(
         xaxis = list(title = 'MDS1'),
         yaxis = list(title = 'MDS2'),
@@ -447,7 +447,7 @@ samplePca2dPlot <- function(dge, color, getPC1, getPC2){
       dragmode = "select") %>%
     config(
       toImageButtonOptions = list(
-        format = "pngg",
+        format = "png",
         filename = "pca2d",
         width = 1500,
         height = 1000
