@@ -19,7 +19,7 @@
 
 /*header text to the right*/
 .skin-blue .main-header .navbar .nav>li>a {
-  font-size: 24px;
+  font-size: 28px;
   color: white;
   display: block;
   height: 90px;
@@ -235,12 +235,12 @@ table.dataTable tr.selected td{
 }
 
 /*radio button*/
-.radio-inline input[type="radio"] {
+.radio input[type="radio"], .radio-inline input[type="radio"] {
   opacity: 0;
   position: fixed;
   width: 0;
 }
-.radio-inline span {
+.radio span, .radio-inline span {
   display: inline-block;
   background-color: #737373;
   color: white;
@@ -251,15 +251,30 @@ table.dataTable tr.selected td{
   border: 1px solid #737373;
   border-radius: 4px;
 }
-.radio-inline input[type="radio"]:checked + span {
+.radio input[type="radio"]:checked + span, .radio-inline input[type="radio"]:checked + span {
   font-weight: bold;
   background-color: #0088cc;
   color: white;
 }
-.radio-inline span:hover {
+.radio span:hover, .radio-inline span:hover {
   background-color: white;
   color: #0088cc;
   border: 1px solid #0088cc;
+}
+#app_mode .shiny-options-group {
+  display: flex;
+  justify-content: space-around;
+}
+#app_mode .radio-inline {
+  padding-left: unset;
+  padding-right: unset;
+}
+#app_mode .control-label {
+  font-size: 20px;
+}
+.control-label {
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 /*checkbox*/
@@ -289,8 +304,37 @@ table.dataTable tr.selected td{
   color: #0088cc;
   border: 1px solid #0088cc;
 }
+.checkbox-inline+.checkbox-inline, .radio-inline+.radio-inline {
+  margin-top: 1px;
+  margin-left: unset;
+}
+.checkbox-inline, .radio-inline, .radio label, .checkbox label {
+  padding-right: 20px;
+}
 
 /* --- widgets */
+
+/* box (infobox) --- */
+
+.box.box-solid.box-primary>.box-header {
+  background: #0088cc;
+  background-color: #0088cc;
+}
+.col-sm-10 {
+  float: unset;
+}
+
+.col-sm-12 {
+  padding-right: unset;
+  padding-left: unset;
+}
+
+.well {
+  padding: 5px;
+  padding-top: 19px;
+}
+
+/* --- box (infobox) */
 
 
 /* switch --- */
@@ -330,6 +374,19 @@ table.dataTable tr.selected td{
   top: 100px;
   background-color: #f9f9f9;
   font-size: 25px;
+  border-radius: 20px;
+  border: 5px solid #0088cc;
+}
+
+.modal-content {
+  border-radius: 20px;
+}
+
+#shiny-notification-panel {
+  bottom: unset;
+  top: 0px;
+  width: 25%;
+  text-align: center;
 }
 
 /* --- modal popup */

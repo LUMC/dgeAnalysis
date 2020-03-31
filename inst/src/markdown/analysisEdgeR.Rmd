@@ -1,30 +1,40 @@
 ---
-title: "Shiny analysis - Limma/Voom"
-author: "Tom Kuipers"
+title: "dgeAnalysis - EdgeR"
+author:
+- "Developed by LUMC-SASC team:"
+- "- Tom Kuipers"
+- "- Leon Mei"
+- "- Davy Cats"
+date: "`r format(Sys.time(), '%d %B %Y')`"
 output:
-  html_document: default
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    theme: paper
 always_allow_html: true
 params:
-  data_samples:     "" #"~/Desktop/test_data_view310_with3/meta2.csv"
-  data_counts:      "" #"~/Desktop/test_data_view310_with3/all_samples.fragments_per_gene.tsv"
-  data_annotation:  "" #"~/Desktop/test_data_view310_with3/gene_annotation.tsv"
-  setGeneName:      "" #"id"/"symbol"
-  cpm_value:        "" #1
-  excluded_samples: "" #"sample_3_minus"
-  design_value:     "" #"~0 + group + subject"
-  matrix_value:     "" #"plus - minus"
-  alpha:            "" #0.05
+  data_samples:     ""
+  data_counts:      ""
+  data_annotation:  ""
+  setGeneName:      ""
+  cpm_value:        ""
+  excluded_samples: ""
+  design_base:      ""
+  design_value:     ""
+  matrix_v1:        ""
+  matrix_v2:        ""
+  alpha:            ""
 ---
 
-
-## R Markdown
-
+# Reading packages and variables
+Required packages are loaded and the input variables are set. The used input settings are shown.
 
 ```{r setup}
 
 if (!require("knitr")) install.packages("knitr")
 if (!require("SummarizedExperiment")) install.packages("SummarizedExperiment")
-if (!require("limma")) install.packages("limma")
+if (!require("edgeR")) install.packages("edgeR")
 if (!require("tidyr")) install.packages("tidyr")
 if (!require("scales")) install.packages("scales")
 if (!require("plotly")) install.packages("plotly")
@@ -41,12 +51,11 @@ data_annotation <- params$data_annotation
 setGeneName <- params$setGeneName
 cpm_value <- params$cpm_value
 excluded_samples <- params$excluded_samples
+design_base <- params$design_base
 design_value <- params$design_value
-matrix_value <- params$matrix_value
+matrix_v1 <- params$matrix_v1
+matrix_v2 <- params$matrix_v2
 alpha <- params$alpha
-
-# Get desgin
-design_value <- reOrderDesign(matrix_value, design_value, data_samples)
 
 ```
 
@@ -55,24 +64,28 @@ design_value <- reOrderDesign(matrix_value, design_value, data_samples)
 # FILTER DATA IF NESSECARY
 
 #Filter if nessecary
-data_samples <- data_samples[!rownames(data_samples) %in% excluded_samples,]
+data_samples <- data_samples[!rownames(data_samples) %in% excluded_samples, , drop=FALSE]
 data_counts <- data_counts[,!colnames(data_counts) %in% excluded_samples]
 
 ```
 
-
+## Input values
 
 ```{r showVariables}
 # SHOW VALUES OF VARIABLES
 
 cpm_value
 excluded_samples
-design_value
-matrix_value
 alpha
+design_base
+design_value
+matrix_v1
+matrix_v2
 
 ```
 
+# Process raw data
+The raw data is processed and pre-filtered, to remove non feature counts. The data is placed in a format (DGE list) which can be used for later analsis.
 
 ```{r showRawData}
 # SHOW RAW DATA
@@ -80,7 +93,7 @@ alpha
 se <- readCountsFromTable(data_counts, data_samples)
 
 alignmentSummaryPlot(se)
-complexityPlot(se)
+complexityPlot(se, TRUE, 1000)
 
 ```
 
@@ -96,13 +109,14 @@ if (!is.null(data_annotation)) {
 
 ```
 
+## Create DGE list
 
 ```{r dge}
 # GET AND CREATE DGE
 
 dge <- DGEList(counts = assay(se), samples = colData(se), genes = rowData(se))
 row.names(dge$genes) <- row.names(dge$counts)
-  
+
 dge <- dge[ rowSums( abs( dge$counts ) ) > 1, ]
 
 tempDge <- dge
@@ -111,14 +125,15 @@ countDistributionLinePlot(tempDge)
 
 ```
 
+# Filter raw data
+The raw data is filtered based on the input values provided.
 
 ```{r selectedFeatures}
 # GET SELECTED FEATURES
 
-#selectedFeatures <- filterByExpr(dge, model.matrix(eval(parse(text=design_value)), dge$samples ))
-limmaV <- calcNormFactors( dge, method = "TMM")
-counts <- cpm(limmaV, log = TRUE)
-selectedFeatures <- rownames( limmaV )[ apply( counts, 1, function( v ) sum( v >= cpm_value ) ) >= 1/4 * ncol( counts ) ]
+edger <- calcNormFactors( dge, method = "TMM")
+counts <- cpm(edger, log = TRUE)
+selectedFeatures <- rownames( edger )[ apply( counts, 1, function( v ) sum( v >= cpm_value ) ) >= 1/4 * ncol( counts ) ]
 
 ```
 
@@ -130,6 +145,8 @@ highExprDge <- dge[ selectedFeatures,, keep.lib.sizes = FALSE ]
 
 ```
 
+# Normalization
+The filtered data is normalized using TMM.
 
 ```{r normalize}
 # NORMALIZE DATA
@@ -139,47 +156,60 @@ normDge <- calcNormFactors( highExprDge, method = "TMM")
 tempDge <- normDge
 tempDge$counts <- cpm(normDge, log = TRUE)
 countDistributionLinePlot(tempDge)
-variancePcaPlot(tempDge)
+samplePca2dPlot(tempDge, design_base, "PC1", "PC2")
 
 ```
 
+# Create design and contrasts
+The design matrix and contrasts are created, based on input values.
 
 ```{r design}
 # CREATE DESIGN
 
-design <- model.matrix(eval(parse(text=design_value)), normDge$samples)
-design <- reNameDesign(design, normDge)
+get_design <- createDesign(normDge$samples, design_base, design_value, matrix_v1, matrix_v2)
+get_design
+normDge <- relevelSamples(normDge, design_base, design_value, matrix_v1, matrix_v2)
+design <- model.matrix(eval(parse(text=get_design)), normDge$samples)
+design
 
-matrix_value <- strsplit(matrix_value, ",")[[1]]
-contr.matrix <- makeContrasts(contrasts = matrix_value, levels=design)
-contr.matrix
+get_matrix1 <- createMatrix(normDge, design_base, design_value, matrix_v1)
+get_matrix2 <- createMatrix(normDge, design_base, design_value, matrix_v2)
+get_matrix1
+get_matrix2
+
+contrast <- createContrast(design, get_matrix1, get_matrix2)
+contrast
 
 ```
 
+# Perform analysis
+The analysis is performed using edgeR with the normalized counts, design matrix and the provided contrasts.
 
 ```{r analysis}
 # PERFORM ANALYSIS
 
-voom <- voom(normDge, design)
-vfit <- lmFit(voom)
-vfit <- contrasts.fit(vfit, contrasts = contr.matrix)
-efit <- eBayes(vfit)
+normDge <- estimateDisp(normDge, design)
+edfit <- glmFit(normDge, design)
+efit <- glmLRT(edfit, contrast = contrast)
 
 efit$DE <- decideTests(efit, p.value = alpha)
 summary(efit$DE)
 
 ```
 
+## Format DE output table
 
 ```{r create_deTab}
 # CREATE deTab TABLE
 
-deTab <- data.frame(topTable(efit, coef=1, n=Inf))
+deTab <- topTags(efit, n=Inf)$table
 deTab <- deTab[order(rownames(deTab)),]
 deTab$DE <- c(efit$DE[order(rownames(efit$DE)),])
+deTab$adj.P.Val <- p.adjust(deTab$PValue, method = "BH")
 
-deTab <- rename(deTab, "avgLog2CPM" = "AveExpr")
+deTab <- rename(deTab, "avgLog2CPM" = "logCPM")
 deTab <- rename(deTab, "avgLog2FC" = "logFC")
+deTab <- rename(deTab, "P.Value" = "PValue")
 
 ```
 
@@ -197,15 +227,18 @@ if (setGeneName == "symbol" && !is.null(data_annotation)) {
 
 ```
 
+## DE results
 
 ```{r showDGEResult}
 # SHOW DGE RESULTS
 
-ma_plot(deTab, NULL)
+ma_plot(deTab)
 pValuePlot(deTab)
 
 ```
 
+# Save results
+Results are saved, so they can be retrieved by the application.
 
 ```{r save}
 # SAVE ANALYSIS
@@ -215,6 +248,8 @@ save(deTab, normDge, file="analysis.RData")
 
 ```
 
+# Session info
+Showing all used packages including version numbers.
 
 ```{r session}
 # INFO

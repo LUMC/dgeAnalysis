@@ -1,24 +1,34 @@
 ---
-title: "Shiny analysis - DESeq2"
-author: "Tom Kuipers"
+title: "dgeAnalysis - DESeq2"
+author:
+- "Developed by LUMC-SASC team:"
+- "- Tom Kuipers"
+- "- Leon Mei"
+- "- Davy Cats"
+date: "`r format(Sys.time(), '%d %B %Y')`"
 output:
-  html_document: default
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    theme: paper
 always_allow_html: true
 params:
-  data_samples:     "" #"~/Desktop/test_data_view310_with3/meta2.csv"
-  data_counts:      "" #"~/Desktop/test_data_view310_with3/all_samples.fragments_per_gene.tsv"
-  data_annotation:  "" #"~/Desktop/test_data_view310_with3/gene_annotation.tsv"
-  setGeneName:      "" #"id"/"symbol"
-  cpm_value:        "" #1
-  excluded_samples: "" #"sample_3_minus"
-  design_value:     "" #"~0 + group + subject"
-  matrix_value:     "" #"plus - minus"
-  alpha:            "" #0.05
+  data_samples:     ""
+  data_counts:      ""
+  data_annotation:  ""
+  setGeneName:      ""
+  cpm_value:        ""
+  excluded_samples: ""
+  design_base:      ""
+  design_value:     ""
+  matrix_v1:        ""
+  matrix_v2:        ""
+  alpha:            ""
 ---
 
-
-## R Markdown
-
+# Reading packages and variables
+Required packages are loaded and the input variables are set. The used input settings are shown.
 
 ```{r setup}
 
@@ -41,12 +51,11 @@ data_annotation <- params$data_annotation
 setGeneName <- params$setGeneName
 cpm_value <- params$cpm_value
 excluded_samples <- params$excluded_samples
+design_base <- params$design_base
 design_value <- params$design_value
-matrix_value <- params$matrix_value
+matrix_v1 <- params$matrix_v1
+matrix_v2 <- params$matrix_v2
 alpha <- params$alpha
-
-# Get desgin
-design_value <- reOrderDesign(matrix_value, design_value, data_samples)
 
 ```
 
@@ -55,23 +64,28 @@ design_value <- reOrderDesign(matrix_value, design_value, data_samples)
 # FILTER DATA IF NESSECARY
 
 #Filter if nessecary
-data_samples <- data_samples[!rownames(data_samples) %in% excluded_samples,]
+data_samples <- data_samples[!rownames(data_samples) %in% excluded_samples, , drop=FALSE]
 data_counts <- data_counts[,!colnames(data_counts) %in% excluded_samples]
 
 ```
 
+## Input values
 
 ```{r showVariables}
 # SHOW VALUES OF VARIABLES
 
 cpm_value
 excluded_samples
-design_value
-matrix_value
 alpha
+design_base
+design_value
+matrix_v1
+matrix_v2
 
 ```
 
+# Process raw data
+The raw data is processed and pre-filtered, to remove non feature counts. The data is placed in a format (DGE list) which can be used for later analsis.
 
 ```{r showRawData}
 # SHOW RAW DATA
@@ -79,10 +93,11 @@ alpha
 se <- readCountsFromTable(data_counts, data_samples)
 
 alignmentSummaryPlot(se)
-complexityPlot(se)
+complexityPlot(se, TRUE, 1000)
 
 ```
 
+## Create DGE list
 
 ```{r filesIntoSE}
 # READ ALL FILES INTO SE
@@ -104,11 +119,19 @@ dge <- DGEList(counts = assay(se), samples = colData(se))
 
 ```
 
+# Create design and prepare analysis
+The design matrix is created and the raw data is filtered based on the input values provided.
 
 ```{r selectedFeatures}
 # GET SELECTED FEATURES
 
-analysis <- DESeqDataSet(se, design = as.formula(design_value))
+get_design <- createDesign(dge$samples, design_base, design_value, matrix_v1, matrix_v2)
+get_design
+dge <- relevelSamples(dge, design_base, design_value, matrix_v1, matrix_v2)
+design <- model.matrix(eval(parse(text=get_design)), dge$samples)
+design
+
+analysis <- DESeqDataSet(se, design = design)
 analysis <- analysis[ rowSums( abs( assay(analysis) ) ) > 1, ]
 
 # FILTER IF NESSECARY
@@ -117,6 +140,8 @@ analysis <- analysis[selectedFeatures,]
 
 ```
 
+# Perform analysis
+The analysis is performed with the filtered data using DESeq2.
 
 ```{r startAnalysis}
 # START ANALYSIS
@@ -125,13 +150,15 @@ analysis <- DESeq(analysis)
 
 ```
 
+# Normalization
+Extract the normalized data from the analysis results.
 
 ```{r getNormalizedCounts}
 # GET NORMALIZED COUNTS
 
 getSize <- estimateSizeFactors(analysis)
 normCounts <- cpm(data.frame(counts(getSize, normalized=TRUE)))
-normDge <- DGEList(counts = normCounts, samples = colData(se))
+normDge <- DGEList(counts = normCounts, samples = dge$samples)
 normDge$counts <- log2(normDge$counts)
 
 countDistributionLinePlot(normDge)
@@ -139,15 +166,26 @@ variancePcaPlot(normDge)
 
 ```
 
+# Collect DE results
+Create the contrast matrix and collect DE results based on this matrix.
 
 ```{r getResults}
 # GET RESULTS
 
-deTab <- results(analysis, alpha = alpha)
+get_matrix1 <- createMatrix(normDge, design_base, design_value, matrix_v1)
+get_matrix2 <- createMatrix(normDge, design_base, design_value, matrix_v2)
+get_matrix1
+get_matrix2
+
+contrast <- createContrast(design, get_matrix1, get_matrix2)
+contrast
+
+deTab <- results(analysis, contrast = contrast, alpha = alpha)
 summary(deTab)
 
 ```
 
+## Format DE output table
 
 ```{r create_deTab}
 # CREATE deTab TABLE
@@ -166,6 +204,7 @@ deTab$DE[deTab$adj.P.Val < alpha & deTab$avgLog2FC > 0] <- 1
 
 ```
 
+## Add annotation to DE table
 
 ```{r addAnnotation}
 # ADD ANNOTATION TO deTab
@@ -196,15 +235,18 @@ if (setGeneName == "symbol" && !is.null(data_annotation)) {
 
 ```
 
+## DE results
 
 ```{r showDGEResult}
 # SHOW DGE RESULTS
 
-ma_plot(deTab, NULL)
+ma_plot(deTab)
 pValuePlot(deTab)
 
 ```
 
+# Save results
+Results are saved, so they can be retrieved by the application.
 
 ```{r save}
 # SAVE ANALYSIS
@@ -213,6 +255,8 @@ save(deTab, normDge, file="analysis.RData")
 
 ```
 
+# Session info
+Showing all used packages including version numbers.
 
 ```{r session}
 #INFO
