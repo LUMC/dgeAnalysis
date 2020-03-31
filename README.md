@@ -11,7 +11,7 @@ install.packages("devtools")
 2. Install the "dgeAnalysis" package:
 ```r
 library("devtools")
-devtools::install_github("LUMC/DGE_analysis")
+devtools::install_github("LUMC/dgeAnalysis")
 ```
 3. Launch the application:
 ```r
