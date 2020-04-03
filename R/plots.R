@@ -309,7 +309,7 @@ multidimensionalScaling2dPlot <- function(dge, color, sourceId){
       toImageButtonOptions = list(
         format = "png",
         filename = sourceId,
-        width = 150,
+        width = 1500,
         height = 1000
       )
     )
