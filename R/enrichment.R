@@ -277,7 +277,11 @@ viewPathwayPlot <- function(deTab, db, pwName){
   pw <- suppressMessages(convertIdentifiers(pw, "symbol"))
   
   setGeneList <- deTab$avgLog2FC
-  names(setGeneList) <- as.character(deTab$geneName)
+  if ("geneName" %in% colnames(deTab)) {
+    names(setGeneList) <- as.character(deTab$geneName)
+  } else {
+    names(setGeneList) <- as.character(rownames(deTab))
+  }
   setGeneList <- sort(setGeneList, decreasing = TRUE)
   setGeneList <- setGeneList[na.omit(names(setGeneList))]
   setGeneList <- setGeneList[!duplicated(names(setGeneList))]
@@ -308,7 +312,11 @@ viewPathwayPlot <- function(deTab, db, pwName){
 
 cnetPlotly <- function(enrich, deTab, cnet_slider){
   setGeneList <- deTab$avgLog2FC
-  names(setGeneList) <- as.character(deTab$geneName)
+  if ("geneName" %in% colnames(deTab)) {
+    names(setGeneList) <- as.character(deTab$geneName)
+  } else {
+    names(setGeneList) <- as.character(rownames(deTab))
+  }
   setGeneList <- sort(setGeneList, decreasing = TRUE)
   setGeneList <- setGeneList[na.omit(names(setGeneList))]
   setGeneList <- setGeneList[!duplicated(names(setGeneList))]
@@ -317,7 +325,12 @@ cnetPlotly <- function(enrich, deTab, cnet_slider){
   
   g <- list2graph(geneSets)
   
-  V(g)$name[V(g)$name %in% as.character(deTab$entrez)] <- as.character(deTab$geneName[as.character(deTab$entrez) %in% V(g)$name])
+  if ("geneName" %in% colnames(deTab)) {
+    V(g)$name[V(g)$name %in% as.character(deTab$entrez)] <- as.character(deTab$geneName[as.character(deTab$entrez) %in% V(g)$name])
+  } else {
+    V(g)$name[V(g)$name %in% as.character(deTab$entrez)] <- as.character(rownames(deTab)[as.character(deTab$entrez) %in% V(g)$name])
+  }
+  
   fc <- setGeneList[V(g)$name]
   V(g)$color <- fc
   

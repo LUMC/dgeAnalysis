@@ -21,7 +21,6 @@ get_do <- reactive({
   }, error = function(err) {
     showNotification(ui = "DO enrichment failed with an error!", duration = 5, type = "error")
     showNotification(ui = as.character(err), duration = 10, type = "error")
-    print(err)
     return(NULL)
   })
 })
