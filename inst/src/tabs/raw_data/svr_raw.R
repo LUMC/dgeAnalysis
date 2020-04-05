@@ -58,7 +58,7 @@ output[["selected_raw_voom"]] <- DT::renderDataTable({
     checkReload()
     s <- event_data(event = "plotly_selected", source = "raw_voom")
     counts <- data.frame(get_raw_dge()$counts[!grepl('^__', rownames(get_raw_dge()$counts)),])
-    DT::datatable(counts[s$key,], options = list(pageLength = 15, scrollX = TRUE))
+    DT::datatable(counts[unlist(s$key),], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
   })
@@ -91,7 +91,7 @@ output[["selected_raw_mds2d"]] <- DT::renderDataTable({
     checkReload()
     s <- event_data(event = "plotly_selected", source = "raw_mds2d")
     if(is.null(s)){s <- ""}
-    DT::datatable(data_samples()[s$key,], options = list(pageLength = 15, scrollX = TRUE))
+    DT::datatable(data_samples()[unlist(s$key),], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c("No data available")), rownames = FALSE, colnames = ""))
   })

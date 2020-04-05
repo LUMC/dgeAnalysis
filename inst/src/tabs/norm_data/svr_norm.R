@@ -53,7 +53,7 @@ output[["selected_norm_voom"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
     s <- event_data(event = "plotly_selected", source = "norm_voom")
-    DT::datatable(data.frame(inUse_normDge$counts)[s$key,], options = list(pageLength = 15, scrollX = TRUE))
+    DT::datatable(data.frame(inUse_normDge$counts)[unlist(s$key),], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
   })
@@ -85,7 +85,7 @@ output[["selected_norm_mds2d"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
     s <- event_data(event = "plotly_selected", source = "norm_mds2d")
-    DT::datatable(data_samples()[s$key,], options = list(pageLength = 15, scrollX = TRUE))
+    DT::datatable(data_samples()[unlist(s$key),], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(NULL)
   })

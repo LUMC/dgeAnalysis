@@ -65,7 +65,7 @@ output[["selected_pca"]] <- DT::renderDataTable({
     checkReload()
     s <- event_data(event = "plotly_selected", source = "pca_pca2d")
     if(is.null(s)){s <- ""}
-    DT::datatable(data_samples()[s$key,], options = list(pageLength = 15, scrollX = TRUE))
+    DT::datatable(data_samples()[unlist(s$key),], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
   })
