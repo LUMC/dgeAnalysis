@@ -6,10 +6,12 @@ get_do <- reactive({
   tryCatch({
     checkReload()
     if (input$choose_do == "enrich") {
+      showNotification(ui = "DO enrichment based on DE genes (with entrezID)", duration = 10, type = "message")
       suppressMessages(enrich <- DOSE::enrichDO(inUse_deTab$entrez[inUse_deTab$DE!=0], pvalueCutoff=0.05))
     } else {
       set.seed(1234)
       geneList <- get_geneList(inUse_deTab)
+      showNotification(ui = "DO enrichment based on all genes (with entrezID) and Log2FC", duration = 10, type = "message")
       suppressMessages(enrich <- DOSE::gseDO(geneList, nPerm=10000, pvalueCutoff=0.05, verbose=FALSE, seed=TRUE))
     }
     if (nrow(as.data.frame(enrich)) == 0) {
@@ -20,6 +22,7 @@ get_do <- reactive({
     enrich
   }, error = function(err) {
     showNotification(ui = "DO enrichment failed with an error!", duration = 5, type = "error")
+    showNotification(ui = "DO enrichment supports: ENS", duration = 10, type = "error")
     showNotification(ui = as.character(err), duration = 10, type = "error")
     return(NULL)
   })

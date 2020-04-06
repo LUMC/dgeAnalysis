@@ -131,10 +131,10 @@ overlap_ratio <- function(x, y) {
 
 get_organismID <- function(deTab, app_mode){
   tryCatch({
-    if (app_mode == "symbol") {
-      id <- deTab$geneId[nrow(deTab)]
-    } else {
+    if (is.null(app_mode) || app_mode != "symbol") {
       id <- rownames(deTab)[nrow(deTab)]
+    } else {
+      id <- deTab$geneId[nrow(deTab)]
     }
     id <- gsub("[^A-Za-z]","", id)
     id <- sub(".{1}$", "", id)
@@ -264,16 +264,16 @@ emap_plotly <- function(enrich){
 ## Returns:
 ##  gg = Igraph object, containing links between genes
 
-viewPathwayPlot <- function(deTab, db, pwName){
-  organism <- get_organismID(deTab)
-  org2org <- list(ENSCEL="celegans",
-                  ENSCAF="cfamiliaris",
-                  ENSDAR="drerio",
-                  ENS="hsapiens",
-                  ENSMUS="mmusculus",
-                  ENSRNO="rnorvegicus")
+viewPathwayPlot <- function(deTab, db, pwName, app_mode){
+  organism <- get_organismID(deTab, app_mode)
+  org <- list(ENSCEL="celegans",
+              ENSCAF="cfamiliaris",
+              ENSDAR="drerio",
+              ENS="hsapiens",
+              ENSMUS="mmusculus",
+              ENSRNO="rnorvegicus")
   pathways <- eval(parse(text="pathways"))
-  pw <- pathways(org2org[[organism]], db)[[pwName]]
+  pw <- pathways(org[[organism]], db)[[pwName]]
   pw <- suppressMessages(convertIdentifiers(pw, "symbol"))
   
   setGeneList <- deTab$avgLog2FC

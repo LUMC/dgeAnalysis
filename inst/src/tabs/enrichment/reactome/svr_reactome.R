@@ -10,10 +10,12 @@ get_reactome <- reactive({
                 ENSRNO="rat")
     organism <- org[[organism]]
     if (input$choose_reactome == "enrich") {
+      showNotification(ui = "Reactome enrichment based on DE genes (with entrezID)", duration = 10, type = "message")
       suppressMessages(enrich <- ReactomePA::enrichPathway(inUse_deTab$entrez[inUse_deTab$DE!=0], organism=organism, pvalueCutoff=0.05))
     } else {
       set.seed(1234)
       geneList <- get_geneList(inUse_deTab)
+      showNotification(ui = "Reactome enrichment based on all genes (with entrezID) and Log2FC", duration = 10, type = "message")
       suppressMessages(enrich <- ReactomePA::gsePathway(geneList, organism=organism, nPerm=10000, pvalueCutoff=0.05, verbose=FALSE, seed=TRUE))
     }
     if (nrow(as.data.frame(enrich)) == 0) {
@@ -24,6 +26,7 @@ get_reactome <- reactive({
     enrich
   }, error = function(err) {
     showNotification(ui = "Reactome enrichment failed with an error!", duration = 5, type = "error")
+    showNotification(ui = "Reactome enrichment supports: ENSCEL, ENS, ENSMUS and ENSRNO", duration = 10, type = "error")
     showNotification(ui = as.character(err), duration = 10, type = "error")
     print(err)
     return(NULL)
@@ -110,7 +113,7 @@ output[["reactome_pathway"]] <- renderPlotly({
     checkReload()
     s <- event_data(event = "plotly_click", source = "Reactome")
     
-    graphData <- viewPathwayPlot(inUse_deTab, 'reactome', s$key)
+    graphData <- viewPathwayPlot(inUse_deTab, 'reactome', s$key, input$setGeneName)
     plotlyGraph(graphData, s$key, "Log2FC", 0)
   }, error = function(err) {
     return(NULL)
@@ -123,7 +126,7 @@ output[["reactome_pathway_table"]] <- DT::renderDataTable({
     checkReload()
     s <- event_data(event = "plotly_click", source = "Reactome")
     
-    graphData <- viewPathwayPlot(inUse_deTab, 'reactome', s$key)
+    graphData <- viewPathwayPlot(inUse_deTab, 'reactome', s$key, input$setGeneName)
     DT::datatable(inUse_deTab[inUse_deTab$geneName %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))

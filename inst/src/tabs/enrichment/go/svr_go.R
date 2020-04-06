@@ -14,10 +14,12 @@ get_go <- reactive({
                 ENSMUS="org.Mm.eg.db")
     organism <- org[[organism]]
     if (input$choose_go == "enrich") {
+      showNotification(ui = "GO enrichment based on DE genes (with entrezID)", duration = 10, type = "message")
       suppressMessages(enrich <- clusterProfiler::enrichGO(inUse_deTab$entrez[inUse_deTab$DE!=0],  ont = input$selectOntology, organism, pvalueCutoff=0.05))
     } else {
       set.seed(1234)
       geneList <- get_geneList(inUse_deTab)
+      showNotification(ui = "GO enrichment based on all genes (with entrezID) and Log2FC", duration = 10, type = "message")
       suppressMessages(enrich <- clusterProfiler::gseGO(geneList, ont = input$selectOntology, organism, nPerm=10000, pvalueCutoff=0.05, verbose=FALSE, seed=TRUE))
     }
     if (nrow(as.data.frame(enrich)) == 0) {
@@ -28,6 +30,7 @@ get_go <- reactive({
     enrich
   }, error = function(err) {
     showNotification(ui = "GO enrichment failed with an error!", duration = 5, type = "error")
+    showNotification(ui = "GO enrichment supports: ENS, ENSMUS", duration = 10, type = "error")
     showNotification(ui = as.character(err), duration = 10, type = "error")
     print(err)
     return(NULL)
