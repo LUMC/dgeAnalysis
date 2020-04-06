@@ -2,6 +2,7 @@
 ## Change application mode New <-> View
 observeEvent(input$app_mode, {
   if (input$app_mode == "new") {
+    showNotification(ui = "New analysis mode selected!", duration = 3, type = "message")
     runjs('$("#show_view_analysis").css({"border-radius": "25px","border": "3px solid rgba(0,0,0,0)"});')
     runjs('$("#show_new_analysis").css({"border-radius": "25px", "border": "3px solid #0088cc"});')
     tryCatch({
@@ -11,6 +12,7 @@ observeEvent(input$app_mode, {
       return(NULL)
     })
   } else {
+    showNotification(ui = "View analysis mode selected!", duration = 3, type = "message")
     runjs('$("#show_new_analysis").css({"border-radius": "25px", "border": "3px solid rgba(0,0,0,0)"});')
     runjs('$("#show_view_analysis").css({"border-radius": "25px", "border": "3px solid #0088cc"});')
     inUse_normDge <<- get_normDge()
