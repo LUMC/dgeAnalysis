@@ -115,7 +115,7 @@ output[["kegg_pathway"]] <- renderPlotly({
     checkReload()
     s <- event_data(event = "plotly_click", source = "KEGG")
     
-    graphData <- viewPathwayPlot(inUse_deTab, 'kegg', s$key, NULL)
+    graphData <- viewPathwayPlot(inUse_deTab, 'kegg', s$key, input$setGeneName)
     plotlyGraph(graphData, s$key, "Log2FC", 0)
   }, error = function(err) {
     return(NULL)
