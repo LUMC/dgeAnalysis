@@ -51,8 +51,8 @@ preMarkdownChecks <- reactive ({
     return("Wrong analysis mode!")
   } else if (is.null(input$matrix_val1) | is.null(input$matrix_val2)) {
     return("One of the contrast is empty!")
-  } else if (input$matrix_val1 == input$matrix_val2) {
-      return("Contrasts cant be the same!")
+  } else if (paste(input$matrix_val1, collapse="") == paste(input$matrix_val2, collapse="")) {
+    return("Contrasts cant be the same!")
   } else if (!is.null(input$setGeneName)) {
     if (input$setGeneName == "symbol" & !("geneName" %in% colnames(data_annotation()))) {
       return("The annotation file is missing a column: 'geneName'!")
