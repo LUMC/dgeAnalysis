@@ -9,9 +9,10 @@
 get_go <- reactive({
   tryCatch({
     checkReload()
-    organism <- get_organismID(inUse_deTab, input$setGeneName)
+    organism <- get_organismID(inUse_deTab)
     org <- list(ENS="org.Hs.eg.db",
-                ENSMUS="org.Mm.eg.db")
+                ENSMUS="org.Mm.eg.db",
+                ENSRNO="org.Rn.eg.db")
     organism <- org[[organism]]
     if (input$choose_go == "enrich") {
       showNotification(ui = "GO enrichment based on DE genes (with entrezID)", duration = 10, type = "message")
@@ -30,7 +31,7 @@ get_go <- reactive({
     enrich
   }, error = function(err) {
     showNotification(ui = "GO enrichment failed with an error!", duration = 5, type = "error")
-    showNotification(ui = "GO enrichment supports: ENS, ENSMUS", duration = 10, type = "error")
+    showNotification(ui = "GO enrichment supports: ENS, ENSMUS and ENSRNO", duration = 10, type = "error")
     showNotification(ui = as.character(err), duration = 10, type = "error")
     print(err)
     return(NULL)
@@ -93,7 +94,11 @@ output[["cnet_go_table"]] <- DT::renderDataTable({
     
     geneSets <- extract_geneSets(enrich, input$cnet_go_slider)
     graphData <- cnetPlotly(enrich, inUse_deTab, input$cnet_go_slider)
-    DT::datatable(inUse_deTab[inUse_deTab$geneName %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
+    if ("geneName" %in% colnames(inUse_deTab)) {
+      DT::datatable(inUse_deTab[inUse_deTab$geneName %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
+    } else {
+      DT::datatable(inUse_deTab[rownames(inUse_deTab) %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
+    }
   }, error = function(err) {
     return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
   })

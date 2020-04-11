@@ -129,9 +129,9 @@ overlap_ratio <- function(x, y) {
 ## Returns:
 ##  id = String, Organism ID value
 
-get_organismID <- function(deTab, app_mode){
+get_organismID <- function(deTab){
   tryCatch({
-    if (is.null(app_mode) || app_mode != "symbol") {
+    if ("geneName" %in% colnames(inUse_deTab)) {
       id <- rownames(deTab)[nrow(deTab)]
     } else {
       id <- deTab$geneId[nrow(deTab)]
@@ -190,7 +190,7 @@ enrichBarplot <- function(enrich, amount, value){
                   ticktext=floor(color) + signif(color %% 1, 4)),
                 reversescale=FALSE)) %>% 
     plotly::layout(
-      xaxis = list(title = 'Counts'),
+      xaxis = list(title = 'Gene counts'),
       title = "Enrichment barplot",
       yaxis = list(title = '')) %>%
     config(
@@ -264,8 +264,8 @@ emap_plotly <- function(enrich){
 ## Returns:
 ##  gg = Igraph object, containing links between genes
 
-viewPathwayPlot <- function(deTab, db, pwName, app_mode){
-  organism <- get_organismID(deTab, app_mode)
+viewPathwayPlot <- function(deTab, db, pwName){
+  organism <- get_organismID(deTab)
   org <- list(ENSCEL="celegans",
               ENSCAF="cfamiliaris",
               ENSDAR="drerio",
@@ -463,6 +463,22 @@ plotlyGraph <- function(g, pwName, getColor, cnet){
 #  ax = L[as.character(es$V1),]$V1,
 #  ay = L[as.character(es$V1),]$V2,
 #  standoff=5
+#)
+#add_annotations(
+#  x = ~L_genes$V1,
+#  y = ~L_genes$V2,
+#  text = rownames(L_genes),
+#  showarrow = TRUE,
+#  arrowwidth = 1,
+#  arrowhead = 0
+#)
+#add_annotations(
+#  x = L_cnet$V1,
+#  y = L_cnet$V2,
+#  text = sprintf("<b>%s</b>", rownames(L_cnet)),
+#  showarrow = TRUE,
+#  arrowwidth = 2,
+#  arrowhead = 0
 #)
 
 ## --------------------------------------------------------------------------

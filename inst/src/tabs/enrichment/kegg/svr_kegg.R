@@ -3,7 +3,7 @@
 get_kegg <- reactive({
   tryCatch({
     checkReload()
-    organism <- get_organismID(inUse_deTab, input$setGeneName)
+    organism <- get_organismID(inUse_deTab)
     org <- list(ENSCEL="cel",
                 ENSCAF="cfa",
                 ENSDAR="dre",
@@ -91,7 +91,11 @@ output[["cnet_kegg_table"]] <- DT::renderDataTable({
     
     geneSets <- extract_geneSets(enrich, input$cnet_kegg_slider)
     graphData <- cnetPlotly(enrich, inUse_deTab, input$cnet_kegg_slider)
-    DT::datatable(inUse_deTab[inUse_deTab$geneName %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
+    if ("geneName" %in% colnames(inUse_deTab)) {
+      DT::datatable(inUse_deTab[inUse_deTab$geneName %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
+    } else {
+      DT::datatable(inUse_deTab[rownames(inUse_deTab) %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
+    }
   }, error = function(err) {
     return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
   })
@@ -115,7 +119,7 @@ output[["kegg_pathway"]] <- renderPlotly({
     checkReload()
     s <- event_data(event = "plotly_click", source = "KEGG")
     
-    graphData <- viewPathwayPlot(inUse_deTab, 'kegg', s$key, input$setGeneName)
+    graphData <- viewPathwayPlot(inUse_deTab, 'kegg', s$key)
     plotlyGraph(graphData, s$key, "Log2FC", 0)
   }, error = function(err) {
     return(NULL)
@@ -128,8 +132,12 @@ output[["kegg_pathway_table"]] <- DT::renderDataTable({
     checkReload()
     s <- event_data(event = "plotly_click", source = "KEGG")
     
-    graphData <- viewPathwayPlot(inUse_deTab, 'kegg', s$key, input$setGeneName)
-    DT::datatable(inUse_deTab[inUse_deTab$geneName %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
+    graphData <- viewPathwayPlot(inUse_deTab, 'kegg', s$key)
+    if ("geneName" %in% colnames(inUse_deTab)) {
+      DT::datatable(inUse_deTab[inUse_deTab$geneName %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
+    } else {
+      DT::datatable(inUse_deTab[rownames(inUse_deTab) %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
+    }
   }, error = function(err) {
     return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
   })
