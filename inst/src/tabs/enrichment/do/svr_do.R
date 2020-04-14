@@ -68,9 +68,23 @@ output[["cnet_do_plot"]] <- renderPlotly({
     checkReload()
     enrich <- get_do()
     
-    geneSets <- extract_geneSets(enrich, input$cnet_do_slider)
-    graphData <- cnetPlotly(enrich, inUse_deTab, input$cnet_do_slider)
-    plotlyGraph(graphData, "Gene-Concept Network", "Log2FC", length(geneSets))
+    geneSets <- extract_geneSets(enrich, input$cnet_do_slider, input$do_select_pathway)
+    graphData <- cnetPlotly(enrich, inUse_deTab, input$cnet_do_slider, input$do_select_pathway)
+    plotlyGraph(graphData, "Gene-Concept Network", "Log2FC", length(geneSets), input$cnet_do_annoP, input$cnet_do_annoG)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Add specific pathway to cnet plot
+output[["cnet_do_select_pathway"]] <- renderUI({
+  tryCatch({
+    enrich <- as.data.frame(get_do())
+    selectInput(inputId = "do_select_pathway",
+                label = "Add specific pathway:",
+                multiple = TRUE,
+                choices = enrich$Description
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -82,8 +96,8 @@ output[["cnet_do_table"]] <- DT::renderDataTable({
     checkReload()
     enrich <- get_do()
     
-    geneSets <- extract_geneSets(enrich, input$cnet_do_slider)
-    graphData <- cnetPlotly(enrich, inUse_deTab, input$cnet_do_slider)
+    geneSets <- extract_geneSets(enrich, input$cnet_do_slider, input$do_select_pathway)
+    graphData <- cnetPlotly(enrich, inUse_deTab, input$cnet_do_slider, input$do_select_pathway)
     if ("geneName" %in% colnames(inUse_deTab)) {
       DT::datatable(inUse_deTab[inUse_deTab$geneName %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
     } else {
@@ -100,7 +114,7 @@ output[["gsea_do_plot"]] <- renderPlotly({
     checkReload()
     enrich <- get_do()
     graphData <- emap_plotly(enrich)
-    plotlyGraph(graphData, "Disease ontology", "P-Value", 0)
+    plotlyGraph(graphData, "Disease ontology", "P-Value", 0, input$do_network_annoP, FALSE)
   }, error = function(err) {
     return(NULL)
   })

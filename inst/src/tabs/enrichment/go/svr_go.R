@@ -78,9 +78,23 @@ output[["cnet_go_plot"]] <- renderPlotly({
     checkReload()
     enrich <- get_go()
     
-    geneSets <- extract_geneSets(enrich, input$cnet_go_slider)
-    graphData <- cnetPlotly(enrich, inUse_deTab, input$cnet_go_slider)
-    plotlyGraph(graphData, "Gene-Concept Network", "Log2FC", length(geneSets))
+    geneSets <- extract_geneSets(enrich, input$cnet_go_slider, input$go_select_pathway)
+    graphData <- cnetPlotly(enrich, inUse_deTab, input$cnet_go_slider, input$go_select_pathway)
+    plotlyGraph(graphData, "Gene-Concept Network", "Log2FC", length(geneSets), input$cnet_go_annoP, input$cnet_go_annoG)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Add specific pathway to cnet plot
+output[["cnet_go_select_pathway"]] <- renderUI({
+  tryCatch({
+    enrich <- as.data.frame(get_go())
+    selectInput(inputId = "go_select_pathway",
+                label = "Add specific pathway:",
+                multiple = TRUE,
+                choices = enrich$Description
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -92,8 +106,8 @@ output[["cnet_go_table"]] <- DT::renderDataTable({
     checkReload()
     enrich <- get_go()
     
-    geneSets <- extract_geneSets(enrich, input$cnet_go_slider)
-    graphData <- cnetPlotly(enrich, inUse_deTab, input$cnet_go_slider)
+    geneSets <- extract_geneSets(enrich, input$cnet_go_slider, input$go_select_pathway)
+    graphData <- cnetPlotly(enrich, inUse_deTab, input$cnet_go_slider, input$go_select_pathway)
     if ("geneName" %in% colnames(inUse_deTab)) {
       DT::datatable(inUse_deTab[inUse_deTab$geneName %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
     } else {
@@ -110,7 +124,7 @@ output[["gsea_go_plot"]] <- renderPlotly({
     checkReload()
     enrich <- get_go()
     graphData <- emap_plotly(enrich)
-    plotlyGraph(graphData, input$selectOntology, "P-Value", 0)
+    plotlyGraph(graphData, input$selectOntology, "P-Value", 0, input$go_network_annoP, FALSE)
   }, error = function(err) {
     return(NULL)
   })

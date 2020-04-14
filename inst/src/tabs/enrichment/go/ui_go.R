@@ -65,7 +65,11 @@ tab_enrich_go <- tabItem(
         position = "right",
         sidebarPanel(
           width = 3,
-          sliderInput("cnet_go_slider", "Amount of shown pathways:", 5, min = 1, max = 15, step = 1),
+          sliderInput("cnet_go_slider", "Amount of shown pathways:", 5, min = 0, max = 15, step = 1),
+          uiOutput("cnet_go_select_pathway"),
+          tags$b("Labels on/off:"),
+          checkboxInput("cnet_go_annoP", "Pathway labels", value = TRUE),
+          checkboxInput("cnet_go_annoG", "Gene labels", value = FALSE),
           br(),
           uiOutput("cnet_go_plot_info"),
           span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
@@ -87,6 +91,9 @@ tab_enrich_go <- tabItem(
         position = "right",
         sidebarPanel(
           width = 3,
+          tags$b("Labels on/off:"),
+          checkboxInput("go_network_annoP", "Pathway labels", value = FALSE),
+          br(),
           uiOutput("go_network_info"),
           span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
         ), 

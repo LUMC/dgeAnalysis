@@ -46,26 +46,24 @@ update_n <- function(x, showCategory) {
 
 
 ## extract_geneSet()
-##  Sets a new n value
-##  n stands for the number of pathways to show
-##  Gets genes from x (enrichment results)
+##  Collect genes within a pathway
+##  Gets genes from enrichment result
 ##  geneSets names are set based on ID and description
 ## Parameters:
-##  x = Enrichment object, containing enrichment results
-##  n = Integer, Updated number of pathways to show
+##  enrich = Enrichment object, containing enrichment results
+##  slider = Integer, Updated number of pathways to show
+##  selected = Vector, Contains manually selected pathways
 ## Returns:
 ##  geneSets = vector, Genes found in corresponding pathways
 
-extract_geneSets <- function(x, n) {
-  n <- update_n(x, n)
-  geneSets <- geneInCategory(x)
-  y <- as.data.frame(x)
+extract_geneSets <- function(enrich, slider, selected) {
+  slider <- update_n(enrich, slider)
+  geneSets <- geneInCategory(enrich)
+  y <- as.data.frame(enrich)
   geneSets <- geneSets[y$ID]
   names(geneSets) <- y$Description
-  if (is.numeric(n)) {
-    return(geneSets[1:n])
-  }
-  return(geneSets[n])
+  geneSets <- append(head(geneSets, slider), geneSets[selected])
+  geneSets
 }
 
 
@@ -195,10 +193,10 @@ enrichBarplot <- function(enrich, amount, value){
       yaxis = list(title = '')) %>%
     config(
       toImageButtonOptions = list(
-        format = "png",
+        format = "svg",
         filename = "enrichbar",
-        width = 1500,
-        height = 1000
+        width = 750,
+        height = 500
       )
     )
   p
@@ -252,51 +250,6 @@ emap_plotly <- function(enrich){
 }
 
 
-## viewPathwayPlot()
-##  Genes are gathered from enrichment result from specific pathway
-##  The geneList is prepared with the right LogFC values and links between genes in the pathway
-##  Igraph object is made to create links between genes in a pathway
-##  Colors of dots are based on p-value.
-## Parameters:
-##  deTab = Dataframe, with all analysis results
-##  db = String, Current database in use (kegg, reactome, go or do)
-##  pwName = String, Name of the pathway
-## Returns:
-##  gg = Igraph object, containing links between genes
-
-viewPathwayPlot <- function(deTab, db, pwName){
-  organism <- get_organismID(deTab)
-  org <- list(ENSCEL="celegans",
-              ENSCAF="cfamiliaris",
-              ENSDAR="drerio",
-              ENS="hsapiens",
-              ENSMUS="mmusculus",
-              ENSRNO="rnorvegicus")
-  pathways <- eval(parse(text="pathways"))
-  pw <- pathways(org[[organism]], db)[[pwName]]
-  pw <- suppressMessages(convertIdentifiers(pw, "symbol"))
-  
-  setGeneList <- deTab$avgLog2FC
-  if ("geneName" %in% colnames(deTab)) {
-    names(setGeneList) <- as.character(deTab$geneName)
-  } else {
-    names(setGeneList) <- as.character(rownames(deTab))
-  }
-  setGeneList <- sort(setGeneList, decreasing = TRUE)
-  setGeneList <- setGeneList[na.omit(names(setGeneList))]
-  setGeneList <- setGeneList[!duplicated(names(setGeneList))]
-  
-  g <- graphite::pathwayGraph(pw)
-  gg <- igraph::igraph.from.graphNEL(g)
-  gg <- igraph::as.undirected(gg)
-  V(gg)$name <- sub("[^:]+:", "", V(gg)$name)
-  
-  fc <- setGeneList[V(gg)$name]
-  V(gg)$color <- fc
-  gg
-}
-
-
 ## cnetPlotly()
 ##  Genes are gathered from enrichment result from specific pathway
 ##  The geneList is prepared with the right LogFC values and links of genes between multiple pathways
@@ -307,10 +260,11 @@ viewPathwayPlot <- function(deTab, db, pwName){
 ##  enrich = Enrich result, A enrichment results
 ##  deTab = Dataframe, with all analysis results
 ##  cnet_slider = Integer, Number of pathways to show
+##  cnet_selected = Vector, manually added pathways
 ## Returns:
 ##  g = Igraph object, containing links of genes multiple pathways
 
-cnetPlotly <- function(enrich, deTab, cnet_slider){
+cnetPlotly <- function(enrich, deTab, cnet_slider, cnet_selected){
   setGeneList <- deTab$avgLog2FC
   if ("geneName" %in% colnames(deTab)) {
     names(setGeneList) <- as.character(deTab$geneName)
@@ -321,7 +275,7 @@ cnetPlotly <- function(enrich, deTab, cnet_slider){
   setGeneList <- setGeneList[na.omit(names(setGeneList))]
   setGeneList <- setGeneList[!duplicated(names(setGeneList))]
   
-  geneSets <- extract_geneSets(enrich, cnet_slider)
+  geneSets <- extract_geneSets(enrich, cnet_slider, cnet_selected)
   
   g <- list2graph(geneSets)
   
@@ -351,10 +305,12 @@ cnetPlotly <- function(enrich, deTab, cnet_slider){
 ##  pwName = String, Name of the shown pathway
 ##  getColor = String, Color given to dots (LogFC or P-Values)
 ##  cnet = Integer, Number of cnet pathways to show
+##  annoP = Boolean, Show pathway labels yes or no
+##  annoG = Boolean, Show gene labels yes or no
 ## Returns:
 ##  p = Plotly object
 
-plotlyGraph <- function(g, pwName, getColor, cnet){
+plotlyGraph <- function(g, pwName, getColor, cnet, annoP, annoG){
   G <- g
   L <- as.data.frame(layout.kamada.kawai(G))
   vs <- V(G)
@@ -362,53 +318,36 @@ plotlyGraph <- function(g, pwName, getColor, cnet){
   rownames(L) <- names(vs)
   
   L_cnet <- L[0:cnet,]
-  L_genes <- L[(cnet+1):nrow(L),][names(vs)[!is.na(vs$color)],]
-  L_genesNA <- L[names(vs)[is.na(vs$color)],]
+  L_genes <- L[(cnet+1):nrow(L),]
   vs <- vs[!is.na(vs$color)]
   
   Ne <- length(es[1]$V1)
   network <- plot_ly(
-    x = ~L_genesNA$V1,
-    y = ~L_genesNA$V2,
-    type = "scattergl",
+    x = ~L_genes$V1,
+    y = ~L_genes$V2,
+    type = "scatter",
     mode = "markers",
-    marker=list(
-      size=12,
-      color="white",
-      line = list(color = '#999999',
-                  width = 1),
-      colorbar=FALSE),
-    text = rownames(L_genesNA),
-    key = rownames(L_genesNA),
+    marker = list(
+      size = 12,
+      color = as.numeric(vs$color),
+      colorscale = 'Viridis',
+      colorbar = list(title=getColor)),
+    text = rownames(L_genes),
+    key = rownames(L_genes),
     hoverinfo = "text",
-    showlegend=FALSE,
-    source=pwName) %>%
-    add_trace(
-      x = ~L_genes$V1,
-      y = ~L_genes$V2,
-      type = "scattergl",
-      mode = "markers",
-      marker=list(
-        size=12,
-        color=as.numeric(vs$color),
-        colorscale='Viridis',
-        colorbar=list(title=getColor)),
-      text = rownames(L_genes),
-      key = rownames(L_genes),
-      hoverinfo = "text",
-      showlegend=FALSE
-    ) %>%
+    showlegend = FALSE
+  ) %>%
     add_trace(
       x = L_cnet$V1,
       y = L_cnet$V2,
-      marker=list(
-        size=20,
-        color="red",
-        colorbar=FALSE),
+      marker = list(
+        size = 20,
+        color = "red",
+        colorbar = FALSE),
       text = rownames(L_cnet),
       key = rownames(L_cnet),
       hoverinfo = "text",
-      showlegend=FALSE
+      showlegend = FALSE
     )
   
   edge_shapes <- list()
@@ -418,7 +357,7 @@ plotlyGraph <- function(g, pwName, getColor, cnet){
     
     edge_shape = list(
       type = "line",
-      line = list(color = "#030303", width = 0.15),
+      line = list(color = "#030303", width = 0.2),
       layer='below',
       showarrow = TRUE,
       x0 = v0$V1,
@@ -440,12 +379,34 @@ plotlyGraph <- function(g, pwName, getColor, cnet){
     yaxis = axis) %>%
     config(
       toImageButtonOptions = list(
-        format = "png",
+        format = "svg",
         filename = "enrichnet",
-        width = 1500,
-        height = 1000
+        width = 750,
+        height = 500
       )
     )
+  if (isTRUE(annoP)) {
+    p <- add_annotations(
+      p,
+      x = L_cnet$V1,
+      y = L_cnet$V2,
+      text = sprintf("<b>%s</b>", rownames(L_cnet)),
+      showarrow = TRUE,
+      arrowwidth = 2,
+      arrowhead = 0
+    )
+  }
+  if (isTRUE(annoG)) {
+    p <- add_annotations(
+      p,
+      x = ~L_genes$V1,
+      y = ~L_genes$V2,
+      text = rownames(L_genes),
+      showarrow = TRUE,
+      arrowwidth = 1,
+      arrowhead = 0
+    )
+  }
   p
 }
 
@@ -463,22 +424,6 @@ plotlyGraph <- function(g, pwName, getColor, cnet){
 #  ax = L[as.character(es$V1),]$V1,
 #  ay = L[as.character(es$V1),]$V2,
 #  standoff=5
-#)
-#add_annotations(
-#  x = ~L_genes$V1,
-#  y = ~L_genes$V2,
-#  text = rownames(L_genes),
-#  showarrow = TRUE,
-#  arrowwidth = 1,
-#  arrowhead = 0
-#)
-#add_annotations(
-#  x = L_cnet$V1,
-#  y = L_cnet$V2,
-#  text = sprintf("<b>%s</b>", rownames(L_cnet)),
-#  showarrow = TRUE,
-#  arrowwidth = 2,
-#  arrowhead = 0
 #)
 
 ## --------------------------------------------------------------------------

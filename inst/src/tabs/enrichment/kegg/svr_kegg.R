@@ -75,9 +75,23 @@ output[["cnet_kegg_plot"]] <- renderPlotly({
     checkReload()
     enrich <- get_kegg()
     
-    geneSets <- extract_geneSets(enrich, input$cnet_kegg_slider)
-    graphData <- cnetPlotly(enrich, inUse_deTab, input$cnet_kegg_slider)
-    plotlyGraph(graphData, "Gene-Concept Network", "Log2FC", length(geneSets))
+    geneSets <- extract_geneSets(enrich, input$cnet_kegg_slider, input$kegg_select_pathway)
+    graphData <- cnetPlotly(enrich, inUse_deTab, input$cnet_kegg_slider, input$kegg_select_pathway)
+    plotlyGraph(graphData, "Gene-Concept Network", "Log2FC", length(geneSets), input$cnet_kegg_annoP, input$cnet_kegg_annoG)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Add specific pathway to cnet plot
+output[["cnet_kegg_select_pathway"]] <- renderUI({
+  tryCatch({
+    enrich <- as.data.frame(get_kegg())
+    selectInput(inputId = "kegg_select_pathway",
+                label = "Add specific pathway:",
+                multiple = TRUE,
+                choices = enrich$Description
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -89,8 +103,8 @@ output[["cnet_kegg_table"]] <- DT::renderDataTable({
     checkReload()
     enrich <- get_kegg()
     
-    geneSets <- extract_geneSets(enrich, input$cnet_kegg_slider)
-    graphData <- cnetPlotly(enrich, inUse_deTab, input$cnet_kegg_slider)
+    geneSets <- extract_geneSets(enrich, input$cnet_kegg_slider, input$kegg_select_pathway)
+    graphData <- cnetPlotly(enrich, inUse_deTab, input$cnet_kegg_slider, input$kegg_select_pathway)
     if ("geneName" %in% colnames(inUse_deTab)) {
       DT::datatable(inUse_deTab[inUse_deTab$geneName %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
     } else {
@@ -107,39 +121,9 @@ output[["gsea_kegg_plot"]] <- renderPlotly({
     checkReload()
     enrich <- get_kegg()
     graphData <- emap_plotly(enrich)
-    plotlyGraph(graphData, "KEGG", "P-Value", 0)
+    plotlyGraph(graphData, "KEGG", "P-Value", 0, input$kegg_network_annoP, FALSE)
   }, error = function(err) {
     return(NULL)
-  })
-})
-
-## create kegg plot of specific pathway by selection
-output[["kegg_pathway"]] <- renderPlotly({
-  tryCatch({
-    checkReload()
-    s <- event_data(event = "plotly_click", source = "KEGG")
-    
-    graphData <- viewPathwayPlot(inUse_deTab, 'kegg', s$key)
-    plotlyGraph(graphData, s$key, "Log2FC", 0)
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
-## get all genes of specific pathway by selection
-output[["kegg_pathway_table"]] <- DT::renderDataTable({
-  tryCatch({
-    checkReload()
-    s <- event_data(event = "plotly_click", source = "KEGG")
-    
-    graphData <- viewPathwayPlot(inUse_deTab, 'kegg', s$key)
-    if ("geneName" %in% colnames(inUse_deTab)) {
-      DT::datatable(inUse_deTab[inUse_deTab$geneName %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
-    } else {
-      DT::datatable(inUse_deTab[rownames(inUse_deTab) %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
-    }
-  }, error = function(err) {
-    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
   })
 })
 
@@ -196,9 +180,6 @@ output[["cnet_kegg_plot_info"]] <- renderUI({
 output[["kegg_network_info"]] <- renderUI({
   infoText <- "The pathway network shows connections between all found pathways. Every dot that the
         plot shows represents a pathway. The color given to the pathways is based on the adjusted
-        p-value. When a particular pathway is clicked, all genes linked to that specific pathway will 
-        be shown together with the interactions between those genes. The genes are colored based on the
-        log fold change calculated by the analysis. If a gene is not present in the analysis dataset it
-        will be colored white."
+        p-value."
   informationBox(infoText)
 })

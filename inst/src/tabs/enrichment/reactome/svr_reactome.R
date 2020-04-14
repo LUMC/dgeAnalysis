@@ -73,9 +73,23 @@ output[["cnet_reactome_plot"]] <- renderPlotly({
     checkReload()
     enrich <- get_reactome()
     
-    geneSets <- extract_geneSets(enrich, input$cnet_reactome_slider)
-    graphData <- cnetPlotly(enrich, inUse_deTab, input$cnet_reactome_slider)
-    plotlyGraph(graphData, "Gene-Concept Network", "Log2FC", length(geneSets))
+    geneSets <- extract_geneSets(enrich, input$cnet_reactome_slider, input$reactome_select_pathway)
+    graphData <- cnetPlotly(enrich, inUse_deTab, input$cnet_reactome_slider, input$reactome_select_pathway)
+    plotlyGraph(graphData, "Gene-Concept Network", "Log2FC", length(geneSets), input$cnet_reactome_annoP, input$cnet_reactome_annoG)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Add specific pathway to cnet plot
+output[["cnet_reactome_select_pathway"]] <- renderUI({
+  tryCatch({
+    enrich <- as.data.frame(get_reactome())
+    selectInput(inputId = "reactome_select_pathway",
+                label = "Add specific pathway:",
+                multiple = TRUE,
+                choices = enrich$Description
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -87,8 +101,8 @@ output[["cnet_reactome_table"]] <- DT::renderDataTable({
     checkReload()
     enrich <- get_reactome()
     
-    geneSets <- extract_geneSets(enrich, input$cnet_reactome_slider)
-    graphData <- cnetPlotly(enrich, inUse_deTab, input$cnet_reactome_slider)
+    geneSets <- extract_geneSets(enrich, input$cnet_reactome_slider, input$reactome_select_pathway)
+    graphData <- cnetPlotly(enrich, inUse_deTab, input$cnet_reactome_slider, input$reactome_select_pathway)
     if ("geneName" %in% colnames(inUse_deTab)) {
       DT::datatable(inUse_deTab[inUse_deTab$geneName %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
     } else {
@@ -105,39 +119,9 @@ output[["gsea_reactome_plot"]] <- renderPlotly({
     checkReload()
     enrich <- get_reactome()
     graphData <- emap_plotly(enrich)
-    plotlyGraph(graphData, "Reactome", "P-Value", 0)
+    plotlyGraph(graphData, "Reactome", "P-Value", 0, input$reactome_network_annoP, FALSE)
   }, error = function(err) {
     return(NULL)
-  })
-})
-
-## create reactome plot of specific pathway by selection
-output[["reactome_pathway"]] <- renderPlotly({
-  tryCatch({
-    checkReload()
-    s <- event_data(event = "plotly_click", source = "Reactome")
-    
-    graphData <- viewPathwayPlot(inUse_deTab, 'reactome', s$key)
-    plotlyGraph(graphData, s$key, "Log2FC", 0)
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
-## get all genes of specific pathway by selection
-output[["reactome_pathway_table"]] <- DT::renderDataTable({
-  tryCatch({
-    checkReload()
-    s <- event_data(event = "plotly_click", source = "Reactome")
-    
-    graphData <- viewPathwayPlot(inUse_deTab, 'reactome', s$key)
-    if ("geneName" %in% colnames(inUse_deTab)) {
-      DT::datatable(inUse_deTab[inUse_deTab$geneName %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
-    } else {
-      DT::datatable(inUse_deTab[rownames(inUse_deTab) %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
-    }
-  }, error = function(err) {
-    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
   })
 })
 
@@ -189,9 +173,6 @@ output[["cnet_reactome_plot_info"]] <- renderUI({
 output[["reactome_network_info"]] <- renderUI({
   infoText <- "The pathway network shows connections between all found pathways. Every dot that the
         plot shows represents a pathway. The color given to the pathways is based on the adjusted
-        p-value. When a particular pathway is clicked, all genes linked to that specific pathway will 
-        be shown together with the interactions between those genes. The genes are colored based on the
-        log fold change calculated by the analysis. If a gene is not present in the analysis dataset it
-        will be colored white."
+        p-value."
   informationBox(infoText)
 })
