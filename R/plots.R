@@ -243,7 +243,7 @@ voomPlot <- function(dge, sourceId){
     text = names(v$voom.xy$x),
     hoverinfo = 'text',
     key = ~names(v$voom.xy$x),
-    source=sourceId) %>%
+    source = sourceId) %>%
     add_trace(
       mode = "lines",
       x = v$voom.line$x,
@@ -298,7 +298,7 @@ multidimensionalScaling2dPlot <- function(dge, color, sourceId){
                   line = list(color = '#999999',
                               width = 1)),
     key = ~rownames(for_plots),
-    source=sourceId) %>%
+    source = sourceId) %>%
     plotly::layout(
       title = paste("MDS Plot 2D"),
       xaxis = list(title = 'MDS1'),
@@ -885,7 +885,7 @@ pValuePlot <- function(deTab){
 ## Returns:
 ##  p = Plotly object
 
-biasPlot <- function(deTab, biasColumn, log) {
+biasPlot <- function(deTab, biasColumn, log, tick, sourceId) {
   if (is.null(biasColumn)) {
     return(NULL)
   }
@@ -901,7 +901,9 @@ biasPlot <- function(deTab, biasColumn, log) {
     alpha = 0.75,
     showlegend = FALSE,
     text = rownames(deTab),
-    hoverinfo = 'text') %>%
+    hoverinfo = 'text',
+    key = rownames(deTab),
+    source = sourceId) %>%
     add_trace(
       data = prediction,
       mode = "lines",
@@ -924,8 +926,10 @@ biasPlot <- function(deTab, biasColumn, log) {
       name = "Standard Error") %>%
     plotly::layout(
       title = paste("Bias based on", biasColumn),
-      xaxis = list(title = biasColumn, type = log), #, type = "log"),
-      yaxis = list(title = 'Average Log2 FC')) %>%
+      xaxis = list(title = biasColumn, type = log, tickformat = tick), #, type = "log"),
+      yaxis = list(title = 'Average Log2 FC'),
+      clickmode = "event+select",
+      dragmode = "select") %>%
     config(
       toImageButtonOptions = list(
         format = "png",

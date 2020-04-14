@@ -1,11 +1,22 @@
 
-## GC bias
+## GC bias plot
 output[["gc_bias"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    biasPlot(inUse_deTab, input$selectGC, NA)
+    biasPlot(inUse_deTab, input$selectGC, NA, "%", "biasGC")
   }, error = function(err) {
     return(NULL)
+  })
+})
+
+## GC bias table
+output[["selected_biasgc"]] <- DT::renderDataTable({
+  tryCatch({
+    s <- event_data(event = "plotly_selected", source = "biasGC")
+    if(is.null(s)){s <- ""}
+    DT::datatable(inUse_deTab[s$key,], options = list(pageLength = 15, scrollX = TRUE))
+  }, error = function(err) {
+    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
   })
 })
 
@@ -21,13 +32,24 @@ output[["selectGC"]] <- renderUI({
   })
 })
 
-## feature length bias
+## feature length bias plot
 output[["len_bias"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    biasPlot(inUse_deTab, input$selectLength, "log")
+    biasPlot(inUse_deTab, input$selectLength, "log", NA, "biasLength")
   }, error = function(err) {
     return(NULL)
+  })
+})
+
+## feature length bias table
+output[["selected_biaslength"]] <- DT::renderDataTable({
+  tryCatch({
+    s <- event_data(event = "plotly_selected", source = "biasLength")
+    if(is.null(s)){s <- ""}
+    DT::datatable(inUse_deTab[s$key,], options = list(pageLength = 15, scrollX = TRUE))
+  }, error = function(err) {
+    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
   })
 })
 
