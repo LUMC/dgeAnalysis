@@ -278,12 +278,12 @@ table.dataTable tr.selected td{
 }
 
 /*checkbox*/
-.checkbox-inline input[type="checkbox"] {
+.checkbox-inline input[type="checkbox"], .checkbox input[type="checkbox"] {
   opacity: 0;
   position: fixed;
   width: 0;
 }
-.checkbox-inline span {
+.checkbox-inline span, .checkbox span {
   display: inline-block;
   background-color: #737373;
   color: white;
@@ -294,21 +294,21 @@ table.dataTable tr.selected td{
   border: 1px solid #737373;
   border-radius: 4px;
 }
-.checkbox-inline input[type="checkbox"]:checked + span {
+.checkbox-inline input[type="checkbox"]:checked + span, .checkbox input[type="checkbox"]:checked + span {
   font-weight: bold;
   background-color: #0088cc;
   color: white;
 }
-.checkbox-inline span:hover {
+.checkbox-inline span:hover, .checkbox span:hover {
   background-color: white;
   color: #0088cc;
   border: 1px solid #0088cc;
 }
-.checkbox-inline+.checkbox-inline, .radio-inline+.radio-inline {
+.checkbox-inline+.checkbox-inline, .radio-inline+.radio-inline, .checkbox+.checkbox {
   margin-top: 1px;
   margin-left: unset;
 }
-.checkbox-inline, .radio-inline, .radio label, .checkbox label {
+.checkbox-inline, .checkbox, .radio-inline, .radio label {
   padding-right: 20px;
 }
 
