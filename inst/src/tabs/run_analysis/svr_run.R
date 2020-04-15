@@ -129,7 +129,7 @@ output[["matrix_value1"]] <- renderUI({
                 label = "Select values for comparison:",
                 multiple = TRUE,
                 selected = AllInputs()[["matrix_val1"]],
-                choices = unique(data_samples()[columns])
+                choices = c("(Treatment)" = "", unique(data_samples()[columns]))
     )
   }, error = function(err) {
     return(NULL)
@@ -145,7 +145,7 @@ output[["matrix_value2"]] <- renderUI({
                 label = "Select values for comparison:",
                 multiple = TRUE,
                 selected = AllInputs()[["matrix_val2"]],
-                choices = unique(data_samples()[columns])
+                choices = c("(Control)" = "", unique(data_samples()[columns]))
     )
   }, error = function(err) {
     return(NULL)
