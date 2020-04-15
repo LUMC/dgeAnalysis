@@ -3,21 +3,39 @@
 get_reactome <- reactive({
   tryCatch({
     checkReload()
+    
     organism <- get_organismID(inUse_deTab)
     org <- list(ENSCEL="celegans",
                 ENS="human",
                 ENSMUS="mouse",
                 ENSRNO="rat")
     organism <- org[[organism]]
+    
     if (input$choose_reactome == "enrich") {
-      showNotification(ui = "Reactome enrichment based on DE genes (with entrezID)", duration = 10, type = "message")
+      showModal(
+        modalDialog(
+          h1("Enrichment is running..."),
+          h4("Reactome enrichment based on DE genes (with entrezID)"),
+          img(src="loading.gif", width = "50%"),
+          footer=NULL
+        )
+      )
       suppressMessages(enrich <- ReactomePA::enrichPathway(inUse_deTab$entrez[inUse_deTab$DE!=0], organism=organism, pvalueCutoff=0.05))
     } else {
+      showModal(
+        modalDialog(
+          h1("Enrichment is running..."),
+          h4("Reactome enrichment based on all genes (with entrezID) and Log2FC"),
+          img(src="loading.gif", width = "50%"),
+          footer=NULL
+        )
+      )
       set.seed(1234)
       geneList <- get_geneList(inUse_deTab)
-      showNotification(ui = "Reactome enrichment based on all genes (with entrezID) and Log2FC", duration = 10, type = "message")
       suppressMessages(enrich <- ReactomePA::gsePathway(geneList, organism=organism, nPerm=10000, pvalueCutoff=0.05, verbose=FALSE, seed=TRUE))
     }
+    
+    removeModal()
     if (nrow(as.data.frame(enrich)) == 0) {
       showNotification(ui = "Reactome enrichment has not found any enriched terms!", duration = 5, type = "warning")
     } else {
@@ -25,6 +43,7 @@ get_reactome <- reactive({
     }
     enrich
   }, error = function(err) {
+    removeModal()
     showNotification(ui = "Reactome enrichment failed with an error!", duration = 5, type = "error")
     showNotification(ui = "Reactome enrichment supports: ENSCEL, ENS, ENSMUS and ENSRNO", duration = 10, type = "error")
     showNotification(ui = as.character(err), duration = 10, type = "error")
@@ -74,7 +93,7 @@ output[["cnet_reactome_plot"]] <- renderPlotly({
     enrich <- get_reactome()
     
     geneSets <- extract_geneSets(enrich, input$cnet_reactome_slider, input$reactome_select_pathway)
-    graphData <- cnetPlotly(enrich, inUse_deTab, input$cnet_reactome_slider, input$reactome_select_pathway)
+    graphData <- cnetPlotly(enrich, geneSets, inUse_deTab)
     plotlyGraph(graphData, "Gene-Concept Network", "Log2FC", length(geneSets), input$cnet_reactome_annoP, input$cnet_reactome_annoG)
   }, error = function(err) {
     return(NULL)
@@ -88,7 +107,7 @@ output[["cnet_reactome_select_pathway"]] <- renderUI({
     selectInput(inputId = "reactome_select_pathway",
                 label = "Add specific pathway:",
                 multiple = TRUE,
-                choices = enrich$Description
+                choices = c("Click to add pathway" = "", enrich$Description)
     )
   }, error = function(err) {
     return(NULL)
@@ -102,7 +121,52 @@ output[["cnet_reactome_table"]] <- DT::renderDataTable({
     enrich <- get_reactome()
     
     geneSets <- extract_geneSets(enrich, input$cnet_reactome_slider, input$reactome_select_pathway)
-    graphData <- cnetPlotly(enrich, inUse_deTab, input$cnet_reactome_slider, input$reactome_select_pathway)
+    graphData <- cnetPlotly(enrich, geneSets, inUse_deTab)
+    if ("geneName" %in% colnames(inUse_deTab)) {
+      DT::datatable(inUse_deTab[inUse_deTab$geneName %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
+    } else {
+      DT::datatable(inUse_deTab[rownames(inUse_deTab) %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
+    }
+  }, error = function(err) {
+    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
+  })
+})
+
+## create heatmap with reactome input
+output[["heat_reactome_plot"]] <- renderPlotly({
+  tryCatch({
+    checkReload()
+    enrich <- get_reactome()
+    
+    geneSets <- extract_geneSets(enrich, input$heat_reactome_slider, input$reactome_select_heat)
+    heatplotly(geneSets, inUse_deTab)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Add specific pathway to heatmap
+output[["heat_reactome_select_pathway"]] <- renderUI({
+  tryCatch({
+    enrich <- as.data.frame(get_reactome())
+    selectInput(inputId = "reactome_select_heat",
+                label = "Add specific pathway:",
+                multiple = TRUE,
+                choices = c("Click to add pathway" = "", enrich$Description)
+    )
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## get all genes of heatmap
+output[["heat_reactome_table"]] <- DT::renderDataTable({
+  tryCatch({
+    checkReload()
+    enrich <- get_reactome()
+    
+    geneSets <- extract_geneSets(enrich, input$heat_reactome_slider, input$reactome_select_heat)
+    graphData <- cnetPlotly(enrich, geneSets, inUse_deTab)
     if ("geneName" %in% colnames(inUse_deTab)) {
       DT::datatable(inUse_deTab[inUse_deTab$geneName %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
     } else {
@@ -138,7 +202,7 @@ output[["select_reactome_pathway"]] <- renderUI({
   })
 })
 
-## show selected pathway from kegg
+## show selected pathway from reactome
 output[["pathway_from_reactome"]] <- renderUI({
   tryCatch({
     checkReload()
@@ -167,6 +231,15 @@ output[["cnet_reactome_plot_info"]] <- renderUI({
         connected. The color given to genes is based on the log fold change determined after the
         expression analysis. In the end, this plot shows the connection of genes between the most
         significant pathways."
+  informationBox(infoText)
+})
+
+output[["heat_reactome_plot_info"]] <- renderUI({
+  infoText <- "The heatmap visualizes pathways and the corresponding genes. The genes are sorted based on 
+        frequeny. The more a genes is present in a pathway the lower it's listed. The pathways are
+        sorted on number of genes, listing pathway with the highest number of genes on the left. The 
+        color is given based on the Log2FC value of a gene. With this plot genes can be compared on sight
+        between pathways."
   informationBox(infoText)
 })
 
