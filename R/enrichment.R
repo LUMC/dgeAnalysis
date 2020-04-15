@@ -179,6 +179,8 @@ enrichBarplot <- function(enrich, amount, value){
     y = ~Description,
     orientation='h',
     type = "bar",
+    hoverinfo= 'text',
+    text = paste("# Genes:", enrich$Count),
     marker=list(color=-enrich[[value]],
                 colorscale='Viridis',
                 colorbar=list(
@@ -264,31 +266,85 @@ emap_plotly <- function(enrich){
 ## Returns:
 ##  g = Igraph object, containing links of genes multiple pathways
 
-cnetPlotly <- function(enrich, deTab, cnet_slider, cnet_selected){
-  setGeneList <- deTab$avgLog2FC
-  if ("geneName" %in% colnames(deTab)) {
-    names(setGeneList) <- as.character(deTab$geneName)
-  } else {
-    names(setGeneList) <- as.character(rownames(deTab))
-  }
-  setGeneList <- sort(setGeneList, decreasing = TRUE)
-  setGeneList <- setGeneList[na.omit(names(setGeneList))]
-  setGeneList <- setGeneList[!duplicated(names(setGeneList))]
-  
-  geneSets <- extract_geneSets(enrich, cnet_slider, cnet_selected)
-  
+cnetPlotly <- function(enrich, geneSets, deTab){
   g <- list2graph(geneSets)
   
-  if ("geneName" %in% colnames(deTab)) {
-    V(g)$name[V(g)$name %in% as.character(deTab$entrez)] <- as.character(deTab$geneName[as.character(deTab$entrez) %in% V(g)$name])
-  } else {
-    V(g)$name[V(g)$name %in% as.character(deTab$entrez)] <- as.character(rownames(deTab)[as.character(deTab$entrez) %in% V(g)$name])
+  g_id <- as.data.frame(V(g)$name[V(g)$name %in% deTab$entrez])
+  colnames(g_id) <- "entrez"
+  
+  if (!"geneName" %in% colnames(deTab)) {
+    deTab$geneName <- rownames(deTab)
   }
   
-  fc <- setGeneList[V(g)$name]
-  V(g)$color <- fc
+  g_id <- merge(g_id, deTab[c("entrez", "geneName", "avgLog2FC")], by = "entrez", all.x=TRUE)
+  g_id <- g_id[order(match(g_id$entrez, V(g)$name[!V(g)$name %in% names(geneSets)])), ]
+  
+  V(g)$color <- g_id$avgLog2FC
+  V(g)$name[V(g)$name %in% g_id$entrez] <- as.character(g_id$geneName)
   
   g
+}
+
+## heatplotly()
+##  The genesets are gathered
+##  Side inforamtion like fc is added
+##  Frequency of genes and pathways is calculated and sorted
+##  Heatmap is created with genes - pathways - log2FC
+## Parameters:
+##  g = Igraph object, containing graph data from genes and/or pathays
+##  pwName = String, Name of the shown pathway
+##  getColor = String, Color given to dots (LogFC or P-Values)
+##  cnet = Integer, Number of cnet pathways to show
+## Returns:
+##  p = Plotly object
+
+heatplotly <- function(geneSets, deTab) {
+  genelist <- list2df(geneSets)
+  genelist <- merge(genelist, deTab[c("entrez", "avgLog2FC")], by.x = "Gene", by.y = "entrez", all.x=TRUE)
+  genelist <- merge(genelist, rev(sort(table(genelist$Gene))), by.x = "Gene", by.y = "Var1")
+  if (length(rev(sort(table(genelist$categoryID)))) == 1) {
+    genelist <- merge(genelist, rev(sort(table(genelist$categoryID))), by.x = "categoryID", by.y = "row.names")
+    colnames(genelist)[colnames(genelist) %in% c("Freq", "y")] <- c("Freq.x", "Freq.y")
+  } else {
+    genelist <- merge(genelist, rev(sort(table(genelist$categoryID))), by.x = "categoryID", by.y = "Var1")
+  }
+  
+  if (!"geneName" %in% colnames(deTab)) {
+    deTab$geneName <- rownames(deTab)
+  }
+  
+  genelist <- merge(genelist, deTab[c("entrez", "geneName")], by.x = "Gene", by.y = "entrez", all.x=TRUE)
+  genelist <- genelist[order(-genelist$Freq.y, -genelist$Freq.x, genelist$Gene), ]
+  
+  p <- plot_ly(
+    x = ~genelist$categoryID,
+    y = ~genelist$geneName,
+    z = ~genelist$avgLog2FC,
+    colorbar = list(title = "Log2FC", len=1),
+    type = "heatmap",
+    hoverinfo = 'text',
+    text = paste("Pathway:", genelist$categoryID,
+                  "<br>Gene:", genelist$geneName,
+                  "<br>Log2FC:", genelist$avgLog2FC)
+    ) %>%
+    plotly::layout(
+      title = "Genes in pathway",
+      xaxis = list(title = '',
+                   categoryorder = "array",
+                   categoryarray = genelist$categoryID),
+      yaxis = list(title = '',
+                   categoryorder = "array",
+                   categoryarray = genelist$geneName)
+      ) %>%
+    config(
+      toImageButtonOptions = list(
+        format = "svg",
+        filename = "enrichheatmap",
+        width = 750,
+        height = 500
+      )
+    )
+  p
 }
 
 
