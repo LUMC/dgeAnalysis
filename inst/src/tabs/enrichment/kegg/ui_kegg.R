@@ -73,6 +73,29 @@ tab_enrich_kegg <- tabItem(
     ),
     
     tabPanel(
+      title = "Pathway heatmap",
+      HTML('<hr style="border-color: #0088cc;">'),
+      sidebarLayout(
+        position = "right",
+        sidebarPanel(
+          width = 3,
+          sliderInput("heat_kegg_slider", "Number of shown pathways:", 5, min = 0, max = 15, step=1),
+          uiOutput("heat_kegg_select_pathway"),
+          br(),
+          uiOutput("heat_kegg_plot_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
+        ), 
+        mainPanel(
+          width = 9,
+          plotlyOutput("heat_kegg_plot", height = "600px") %>% withSpinner()
+        )
+      ),
+      HTML('<hr style="border-color: #0088cc;">'),
+      DT::dataTableOutput("heat_kegg_table") %>% withSpinner(),
+      HTML('<hr style="border-color: #0088cc;">')
+    ),
+    
+    tabPanel(
       title = "Pathway network",
       HTML('<hr style="border-color: #0088cc;">'),
       sidebarLayout(
