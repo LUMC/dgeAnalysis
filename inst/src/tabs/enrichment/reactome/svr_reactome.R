@@ -33,6 +33,7 @@ get_reactome <- reactive({
       set.seed(1234)
       geneList <- get_geneList(inUse_deTab)
       suppressMessages(enrich <- ReactomePA::gsePathway(geneList, organism=organism, nPerm=10000, pvalueCutoff=0.05, verbose=FALSE, seed=TRUE))
+      enrich@result$Count <- lengths(strsplit(enrich$core_enrichment, "/"))
     }
     
     removeModal()
@@ -57,7 +58,7 @@ output[["reactome_data_table"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
     enrich <- as.data.frame(get_reactome())
-    enrich <- enrich[ , -c(1, (ncol(enrich)-1):ncol(enrich))]
+    enrich <- enrich[,!(colnames(enrich) %in% c("ID", "leading_edge", "core_enrichment", "geneID"))]
     DT::datatable(enrich, options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
@@ -236,10 +237,8 @@ output[["cnet_reactome_plot_info"]] <- renderUI({
 
 output[["heat_reactome_plot_info"]] <- renderUI({
   infoText <- "The heatmap visualizes pathways and the corresponding genes. The genes are sorted based on 
-        frequeny. The more a genes is present in a pathway the lower it's listed. The pathways are
-        sorted on number of genes, listing pathway with the highest number of genes on the left. The 
-        color is given based on the Log2FC value of a gene. With this plot genes can be compared on sight
-        between pathways."
+        Log2FC. The pathways are sorted on number of gene mathes between other pathways, listing pathways with
+        the most gene matches on the left. With this plot genes present in pathways can be compared on sight."
   informationBox(infoText)
 })
 
