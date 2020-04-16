@@ -49,6 +49,7 @@ update_n <- function(x, showCategory) {
 ##  Collect genes within a pathway
 ##  Gets genes from enrichment result
 ##  geneSets names are set based on ID and description
+##  duplicated pathways are removed from the set
 ## Parameters:
 ##  enrich = Enrichment object, containing enrichment results
 ##  slider = Integer, Updated number of pathways to show
@@ -63,6 +64,7 @@ extract_geneSets <- function(enrich, slider, selected) {
   geneSets <- geneSets[y$ID]
   names(geneSets) <- y$Description
   geneSets <- append(head(geneSets, slider), geneSets[selected])
+  geneSets <- geneSets[!duplicated(geneSets)]
   geneSets
 }
 
@@ -160,12 +162,6 @@ get_organismID <- function(deTab){
 
 enrichBarplot <- function(enrich, amount, value){
   enrich <- na.omit(enrich[0:amount,])
-  enrich <- as.data.frame(enrich)
-  tryCatch({
-    enrich$Count <- lengths(strsplit(enrich$core_enrichment, "/"))
-  }, error = function(err) {
-    value <<- sub("s$", "", value)
-  })
   enrich$Description <- factor(enrich$Description,
                                levels = unique(enrich$Description)[order(enrich[[value]],
                                                                          enrich$Description,
@@ -195,10 +191,10 @@ enrichBarplot <- function(enrich, amount, value){
       yaxis = list(title = '')) %>%
     config(
       toImageButtonOptions = list(
-        format = "svg",
+        format = "png",
         filename = "enrichbar",
-        width = 750,
-        height = 500
+        width = 1500,
+        height = 1000
       )
     )
   p
@@ -261,8 +257,8 @@ emap_plotly <- function(enrich){
 ## Parameters:
 ##  enrich = Enrich result, A enrichment results
 ##  deTab = Dataframe, with all analysis results
-##  cnet_slider = Integer, Number of pathways to show
-##  cnet_selected = Vector, manually added pathways
+##  geneSets = Martrix object, containing all pathways with corresponding genes
+##  deTab = Dataframe, with all analysis results
 ## Returns:
 ##  g = Igraph object, containing links of genes multiple pathways
 
@@ -288,13 +284,11 @@ cnetPlotly <- function(enrich, geneSets, deTab){
 ## heatplotly()
 ##  The genesets are gathered
 ##  Side inforamtion like fc is added
-##  Frequency of genes and pathways is calculated and sorted
+##  Frequency of genes and pathways is calculated and sorted upon
 ##  Heatmap is created with genes - pathways - log2FC
 ## Parameters:
-##  g = Igraph object, containing graph data from genes and/or pathays
-##  pwName = String, Name of the shown pathway
-##  getColor = String, Color given to dots (LogFC or P-Values)
-##  cnet = Integer, Number of cnet pathways to show
+##  geneSets = Martrix object, containing all pathways with corresponding genes
+##  deTab = Dataframe, with all analysis results
 ## Returns:
 ##  p = Plotly object
 
@@ -309,12 +303,18 @@ heatplotly <- function(geneSets, deTab) {
     genelist <- merge(genelist, rev(sort(table(genelist$categoryID))), by.x = "categoryID", by.y = "Var1")
   }
   
+  for (pathway in unique(genelist$categoryID)) {
+    entrezID <- genelist$Gene[genelist$categoryID == pathway]
+    entrez_matches <- count(genelist$Gene[genelist$categoryID != pathway] %in% entrezID)
+    genelist$match[genelist$categoryID == pathway] <- entrez_matches
+  }
+  
   if (!"geneName" %in% colnames(deTab)) {
     deTab$geneName <- rownames(deTab)
   }
   
   genelist <- merge(genelist, deTab[c("entrez", "geneName")], by.x = "Gene", by.y = "entrez", all.x=TRUE)
-  genelist <- genelist[order(-genelist$Freq.y, -genelist$Freq.x, genelist$Gene), ]
+  genelist <- genelist[order(-genelist$match, -genelist$Freq.y, genelist$avgLog2FC), ]
   
   p <- plot_ly(
     x = ~genelist$categoryID,
@@ -338,10 +338,10 @@ heatplotly <- function(geneSets, deTab) {
       ) %>%
     config(
       toImageButtonOptions = list(
-        format = "svg",
+        format = "png",
         filename = "enrichheatmap",
-        width = 750,
-        height = 500
+        width = 1500,
+        height = 1000
       )
     )
   p
@@ -435,10 +435,10 @@ plotlyGraph <- function(g, pwName, getColor, cnet, annoP, annoG){
     yaxis = axis) %>%
     config(
       toImageButtonOptions = list(
-        format = "svg",
+        format = "png",
         filename = "enrichnet",
-        width = 750,
-        height = 500
+        width = 1500,
+        height = 1000
       )
     )
   if (isTRUE(annoP)) {
