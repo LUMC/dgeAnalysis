@@ -46,31 +46,32 @@ update_n <- function(x, showCategory) {
 
 
 ## extract_geneSet()
-##  Sets a new n value
-##  n stands for the number of pathways to show
-##  Gets genes from x (enrichment results)
+##  Collect genes within a pathway
+##  Gets genes from enrichment result
 ##  geneSets names are set based on ID and description
+##  duplicated pathways are removed from the set
 ## Parameters:
-##  x = Enrichment object, containing enrichment results
-##  n = Integer, Updated number of pathways to show
+##  enrich = Enrichment object, containing enrichment results
+##  slider = Integer, Updated number of pathways to show
+##  selected = Vector, Contains manually selected pathways
 ## Returns:
 ##  geneSets = vector, Genes found in corresponding pathways
 
-extract_geneSets <- function(x, n) {
-  n <- update_n(x, n)
-  geneSets <- geneInCategory(x)
-  y <- as.data.frame(x)
+extract_geneSets <- function(enrich, slider, selected) {
+  slider <- update_n(enrich, slider)
+  geneSets <- geneInCategory(enrich)
+  y <- as.data.frame(enrich)
   geneSets <- geneSets[y$ID]
   names(geneSets) <- y$Description
-  if (is.numeric(n)) {
-    return(geneSets[1:n])
-  }
-  return(geneSets[n])
+  geneSets <- append(head(geneSets, slider), geneSets[selected])
+  geneSets <- geneSets[!duplicated(geneSets)]
+  geneSets
 }
 
 
 ## list2graph()
-##  The inputList is converted to a graph format
+##  The inputList is converted to a dataframe
+##  The dataframe is converted to a graph
 ##  Igraph object is created based on a vector/list
 ## Parameters:
 ##  inputList = Vector, containing Gene names and LogFC
@@ -78,8 +79,8 @@ extract_geneSets <- function(x, n) {
 ##  g = Igraph object, Graph with links between genes
 
 list2graph <- function(inputList) {
-  x <- list2df(inputList)
-  g <- igraph::graph.data.frame(x, directed=FALSE)
+  ldf <- list2df(inputList)
+  g <- igraph::graph.data.frame(ldf, directed=FALSE)
   return(g)
 }
 
@@ -129,12 +130,12 @@ overlap_ratio <- function(x, y) {
 ## Returns:
 ##  id = String, Organism ID value
 
-get_organismID <- function(deTab, app_mode){
+get_organismID <- function(deTab){
   tryCatch({
-    if (app_mode == "symbol") {
-      id <- deTab$geneId[nrow(deTab)]
-    } else {
+    if ("geneName" %in% colnames(inUse_deTab)) {
       id <- rownames(deTab)[nrow(deTab)]
+    } else {
+      id <- deTab$geneId[nrow(deTab)]
     }
     id <- gsub("[^A-Za-z]","", id)
     id <- sub(".{1}$", "", id)
@@ -162,12 +163,6 @@ get_organismID <- function(deTab, app_mode){
 
 enrichBarplot <- function(enrich, amount, value){
   enrich <- na.omit(enrich[0:amount,])
-  enrich <- as.data.frame(enrich)
-  tryCatch({
-    enrich$Count <- lengths(strsplit(enrich$core_enrichment, "/"))
-  }, error = function(err) {
-    value <<- sub("s$", "", value)
-  })
   enrich$Description <- factor(enrich$Description,
                                levels = unique(enrich$Description)[order(enrich[[value]],
                                                                          enrich$Description,
@@ -181,6 +176,8 @@ enrichBarplot <- function(enrich, amount, value){
     y = ~Description,
     orientation='h',
     type = "bar",
+    hoverinfo= 'text',
+    text = paste("# Genes:", enrich$Count),
     marker=list(color=-enrich[[value]],
                 colorscale='Viridis',
                 colorbar=list(
@@ -190,7 +187,7 @@ enrichBarplot <- function(enrich, amount, value){
                   ticktext=floor(color) + signif(color %% 1, 4)),
                 reversescale=FALSE)) %>% 
     plotly::layout(
-      xaxis = list(title = 'Counts'),
+      xaxis = list(title = 'Gene counts'),
       title = "Enrichment barplot",
       yaxis = list(title = '')) %>%
     config(
@@ -252,47 +249,6 @@ emap_plotly <- function(enrich){
 }
 
 
-## viewPathwayPlot()
-##  Genes are gathered from enrichment result from specific pathway
-##  The geneList is prepared with the right LogFC values and links between genes in the pathway
-##  Igraph object is made to create links between genes in a pathway
-##  Colors of dots are based on p-value.
-## Parameters:
-##  deTab = Dataframe, with all analysis results
-##  db = String, Current database in use (kegg, reactome, go or do)
-##  pwName = String, Name of the pathway
-## Returns:
-##  gg = Igraph object, containing links between genes
-
-viewPathwayPlot <- function(deTab, db, pwName){
-  organism <- get_organismID(deTab)
-  org2org <- list(ENSCEL="celegans",
-                  ENSCAF="cfamiliaris",
-                  ENSDAR="drerio",
-                  ENS="hsapiens",
-                  ENSMUS="mmusculus",
-                  ENSRNO="rnorvegicus")
-  pathways <- eval(parse(text="pathways"))
-  pw <- pathways(org2org[[organism]], db)[[pwName]]
-  pw <- suppressMessages(convertIdentifiers(pw, "symbol"))
-  
-  setGeneList <- deTab$avgLog2FC
-  names(setGeneList) <- as.character(deTab$geneName)
-  setGeneList <- sort(setGeneList, decreasing = TRUE)
-  setGeneList <- setGeneList[na.omit(names(setGeneList))]
-  setGeneList <- setGeneList[!duplicated(names(setGeneList))]
-  
-  g <- graphite::pathwayGraph(pw)
-  gg <- igraph::igraph.from.graphNEL(g)
-  gg <- igraph::as.undirected(gg)
-  V(gg)$name <- sub("[^:]+:", "", V(gg)$name)
-  
-  fc <- setGeneList[V(gg)$name]
-  V(gg)$color <- fc
-  gg
-}
-
-
 ## cnetPlotly()
 ##  Genes are gathered from enrichment result from specific pathway
 ##  The geneList is prepared with the right LogFC values and links of genes between multiple pathways
@@ -302,26 +258,94 @@ viewPathwayPlot <- function(deTab, db, pwName){
 ## Parameters:
 ##  enrich = Enrich result, A enrichment results
 ##  deTab = Dataframe, with all analysis results
-##  cnet_slider = Integer, Number of pathways to show
+##  geneSets = Martrix object, containing all pathways with corresponding genes
+##  deTab = Dataframe, with all analysis results
 ## Returns:
 ##  g = Igraph object, containing links of genes multiple pathways
 
-cnetPlotly <- function(enrich, deTab, cnet_slider){
-  setGeneList <- deTab$avgLog2FC
-  names(setGeneList) <- as.character(deTab$geneName)
-  setGeneList <- sort(setGeneList, decreasing = TRUE)
-  setGeneList <- setGeneList[na.omit(names(setGeneList))]
-  setGeneList <- setGeneList[!duplicated(names(setGeneList))]
-  
-  geneSets <- extract_geneSets(enrich, cnet_slider)
-  
+cnetPlotly <- function(enrich, geneSets, deTab){
   g <- list2graph(geneSets)
   
-  V(g)$name[V(g)$name %in% as.character(deTab$entrez)] <- as.character(deTab$geneName[as.character(deTab$entrez) %in% V(g)$name])
-  fc <- setGeneList[V(g)$name]
-  V(g)$color <- fc
+  g_id <- as.data.frame(V(g)$name[V(g)$name %in% deTab$entrez])
+  colnames(g_id) <- "entrez"
+  
+  if (!"geneName" %in% colnames(deTab)) {
+    deTab$geneName <- rownames(deTab)
+  }
+  
+  g_id <- merge(g_id, deTab[c("entrez", "geneName", "avgLog2FC")], by = "entrez", all.x=TRUE)
+  g_id <- g_id[order(match(g_id$entrez, V(g)$name[!V(g)$name %in% names(geneSets)])), ]
+  
+  V(g)$color <- g_id$avgLog2FC
+  V(g)$name[V(g)$name %in% g_id$entrez] <- as.character(g_id$geneName)
   
   g
+}
+
+## heatplotly()
+##  The genesets are gathered
+##  Side inforamtion like fc is added
+##  Frequency of genes and pathways is calculated and sorted upon
+##  Heatmap is created with genes - pathways - log2FC
+## Parameters:
+##  geneSets = Martrix object, containing all pathways with corresponding genes
+##  deTab = Dataframe, with all analysis results
+## Returns:
+##  p = Plotly object
+
+heatplotly <- function(geneSets, deTab) {
+  genelist <- list2df(geneSets)
+  genelist <- merge(genelist, deTab[c("entrez", "avgLog2FC")], by.x = "Gene", by.y = "entrez", all.x=TRUE)
+  genelist <- merge(genelist, rev(sort(table(genelist$Gene))), by.x = "Gene", by.y = "Var1")
+  if (length(rev(sort(table(genelist$categoryID)))) == 1) {
+    genelist <- merge(genelist, rev(sort(table(genelist$categoryID))), by.x = "categoryID", by.y = "row.names")
+    colnames(genelist)[colnames(genelist) %in% c("Freq", "y")] <- c("Freq.x", "Freq.y")
+  } else {
+    genelist <- merge(genelist, rev(sort(table(genelist$categoryID))), by.x = "categoryID", by.y = "Var1")
+  }
+  
+  for (pathway in unique(genelist$categoryID)) {
+    entrezID <- genelist$Gene[genelist$categoryID == pathway]
+    entrez_matches <- count(genelist$Gene[genelist$categoryID != pathway] %in% entrezID)
+    genelist$match[genelist$categoryID == pathway] <- entrez_matches
+  }
+  
+  if (!"geneName" %in% colnames(deTab)) {
+    deTab$geneName <- rownames(deTab)
+  }
+  
+  genelist <- merge(genelist, deTab[c("entrez", "geneName")], by.x = "Gene", by.y = "entrez", all.x=TRUE)
+  genelist <- genelist[order(-genelist$match, -genelist$Freq.y, genelist$avgLog2FC), ]
+  
+  p <- plot_ly(
+    x = ~genelist$categoryID,
+    y = ~genelist$geneName,
+    z = ~genelist$avgLog2FC,
+    colorbar = list(title = "Log2FC", len=1),
+    type = "heatmap",
+    hoverinfo = 'text',
+    text = paste("Pathway:", genelist$categoryID,
+                  "<br>Gene:", genelist$geneName,
+                  "<br>Log2FC:", genelist$avgLog2FC)
+    ) %>%
+    plotly::layout(
+      title = "Genes in pathway",
+      xaxis = list(title = '',
+                   categoryorder = "array",
+                   categoryarray = genelist$categoryID),
+      yaxis = list(title = '',
+                   categoryorder = "array",
+                   categoryarray = genelist$geneName)
+      ) %>%
+    config(
+      toImageButtonOptions = list(
+        format = "png",
+        filename = "enrichheatmap",
+        width = 1500,
+        height = 1000
+      )
+    )
+  p
 }
 
 
@@ -338,10 +362,12 @@ cnetPlotly <- function(enrich, deTab, cnet_slider){
 ##  pwName = String, Name of the shown pathway
 ##  getColor = String, Color given to dots (LogFC or P-Values)
 ##  cnet = Integer, Number of cnet pathways to show
+##  annoP = Boolean, Show pathway labels yes or no
+##  annoG = Boolean, Show gene labels yes or no
 ## Returns:
 ##  p = Plotly object
 
-plotlyGraph <- function(g, pwName, getColor, cnet){
+plotlyGraph <- function(g, pwName, getColor, cnet, annoP, annoG){
   G <- g
   L <- as.data.frame(layout.kamada.kawai(G))
   vs <- V(G)
@@ -349,53 +375,36 @@ plotlyGraph <- function(g, pwName, getColor, cnet){
   rownames(L) <- names(vs)
   
   L_cnet <- L[0:cnet,]
-  L_genes <- L[(cnet+1):nrow(L),][names(vs)[!is.na(vs$color)],]
-  L_genesNA <- L[names(vs)[is.na(vs$color)],]
+  L_genes <- L[(cnet+1):nrow(L),]
   vs <- vs[!is.na(vs$color)]
   
   Ne <- length(es[1]$V1)
   network <- plot_ly(
-    x = ~L_genesNA$V1,
-    y = ~L_genesNA$V2,
+    x = ~L_genes$V1,
+    y = ~L_genes$V2,
     type = "scattergl",
     mode = "markers",
-    marker=list(
-      size=12,
-      color="white",
-      line = list(color = '#999999',
-                  width = 1),
-      colorbar=FALSE),
-    text = rownames(L_genesNA),
-    key = rownames(L_genesNA),
+    marker = list(
+      size = 12,
+      color = as.numeric(vs$color),
+      colorscale = 'Viridis',
+      colorbar = list(title=getColor)),
+    text = rownames(L_genes),
+    key = rownames(L_genes),
     hoverinfo = "text",
-    showlegend=FALSE,
-    source=pwName) %>%
-    add_trace(
-      x = ~L_genes$V1,
-      y = ~L_genes$V2,
-      type = "scattergl",
-      mode = "markers",
-      marker=list(
-        size=12,
-        color=as.numeric(vs$color),
-        colorscale='Viridis',
-        colorbar=list(title=getColor)),
-      text = rownames(L_genes),
-      key = rownames(L_genes),
-      hoverinfo = "text",
-      showlegend=FALSE
-    ) %>%
+    showlegend = FALSE
+  ) %>%
     add_trace(
       x = L_cnet$V1,
       y = L_cnet$V2,
-      marker=list(
-        size=20,
-        color="red",
-        colorbar=FALSE),
+      marker = list(
+        size = 20,
+        color = "red",
+        colorbar = FALSE),
       text = rownames(L_cnet),
       key = rownames(L_cnet),
       hoverinfo = "text",
-      showlegend=FALSE
+      showlegend = FALSE
     )
   
   edge_shapes <- list()
@@ -405,7 +414,7 @@ plotlyGraph <- function(g, pwName, getColor, cnet){
     
     edge_shape = list(
       type = "line",
-      line = list(color = "#030303", width = 0.15),
+      line = list(color = "#030303", width = 0.2),
       layer='below',
       showarrow = TRUE,
       x0 = v0$V1,
@@ -433,6 +442,28 @@ plotlyGraph <- function(g, pwName, getColor, cnet){
         height = 1000
       )
     )
+  if (isTRUE(annoP)) {
+    p <- add_annotations(
+      p,
+      x = L_cnet$V1,
+      y = L_cnet$V2,
+      text = sprintf("<b>%s</b>", rownames(L_cnet)),
+      showarrow = TRUE,
+      arrowwidth = 2,
+      arrowhead = 0
+    )
+  }
+  if (isTRUE(annoG)) {
+    p <- add_annotations(
+      p,
+      x = ~L_genes$V1,
+      y = ~L_genes$V2,
+      text = rownames(L_genes),
+      showarrow = TRUE,
+      arrowwidth = 1,
+      arrowhead = 0
+    )
+  }
   p
 }
 

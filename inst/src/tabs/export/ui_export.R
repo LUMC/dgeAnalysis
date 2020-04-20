@@ -2,7 +2,7 @@
 tab_export <- tabItem(
   tabName = "export",
   align="center",
-  br(),
+  HTML('<hr style="border-color: #0088cc;">'),
   br(),
   br(),
   h2("Download tables"),
@@ -21,8 +21,15 @@ tab_export <- tabItem(
   br(),
   br(),
   br(),
+  br(),
   HTML('<hr style="border-color: #0088cc;">'),
   br(),
+  br(),
   h2("Download R Markdown analysis"),
-  downloadButton("downloadMHTML", label = "Download as HTML")
+  downloadButton("downloadMHTML", label = "Download as HTML"),
+  br(),
+  br(),
+  br(),
+  br(),
+  HTML('<hr style="border-color: #0088cc;">')
 )

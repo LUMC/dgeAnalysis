@@ -112,7 +112,8 @@ tab_norm_data <- tabItem(
           width = 9,
           plotlyOutput("norm_un_cluster_3d", height = "600px") %>% withSpinner()
         )
-      )
+      ),
+      HTML('<hr style="border-color: #0088cc;">')
     )
   )
 )

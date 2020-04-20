@@ -5,13 +5,33 @@
 get_do <- reactive({
   tryCatch({
     checkReload()
+    
     if (input$choose_do == "enrich") {
+      showModal(
+        modalDialog(
+          h1("Enrichment is running..."),
+          h4("DO enrichment based on DE genes (with entrezID)"),
+          img(src="loading.gif", width = "50%"),
+          footer=NULL
+        )
+      )
       suppressMessages(enrich <- DOSE::enrichDO(inUse_deTab$entrez[inUse_deTab$DE!=0], pvalueCutoff=0.05))
     } else {
+      showModal(
+        modalDialog(
+          h1("Enrichment is running..."),
+          h4("DO enrichment based on all genes (with entrezID) and Log2FC"),
+          img(src="loading.gif", width = "50%"),
+          footer=NULL
+        )
+      )
       set.seed(1234)
       geneList <- get_geneList(inUse_deTab)
       suppressMessages(enrich <- DOSE::gseDO(geneList, nPerm=10000, pvalueCutoff=0.05, verbose=FALSE, seed=TRUE))
+      enrich@result$Count <- lengths(strsplit(enrich$core_enrichment, "/"))
     }
+    
+    removeModal()
     if (nrow(as.data.frame(enrich)) == 0) {
       showNotification(ui = "DO enrichment has not found any enriched terms!", duration = 5, type = "warning")
     } else {
@@ -19,9 +39,10 @@ get_do <- reactive({
     }
     enrich
   }, error = function(err) {
+    removeModal()
     showNotification(ui = "DO enrichment failed with an error!", duration = 5, type = "error")
+    showNotification(ui = "DO enrichment supports: ENS", duration = 10, type = "error")
     showNotification(ui = as.character(err), duration = 10, type = "error")
-    print(err)
     return(NULL)
   })
 })
@@ -31,7 +52,7 @@ output[["do_data_table"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
     enrich <- as.data.frame(get_do())
-    enrich <- enrich[ , -c(1, (ncol(enrich)-1):ncol(enrich))]
+    enrich <- enrich[,!(colnames(enrich) %in% c("ID", "leading_edge", "core_enrichment", "geneID"))]
     DT::datatable(enrich, options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
@@ -66,9 +87,23 @@ output[["cnet_do_plot"]] <- renderPlotly({
     checkReload()
     enrich <- get_do()
     
-    geneSets <- extract_geneSets(enrich, input$cnet_do_slider)
-    graphData <- cnetPlotly(enrich, inUse_deTab, input$cnet_do_slider)
-    plotlyGraph(graphData, "Gene-Concept Network", "Log2FC", length(geneSets))
+    geneSets <- extract_geneSets(enrich, input$cnet_do_slider, input$do_select_pathway)
+    graphData <- cnetPlotly(enrich, geneSets, inUse_deTab)
+    plotlyGraph(graphData, "Gene-Concept Network", "Log2FC", length(geneSets), input$cnet_do_annoP, input$cnet_do_annoG)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Add specific pathway to cnet plot
+output[["cnet_do_select_pathway"]] <- renderUI({
+  tryCatch({
+    enrich <- as.data.frame(get_do())
+    selectInput(inputId = "do_select_pathway",
+                label = "Add specific pathway:",
+                multiple = TRUE,
+                choices = c("Click to add pathway" = "", enrich$Description)
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -80,9 +115,58 @@ output[["cnet_do_table"]] <- DT::renderDataTable({
     checkReload()
     enrich <- get_do()
     
-    geneSets <- extract_geneSets(enrich, input$cnet_do_slider)
-    graphData <- cnetPlotly(enrich, inUse_deTab, input$cnet_do_slider)
-    DT::datatable(inUse_deTab[inUse_deTab$geneName %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
+    geneSets <- extract_geneSets(enrich, input$cnet_do_slider, input$do_select_pathway)
+    graphData <- cnetPlotly(enrich, geneSets, inUse_deTab)
+    if ("geneName" %in% colnames(inUse_deTab)) {
+      DT::datatable(inUse_deTab[inUse_deTab$geneName %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
+    } else {
+      DT::datatable(inUse_deTab[rownames(inUse_deTab) %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
+    }
+  }, error = function(err) {
+    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
+  })
+})
+
+## create heatmap with do input
+output[["heat_do_plot"]] <- renderPlotly({
+  tryCatch({
+    checkReload()
+    enrich <- get_do()
+    
+    geneSets <- extract_geneSets(enrich, input$heat_do_slider, input$do_select_heat)
+    heatplotly(geneSets, inUse_deTab)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Add specific pathway to heatmap
+output[["heat_do_select_pathway"]] <- renderUI({
+  tryCatch({
+    enrich <- as.data.frame(get_do())
+    selectInput(inputId = "do_select_heat",
+                label = "Add specific pathway:",
+                multiple = TRUE,
+                choices = c("Click to add pathway" = "", enrich$Description)
+    )
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## get all genes of heatmap
+output[["heat_do_table"]] <- DT::renderDataTable({
+  tryCatch({
+    checkReload()
+    enrich <- get_do()
+    
+    geneSets <- extract_geneSets(enrich, input$heat_do_slider, input$do_select_heat)
+    graphData <- cnetPlotly(enrich, geneSets, inUse_deTab)
+    if ("geneName" %in% colnames(inUse_deTab)) {
+      DT::datatable(inUse_deTab[inUse_deTab$geneName %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
+    } else {
+      DT::datatable(inUse_deTab[rownames(inUse_deTab) %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
+    }
   }, error = function(err) {
     return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
   })
@@ -94,7 +178,7 @@ output[["gsea_do_plot"]] <- renderPlotly({
     checkReload()
     enrich <- get_do()
     graphData <- emap_plotly(enrich)
-    plotlyGraph(graphData, "Disease ontology", "P-Value", 0)
+    plotlyGraph(graphData, "Disease ontology", "P-Value", 0, input$do_network_annoP, FALSE)
   }, error = function(err) {
     return(NULL)
   })
@@ -151,6 +235,13 @@ output[["cnet_do_plot_info"]] <- renderUI({
   connected. The color given to genes is based on the log fold change determined after the
   expression analysis. In the end, this plot shows the connection of genes between the most
   significant pathways."
+  informationBox(infoText)
+})
+
+output[["heat_do_plot_info"]] <- renderUI({
+  infoText <- "The heatmap visualizes pathways and the corresponding genes. The genes are sorted based on 
+        Log2FC. The pathways are sorted on number of gene mathes between other pathways, listing pathways with
+        the most gene matches on the left. With this plot genes present in pathways can be compared on sight."
   informationBox(infoText)
 })
 

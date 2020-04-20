@@ -93,7 +93,7 @@ output[["analysis_bar_select_gene"]] <- renderUI({
     selectInput(inputId = "selected_analysis_bar",
                 label = "Add specific genes:",
                 multiple = TRUE,
-                choices = rownames(inUse_deTab)
+                choices = c("Click to add gene" = "", rownames(inUse_deTab))
     )
   }, error = function(err) {
     return(NULL)

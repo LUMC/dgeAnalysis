@@ -22,6 +22,8 @@ tab_bias <- tabItem(
           plotlyOutput("gc_bias", height = "600px") %>% withSpinner()
         )
       ),
+      HTML('<hr style="border-color: #0088cc;">'),
+      DT::dataTableOutput("selected_biasgc") %>% withSpinner(),
       HTML('<hr style="border-color: #0088cc;">')
     ),
     
@@ -42,6 +44,8 @@ tab_bias <- tabItem(
           plotlyOutput("len_bias", height = "600px") %>% withSpinner()
         )
       ),
+      HTML('<hr style="border-color: #0088cc;">'),
+      DT::dataTableOutput("selected_biaslength") %>% withSpinner(),
       HTML('<hr style="border-color: #0088cc;">')
     )
   )

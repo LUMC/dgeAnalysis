@@ -243,7 +243,7 @@ voomPlot <- function(dge, sourceId){
     text = names(v$voom.xy$x),
     hoverinfo = 'text',
     key = ~names(v$voom.xy$x),
-    source=sourceId) %>%
+    source = sourceId) %>%
     add_trace(
       mode = "lines",
       x = v$voom.line$x,
@@ -298,7 +298,7 @@ multidimensionalScaling2dPlot <- function(dge, color, sourceId){
                   line = list(color = '#999999',
                               width = 1)),
     key = ~rownames(for_plots),
-    source=sourceId) %>%
+    source = sourceId) %>%
     plotly::layout(
       title = paste("MDS Plot 2D"),
       xaxis = list(title = 'MDS1'),
@@ -309,7 +309,7 @@ multidimensionalScaling2dPlot <- function(dge, color, sourceId){
       toImageButtonOptions = list(
         format = "png",
         filename = sourceId,
-        width = 150,
+        width = 1500,
         height = 1000
       )
     )
@@ -528,13 +528,20 @@ variableHeatmapPlot <- function(dge, amount){
   var_genes <- apply(lcpm, 1, var)
   select_var <- names(sort(var_genes, decreasing=TRUE))[1:amount]
   high_var_cpm <- lcpm[select_var,]
+  high_var_cpm <- as.data.frame(stack(high_var_cpm))
   
   p <- plot_ly(
-    x = ~colnames(high_var_cpm),
-    y = ~rownames(high_var_cpm),
-    z = ~high_var_cpm,
+    data = high_var_cpm,
+    x = ~col,
+    y = ~row,
+    z = ~value,
     colorbar = list(title = "Log2CPM", len=1),
-    type = "heatmap") %>%
+    type = "heatmap",
+    hoverinfo = 'text',
+    text = paste("Sample:", high_var_cpm$col,
+                 "<br>Gene:", high_var_cpm$row,
+                 "<br>Log2CPM:", high_var_cpm$value)
+    ) %>%
     plotly::layout(
       title = "Most variable genes",
       xaxis = list(title = ''),
@@ -568,16 +575,23 @@ variableHeatmapPlot <- function(dge, amount){
 
 topDgeHeatmapPlot <- function(deTab, dge, amount){
   sortdeTab <- deTab[order(rank(deTab$adj.P.Val)),]
-  sortdeTab <- head(sortdeTab, amount)
+  sortdeTab <- head(sortdeTab, 50)
   getnorm <- dge[rownames(sortdeTab),]
   getnorm <- getnorm$counts
+  getnorm <- as.data.frame(stack(getnorm))
   
   p <- plot_ly(
-    x = ~colnames(getnorm),
-    y = ~rownames(getnorm),
-    z = ~getnorm,
+    data = getnorm,
+    x = ~col,
+    y = ~row,
+    z = ~value,
     colorbar = list(title = "Log2CPM", len=1),
-    type = "heatmap") %>%
+    type = "heatmap",
+    hoverinfo = 'text',
+    text = paste("Sample:", getnorm$col,
+                 "<br>Gene:", getnorm$row,
+                 "<br>Log2CPM:", getnorm$value)
+    ) %>%
     plotly::layout(
       title = "Most expressed genes",
       xaxis = list(title = ''),
@@ -793,16 +807,16 @@ volcanoPlot <- function(deTab, LogCut, PCut){
 ##  p = Plotly object
 
 barcodePlot <- function(deTab, dge, color, amount, selected) {
-  if (is.null(color)) {
-    return(NULL)
-  }
-  
   sortdeTab <- deTab[order(rank(deTab$adj.P.Val)),]
   sortdeTab <- head(sortdeTab, amount)
   getnorm <- dge[c(rownames(sortdeTab), selected),]
   getnorm$counts <- getnorm$counts
   stack1 <- as.data.frame(stack(getnorm$counts))
   stack1$group <- getnorm$samples[[color]][stack1$col]
+  
+  if (is.null(stack1$group)) {
+    return(NULL)
+  }
   
   p <- plot_ly(
     type = "scattergl",
@@ -885,7 +899,7 @@ pValuePlot <- function(deTab){
 ## Returns:
 ##  p = Plotly object
 
-biasPlot <- function(deTab, biasColumn, log) {
+biasPlot <- function(deTab, biasColumn, log, tick, sourceId) {
   if (is.null(biasColumn)) {
     return(NULL)
   }
@@ -901,7 +915,9 @@ biasPlot <- function(deTab, biasColumn, log) {
     alpha = 0.75,
     showlegend = FALSE,
     text = rownames(deTab),
-    hoverinfo = 'text') %>%
+    hoverinfo = 'text',
+    key = rownames(deTab),
+    source = sourceId) %>%
     add_trace(
       data = prediction,
       mode = "lines",
@@ -924,8 +940,10 @@ biasPlot <- function(deTab, biasColumn, log) {
       name = "Standard Error") %>%
     plotly::layout(
       title = paste("Bias based on", biasColumn),
-      xaxis = list(title = biasColumn, type = log), #, type = "log"),
-      yaxis = list(title = 'Average Log2 FC')) %>%
+      xaxis = list(title = biasColumn, type = log, tickformat = tick), #, type = "log"),
+      yaxis = list(title = 'Average Log2 FC'),
+      clickmode = "event+select",
+      dragmode = "select") %>%
     config(
       toImageButtonOptions = list(
         format = "png",

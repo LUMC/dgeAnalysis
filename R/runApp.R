@@ -7,10 +7,12 @@ startApp <- function() {
     stop("Could not find 'dgeAnalysis'. Try re-installing 'dgeAnalysis'.", call. = FALSE)
   }
   
+  library("dgeAnalysis")
   options(shiny.maxRequestSize = 50*1024^2)
   options(spinner.color = "#0088cc")
   options(warn = -1)
   
+  message("Initializing dgeAnalysis...")
   suppressWarnings(rm(list=c("deTab", "normDge", "inUse_deTab", "inUse_normDge"), envir=.GlobalEnv))
   suppressMessages(source(system.file("src/lib/libraries.R", package = "dgeAnalysis")))
   

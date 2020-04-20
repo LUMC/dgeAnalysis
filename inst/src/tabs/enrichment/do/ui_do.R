@@ -53,7 +53,11 @@ tab_enrich_do <- tabItem(
         position = "right",
         sidebarPanel(
           width = 3,
-          sliderInput("cnet_do_slider", "Amount of shown pathways:", 5, min = 1, max = 15, step=1),
+          sliderInput("cnet_do_slider", "Amount of shown pathways:", 5, min = 0, max = 15, step=1),
+          uiOutput("cnet_do_select_pathway"),
+          tags$b("Labels on/off:"),
+          checkboxInput("cnet_do_annoP", "Pathway labels", value = TRUE),
+          checkboxInput("cnet_do_annoG", "Gene labels", value = FALSE),
           br(),
           uiOutput("cnet_do_plot_info"),
           span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
@@ -69,12 +73,38 @@ tab_enrich_do <- tabItem(
     ),
     
     tabPanel(
+      title = "Pathway heatmap",
+      HTML('<hr style="border-color: #0088cc;">'),
+      sidebarLayout(
+        position = "right",
+        sidebarPanel(
+          width = 3,
+          sliderInput("heat_do_slider", "Number of shown pathways:", 5, min = 0, max = 15, step=1),
+          uiOutput("heat_do_select_pathway"),
+          br(),
+          uiOutput("heat_do_plot_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
+        ), 
+        mainPanel(
+          width = 9,
+          plotlyOutput("heat_do_plot", height = "600px") %>% withSpinner()
+        )
+      ),
+      HTML('<hr style="border-color: #0088cc;">'),
+      DT::dataTableOutput("heat_do_table") %>% withSpinner(),
+      HTML('<hr style="border-color: #0088cc;">')
+    ),
+    
+    tabPanel(
       title = "Pathway network",
       HTML('<hr style="border-color: #0088cc;">'),
       sidebarLayout(
         position = "right",
         sidebarPanel(
           width = 3,
+          tags$b("Labels on/off:"),
+          checkboxInput("do_network_annoP", "Pathway labels", value = FALSE),
+          br(),
           uiOutput("do_network_info"),
           span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
         ), 
