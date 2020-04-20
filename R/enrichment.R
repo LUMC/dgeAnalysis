@@ -70,7 +70,8 @@ extract_geneSets <- function(enrich, slider, selected) {
 
 
 ## list2graph()
-##  The inputList is converted to a graph format
+##  The inputList is converted to a dataframe
+##  The dataframe is converted to a graph
 ##  Igraph object is created based on a vector/list
 ## Parameters:
 ##  inputList = Vector, containing Gene names and LogFC
@@ -78,8 +79,8 @@ extract_geneSets <- function(enrich, slider, selected) {
 ##  g = Igraph object, Graph with links between genes
 
 list2graph <- function(inputList) {
-  x <- list2df(inputList)
-  g <- igraph::graph.data.frame(x, directed=FALSE)
+  ldf <- list2df(inputList)
+  g <- igraph::graph.data.frame(ldf, directed=FALSE)
   return(g)
 }
 
@@ -381,7 +382,7 @@ plotlyGraph <- function(g, pwName, getColor, cnet, annoP, annoG){
   network <- plot_ly(
     x = ~L_genes$V1,
     y = ~L_genes$V2,
-    type = "scatter",
+    type = "scattergl",
     mode = "markers",
     marker = list(
       size = 12,
