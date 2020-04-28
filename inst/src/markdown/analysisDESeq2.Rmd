@@ -135,7 +135,8 @@ analysis <- DESeqDataSet(se, design = design)
 analysis <- analysis[ rowSums( abs( assay(analysis) ) ) > 1, ]
 
 # FILTER IF NESSECARY
-selectedFeatures <- rownames( analysis )[ apply( cpm(counts(analysis)), 1, function( v ) sum( v >= cpm_value ) ) >= 1/4 * ncol( counts(analysis) ) ]
+counts <- cpm(counts(analysis), log = TRUE)
+selectedFeatures <- rownames( analysis )[ apply( counts, 1, function( v ) sum( v >= cpm_value ) ) >= 1/4 * ncol( counts ) ]
 analysis <- analysis[selectedFeatures,]
 
 ```
@@ -160,6 +161,7 @@ getSize <- estimateSizeFactors(analysis)
 normCounts <- cpm(data.frame(counts(getSize, normalized=TRUE)))
 normDge <- DGEList(counts = normCounts, samples = dge$samples)
 normDge$counts <- log2(normDge$counts)
+normDge$counts[is.infinite(normDge$counts)] <- 0
 
 countDistributionLinePlot(normDge)
 variancePcaPlot(normDge)
@@ -193,9 +195,6 @@ summary(deTab)
 deTab <- data.frame(deTab[,c("log2FoldChange", "pvalue", "padj")])
 colnames(deTab) <- c("avgLog2FC", "P.Value", "adj.P.Val")
 deTab$avgLog2CPM <- rowMeans(normDge$counts)
-
-deTab <- na.omit(deTab)
-deTab <- deTab[!is.infinite(rowSums(deTab)),]
 
 # SET DE GENES
 deTab$DE <- 0
