@@ -3,7 +3,8 @@
 datasetInput <- reactive({
   checkReload()
   switch(input$dataset_select,
-         "normCounts" = inUse_normDge$counts,
+         "normCounts" = 2^(inUse_normDge$counts),
+         "normCountslog2" = inUse_normDge$counts,
          "deTab" = inUse_deTab,
          "deg" = inUse_deTab[inUse_deTab$DE != 0,],
          "pcGene" = pc_gene_table(),
