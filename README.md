@@ -14,7 +14,7 @@ devtools::install_github("LUMC/dgeAnalysis")
 ```
 3. Launch the application:
 ```r
-library(dgeAnalysis)
+library("dgeAnalysis")
 dgeAnalysis::startApp()
 ```
 
@@ -55,7 +55,7 @@ Windows RTools:\
    https://cran.r-project.org/bin/windows/Rtools/Rtools35.exe
 
 ## Fix install problems
-If there are problems installing the application it might be worth to try installing packages manually:
+If there are problems installing the application, it might be worth to try installing specific packages manually:
 ```
 ## Install or import required packages
 if (!require("shiny")) install.packages("shiny")

@@ -107,7 +107,9 @@ get_normDge <- reactive({
                               data_samples())
     se <- addSamplesFromTableToSE(se, data_samples())
     normDge <- tryCatch({
-      return(DGEList(counts = assay(se), samples = colData(se)))
+      temp <- DGEList(counts = assay(se), samples = colData(se))
+      temp$counts <- log2(temp$counts)
+      return(temp)
     }, error = function(err) {
       temp <- DGEList(counts = 2^(assay(se)), samples = colData(se))
       temp$counts <- log2(temp$counts)
