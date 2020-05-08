@@ -146,6 +146,7 @@ gamConfidenceFit <- function(deTab, biasColumn) {
   gamModel <- do.call(mgcv::gam, c(base.args, method.args))
   prediction <- augment(gamModel)
   prediction <- prediction[order(prediction[[biasColumn]]), ]
+  prediction$.se.fit <- as.vector(prediction$.se.fit)
   
   setRange <- range(1, nrow(prediction))
   result <- round(seq(setRange[1], setRange[2], length.out = 500))
