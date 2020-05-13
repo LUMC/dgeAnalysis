@@ -126,7 +126,7 @@ get_normDge <- reactive({
 get_raw_dge <- reactive({
   data_counts <- data_counts()
   data_counts <- data_counts[!grepl('^__', rownames(data_counts)),]
-  se <- readCountsFromTable(data_counts(),
+  se <- readCountsFromTable(data_counts,
                             data_samples())
   se <- addSamplesFromTableToSE(se, data_samples())
   if (!is.null(data_annotation())) {
