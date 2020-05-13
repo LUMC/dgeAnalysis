@@ -29,8 +29,7 @@ addSamplesFromTableToSE <- function(se, data_samples){
   data_samples <- droplevels(data_samples)
   samples <- intersect(colnames(se), rownames(data_samples))
   se <- se[,samples]
-  colData(se) <- DataFrame(data_samples[samples,])
-  names(colData(se)) <- colnames(data_samples)
+  colData(se) <- DataFrame(data_samples[samples,, drop = FALSE])
   se
 }
 
