@@ -74,6 +74,7 @@ server <- function(input, output, session) {
                menuSubItem("Gene Ontology", tabName = "enrich_go", icon = icon("bezier-curve")),
                menuSubItem("Disease Ontology", tabName = "enrich_do", icon = icon("bezier-curve"))
       ),
+      menuItem("WGCNA", tabName = "wgcna", icon = icon("code-branch")),
       menuItem("Export", tabName = "export", icon = icon("download")),
       menuItem("About", tabName = "about", icon = icon("info-circle")),
       img(src = "lumcLogo.png", width="200px")
@@ -95,6 +96,7 @@ server <- function(input, output, session) {
   source("tabs/enrichment/reactome/svr_reactome.R", local = TRUE)
   source("tabs/enrichment/go/svr_go.R", local = TRUE)
   source("tabs/enrichment/do/svr_do.R", local = TRUE)
+  source("tabs/wgcna/svr_wgcna.R", local = TRUE)
   source("tabs/export/svr_export.R", local = TRUE)
   source("tabs/about/svr_about.R", local = TRUE)
 

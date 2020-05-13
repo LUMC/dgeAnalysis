@@ -13,6 +13,7 @@ source("tabs/enrichment/kegg/ui_kegg.R", local = TRUE)
 source("tabs/enrichment/reactome/ui_reactome.R", local = TRUE)
 source("tabs/enrichment/go/ui_go.R", local = TRUE)
 source("tabs/enrichment/do/ui_do.R", local = TRUE)
+source("tabs/wgcna/ui_wgcna.R", local = TRUE)
 source("tabs/export/ui_export.R", local = TRUE)
 source("tabs/about/ui_about.R", local = TRUE)
 
@@ -54,6 +55,7 @@ ui <- dashboardPage(
       tab_enrich_reactome,
       tab_enrich_go,
       tab_enrich_do,
+      tab_wgcna,
       tab_export,
       tab_about
     )
