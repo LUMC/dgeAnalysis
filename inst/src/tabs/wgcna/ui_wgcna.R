@@ -1,6 +1,8 @@
 tab_wgcna <- tabItem(
   tabName = "wgcna",
   align = "center",
+  h1("!!!  UNDER DEVELOPMENT  !!!"),
+  h2("Please don't use me (yet)"),
   br(),
   
   tabsetPanel(
@@ -19,6 +21,24 @@ tab_wgcna <- tabItem(
         mainPanel(
           width = 9,
           plotlyOutput("wgcna_sample_tree", height = "600px") %>% withSpinner()
+        )
+      )
+    ),
+    
+    tabPanel(
+      title = "Trait heatmap",
+      HTML('<hr style="border-color: #0088cc;">'),
+      sidebarLayout(
+        position = "right",
+        sidebarPanel(
+          width = 3,
+          br(),
+          uiOutput("wgcna_trait_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
+        ), 
+        mainPanel(
+          width = 9,
+          plotlyOutput("wgcna_trait_heat", height = "600px") %>% withSpinner()
         )
       )
     ),
