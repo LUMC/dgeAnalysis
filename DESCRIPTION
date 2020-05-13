@@ -1,7 +1,7 @@
 Package: dgeAnalysis
 Type: Package
 Title: dgeAnalysis
-Version: 1.1.0
+Version: 1.2.0
 Author@R:
   person("Tom", "Kuipers", email = "t.b.kuipers@outlook.com", role = c("aut", "cre"))
 Description:
@@ -23,8 +23,8 @@ Imports:
     scales (>= 1.1.0),
     broom (>= 0.5.4),
     plotly (>= 4.9.1),
-    igraph (>= 1.2.4.2),
-    reshape2 (>= 1.4.3),
+    igraph (>= 1.2.5),
+    reshape2 (>= 1.4.4),
     SummarizedExperiment (>= 1.16.1),
     edgeR (>= 3.28.0),
     limma (>= 3.42.1),
@@ -35,7 +35,9 @@ Imports:
     ReactomePA (>= 1.30.0),
     org.Hs.eg.db (>= 3.10),
     org.Mm.eg.db (>= 3.10),
-    rmarkdown (>= 2.1)
+    rmarkdown (>= 2.1),
+    WGCNA (>= 1.69),
+    ggdendro (>= 0.1-20)
 biocViews: Annotation, Clustering, GeneSetEnrichment, GO, KEGG,
     MultipleComparison, Pathways, Reactome, Visualization,
     Sequencing, RNASeq, ChIPSeq, GeneExpression, Transcription,
