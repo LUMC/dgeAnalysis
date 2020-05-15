@@ -94,7 +94,7 @@ complexityPlot <- function(se, perc, rank) {
       color = ~sample,
       type = "scattergl",
       mode = "lines+markers",
-      text = ~paste(rank, "Genes\n", round(fraction*100, 2), '% Reads\n'),
+      text = ~paste(sample, "\n", rank, "Genes\n", round(fraction*100, 2), '% Reads\n'),
       hoverinfo = 'text') %>%
       plotly::layout(
         title = "Gene complexity %",
@@ -116,7 +116,7 @@ complexityPlot <- function(se, perc, rank) {
       color = ~sample,
       type = "scattergl",
       mode = "lines+markers",
-      text = ~paste(rank, "Genes\n", formatC(value, format="f", big.mark=".", digits=0), 'Reads\n'),
+      text = ~paste(sample, "\n", rank, "Genes\n", formatC(value, format="f", big.mark=".", digits=0), 'Reads\n'),
       hoverinfo = 'text') %>%
       plotly::layout(
         title = "Gene complexity",
