@@ -29,7 +29,7 @@ alignmentSummaryPlot <- function(se, perc=T){
       orientation = 'h',
       color = ~feature,
       type = "bar",
-      text = ~paste(sample, '\n', round(count*100, 2), '%\n', feature),
+      text = ~paste(sample, '\n', round(count*100, 2), '%', feature),
       hoverinfo = 'text') %>% 
       plotly::layout(
         title = "Count assignments %",
