@@ -29,7 +29,7 @@ alignmentSummaryPlot <- function(se, perc=T){
       orientation = 'h',
       color = ~feature,
       type = "bar",
-      text = ~paste(feature, round(count*100, 2), '%\n'),
+      text = ~paste(sample, '\n', round(count*100, 2), '%\n', feature),
       hoverinfo = 'text') %>% 
       plotly::layout(
         title = "Count assignments %",
@@ -52,7 +52,7 @@ alignmentSummaryPlot <- function(se, perc=T){
       orientation = 'h',
       color = ~feature,
       type = "bar",
-      text = ~paste(feature, formatC(count, format="f", big.mark=".", digits=0), 'Reads\n'),
+      text = ~paste(sample, '\n', formatC(count, format="f", big.mark=".", digits=0), 'Reads', feature),
       hoverinfo = 'text') %>% 
       plotly::layout(
         title = "Count assignments",
