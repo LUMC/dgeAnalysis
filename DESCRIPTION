@@ -36,8 +36,7 @@ Imports:
     org.Hs.eg.db (>= 3.10),
     org.Mm.eg.db (>= 3.10),
     rmarkdown (>= 2.1),
-    WGCNA (>= 1.69),
-    ggdendro (>= 0.1-20)
+    WGCNA (>= 1.69)
 biocViews: Annotation, Clustering, GeneSetEnrichment, GO, KEGG,
     MultipleComparison, Pathways, Reactome, Visualization,
     Sequencing, RNASeq, ChIPSeq, GeneExpression, Transcription,

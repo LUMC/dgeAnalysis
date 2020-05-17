@@ -30,4 +30,3 @@ if (!require("reshape2")) install.packages("reshape2")
 
 ## WGCNA
 if (!require("WGCNA")) install.packages("WGCNA")
-if (!require("ggdendro")) install.packages("ggdendro")
