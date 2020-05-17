@@ -38,6 +38,7 @@ server <- function(input, output, session) {
     enrich_reactome = "Reactome Enrichment",
     enrich_go = "Gene Ontology",
     enrich_do = "Disease Ontology",
+    wgcna = "WGCNA",
     export = "Export",
     about = "About"
   )
