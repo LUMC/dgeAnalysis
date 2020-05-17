@@ -68,6 +68,26 @@ tab_wgcna <- tabItem(
         )
       ),
       HTML('<hr style="border-color: #0088cc;">')
+    ),
+    
+    tabPanel(
+      title = "Dendrogram module",
+      HTML('<hr style="border-color: #0088cc;">'),
+      sidebarLayout(
+        position = "right",
+        sidebarPanel(
+          width = 3,
+          sliderInput("module_power", "Number of powers", 6, min = 1, max = 50, step = 1),
+          uiOutput("wgcna_number_genes"),
+          br(),
+          uiOutput("wgcna_module_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
+        ), 
+        mainPanel(
+          width = 9,
+          plotlyOutput("wgcna_dendro_module", height = "600px") %>% withSpinner()
+        )
+      )
     )
   )
 )
