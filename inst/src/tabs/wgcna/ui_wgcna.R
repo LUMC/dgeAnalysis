@@ -85,7 +85,44 @@ tab_wgcna <- tabItem(
         ), 
         mainPanel(
           width = 9,
+          plotlyOutput("wgcna_dendro_gene_module", height = "600px") %>% withSpinner(),
           plotlyOutput("wgcna_dendro_module", height = "600px") %>% withSpinner()
+        )
+      )
+    ),
+    
+    tabPanel(
+      title = "Module - Trait relation",
+      HTML('<hr style="border-color: #0088cc;">'),
+      sidebarLayout(
+        position = "right",
+        sidebarPanel(
+          width = 3,
+          br(),
+          uiOutput("wgcna_module_trait_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
+        ), 
+        mainPanel(
+          width = 9,
+          plotlyOutput("wgcna_module_trait", height = "600px") %>% withSpinner()
+        )
+      )
+    ),
+    
+    tabPanel(
+      title = "Network heatmap",
+      HTML('<hr style="border-color: #0088cc;">'),
+      sidebarLayout(
+        position = "right",
+        sidebarPanel(
+          width = 3,
+          br(),
+          uiOutput("wgcna_network_heat_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
+        ), 
+        mainPanel(
+          width = 9,
+          plotlyOutput("wgcna_network_heat", height = "600px") %>% withSpinner()
         )
       )
     )

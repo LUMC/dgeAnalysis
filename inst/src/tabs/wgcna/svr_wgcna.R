@@ -28,7 +28,7 @@ output[["wgcna_trait_heat"]] <- renderPlotly({
     checkReload()
     
     trait <- data_samples()[, unlist(lapply(data_samples(), is.numeric)), drop = FALSE]
-    plot_dendro_heat(trait)
+    plot_trait_heat(trait)
   }, error = function(err) {
     return(NULL)
   })
@@ -51,51 +51,37 @@ output[["wgcna_power_plot"]] <- renderPlotly({
 
 ## Calculate power values with soft threshold
 get_power <- reactive({
-  tryCatch({
-    showModal(
-      modalDialog(
-        h1("Running soft threshold calculations..."),
-        h4("This can take a while..."),
-        img(src="loading.gif", width = "50%"),
-        footer=NULL
-      )
+  showModal(
+    modalDialog(
+      h1("Running soft threshold calculations..."),
+      h4("This can take a while..."),
+      img(src="loading.gif", width = "50%"),
+      footer=NULL
     )
-    
-    powers <- c(c(1:input$power_numberOf))
-    soft <- pickSoftThreshold(t(inUse_normDge$counts), powerVector = powers, verbose = 2)
-    removeModal()
-    soft
-  }, error = function(err) {
-    removeModal()
-    return(NULL)
-  })
+  )
+  
+  powers <- c(c(1:input$power_numberOf))
+  soft <- pickSoftThreshold(t(inUse_normDge$counts), powerVector = powers, verbose = 2)
+  removeModal()
+  soft
 })
 
 ## Dendrogram with modules
-output[["wgcna_dendro_module"]] <- renderPlotly({
+output[["wgcna_dendro_gene_module"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    showModal(
-      modalDialog(
-        h1("Running TOM calculations..."),
-        h4("This can take a while..."),
-        img(src="loading.gif", width = "50%"),
-        footer=NULL
-      )
-    )
+    dissTOM <- get_TOM_manual()
+    geneTree <- hclust(as.dist(dissTOM), method = "average")
+    dynamicColors <- get_modules()
     
-    dendrogram <- get_TOM_manual()
-    modules <- get_modules()[dendrogram$order]
-    removeModal()
-    p1 <- plotly_dendrogram(dendrogram, NULL, modules)
-    p2 <- plot_modules(modules)
+    p1 <- plotly_dendrogram(geneTree, NULL, dynamicColors)
+    p2 <- plot_modules(dynamicColors)
     subplot(
       list(p1, p2),
       nrows = 2,
       heights = c(0.9, 0.1)
     )
   }, error = function(err) {
-    removeModal()
     return(NULL)
   })
 })
@@ -117,44 +103,178 @@ output[["wgcna_number_genes"]] <- renderUI({
 
 ## Calculate TOMsimilarityFromExpr most variable manually
 get_TOM_manual <- reactive({
+  showModal(
+    modalDialog(
+      h1("Running TOM calculations..."),
+      h4("This can take a while..."),
+      img(src="loading.gif", width = "50%"),
+      footer=NULL
+    )
+  )
+  
+  if (is.null(input$wgcna_number_genes)) {
+    amount <- 1000
+  } else {
+    amount <- input$wgcna_number_genes
+  }
+  
+  lcpm <- inUse_normDge$counts
+  var_genes <- apply(lcpm, 1, var)
+  select_var <- names(sort(var_genes, decreasing=TRUE))[1:amount]
+  high_var_cpm <- as.data.frame(lcpm[select_var,])
+  
+  SubGeneNames <- rownames(high_var_cpm)
+  adjacency <- adjacency(t(high_var_cpm), type = "signed", power = input$module_power)
+  TOM <- TOMsimilarityFromExpr(adjacency, networkType = "signed", TOMType = "signed", power = input$module_power)
+  colnames(TOM) <- rownames(TOM) <- SubGeneNames
+  dissTOM <- 1-TOM
+  
+  removeModal()
+  dissTOM
+})
+
+## Calculate TOMsimilarityFromExpr in blocks automatic
+get_TOM_auto <- reactive({
+  showModal(
+    modalDialog(
+      h1("Running TOM calculations..."),
+      h4("This can take a while..."),
+      img(src="loading.gif", width = "50%"),
+      footer=NULL
+    )
+  )
+  
+  net <- blockwiseModules(t(inUse_normDge$counts), power = input$module_power,
+                          TOMType = "unsigned", minModuleSize = 20,
+                          reassignThreshold = 0, mergeCutHeight = 0.25,
+                          numericLabels = TRUE, pamRespectsDendro = FALSE,
+                          verbose = 3)
+  
+  removeModal()
+  net
+})
+
+## Get module colors from TOM
+get_modules <- reactive({
+  dissTOM <- get_TOM_manual()
+  geneTree <- hclust(as.dist(dissTOM), method = "average")
+  
+  dynamicMods <- cutreeDynamic(dendro = geneTree, method="tree", minClusterSize = 20)
+  dynamicColors <- labels2colors(dynamicMods, colorSeq = setdiff(standardColors(), "black"))
+  dynamicColors <- dynamicColors[geneTree$order]
+  dynamicColors
+})
+
+output[["wgcna_dendro_module"]] <- renderPlotly({
+  tryCatch({
+    checkReload()
+    
+    METree <- get_eigengenes()
+    color <- gsub('^.{2}', '', METree$labels)
+    color <- color[METree$order]
+    plotly_dendrogram(METree, NULL, color)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Module dendrogram get eigengenes
+get_eigengenes <- reactive({
+  dynamicColors <- get_modules()
+  
+  if (is.null(input$wgcna_number_genes)) {
+    amount <- 1000
+  } else {
+    amount <- input$wgcna_number_genes
+  }
+  
+  lcpm <- inUse_normDge$counts
+  var_genes <- apply(lcpm, 1, var)
+  select_var <- names(sort(var_genes, decreasing=TRUE))[1:amount]
+  high_var_cpm <- as.data.frame(lcpm[select_var,])
+  
+  MEList <- moduleEigengenes(t(high_var_cpm), colors = dynamicColors)
+  MEs <- MEList$eigengenes
+  MEDiss <- 1-cor(MEs)
+  METree <- hclust(as.dist(MEDiss), method = "average")
+  METree
+})
+
+output[["wgcna_module_trait"]] <- renderPlotly({
+  tryCatch({
+    checkReload()
+    
+    METree <- get_relation()
+    color <- gsub('^.{2}', '', METree$labels)
+    color <- color[METree$order]
+    plotly_dendrogram(METree, NULL, color)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Module dendrogram get eigengenes
+get_relation <- reactive({
+  dynamicColors <- get_modules()
+  trait <- data_samples()[, unlist(lapply(data_samples(), is.numeric)), drop = FALSE]
+  
+  trait <- data.frame(matrix(ncol=2, nrow=6, dimnames=list(NULL, c("trait1", "trait2"))))
+  trait$trait1 <- c(55, 65, 60, 75, 88, 74)
+  trait$trait2 <- c(7.5, 8.4, 9.3, 5.5, 6, 5)
+  
   lcpm <- inUse_normDge$counts
   var_genes <- apply(lcpm, 1, var)
   select_var <- names(sort(var_genes, decreasing=TRUE))[1:input$wgcna_number_genes]
   high_var_cpm <- as.data.frame(lcpm[select_var,])
   
-  SubGeneNames <- rownames(high_var_cpm)
-  adjacency <- adjacency(t(high_var_cpm), type = "signed", power = 6)
-  TOM <- TOMsimilarityFromExpr(adjacency, networkType = "signed", TOMType = "signed", power = 6)
-  colnames(TOM) <- rownames(TOM) <- SubGeneNames
-  dissTOM <- 1-TOM
+  nSamples = ncol(high_var_cpm)
+  MEs0 = moduleEigengenes(t(high_var_cpm), dynamicColors)$eigengenes
+  MEs = orderMEs(MEs0)
+  moduleTraitCor = cor(MEs, trait, use = "p")
+  moduleTraitPvalue = corPvalueStudent(moduleTraitCor, nSamples)
   
+  textMatrix = paste(signif(moduleTraitCor, 2), "\n(",
+                     signif(moduleTraitPvalue, 1), ")", sep = "");
+  dim(textMatrix) = dim(moduleTraitCor)
+  par(mar = c(6, 8.5, 3, 3));
+  # Display the correlation values within a heatmap plot
+  labeledHeatmap(Matrix = moduleTraitCor,
+                 xLabels = names(trait),
+                 yLabels = names(MEs),
+                 ySymbols = names(MEs),
+                 colorLabels = FALSE,
+                 colors = greenWhiteRed(50),
+                 textMatrix = textMatrix,
+                 setStdMargins = FALSE,
+                 cex.text = 0.5,
+                 zlim = c(-1,1),
+                 main = paste("Module-trait relationships"))
+  
+  plot_dendro_heat(trait)
+})
+
+## Module/Dendro network heatmap
+output[["wgcna_network_heat"]] <- renderPlotly({
+  tryCatch({
+    checkReload()
+    
+    data_TOM <- get_dendro_network_heatmap()
+    plotly_dendro_heat(data_TOM)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Get dat for module/Dendro network heatmap
+get_dendro_network_heatmap <- reactive({
+  dissTOM <- get_TOM_manual()
   geneTree <- hclust(as.dist(dissTOM), method = "average")
-})
-
-## Calculate TOMsimilarityFromExpr in blocks automatic
-get_TOM_auto <- reactive({
-  tryCatch({
-    net <- blockwiseModules(t(inUse_normDge$counts), power = input$module_power,
-                            TOMType = "unsigned", minModuleSize = 30,
-                            reassignThreshold = 0, mergeCutHeight = 0.25,
-                            numericLabels = TRUE, pamRespectsDendro = FALSE,
-                            verbose = 3)
-    net
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
-## Get module colors from TOM
-get_modules <- reactive({
-  tryCatch({
-    geneTree <- get_TOM_manual()
-    dynamicMods <- cutreeDynamic(dendro = geneTree, method="tree", minClusterSize = 30)
-    dynamicColors <- labels2colors(dynamicMods, colorSeq = setdiff(standardColors(), "black"))
-    dynamicColors
-  }, error = function(err) {
-    return(NULL)
-  })
+  
+  data_TOM <- dissTOM^7
+  diag(data_TOM) <- NA
+  data_TOM <- data_TOM[, geneTree$order]
+  data_TOM <- data_TOM[rev(geneTree$order),]
+  data_TOM
 })
 
 
@@ -179,3 +299,14 @@ output[["wgcna_module_info"]] <- renderUI({
   infoText <- "Module dendrogram"
   informationBox(infoText)
 })
+
+output[["wgcna_module_trait_info"]] <- renderUI({
+  infoText <- "Module and trait relation"
+  informationBox(infoText)
+})
+
+output[["wgcna_network_heat_info"]] <- renderUI({
+  infoText <- "Dendrogram heatmap network"
+  informationBox(infoText)
+})
+

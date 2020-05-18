@@ -105,11 +105,13 @@ plotly_dendrogram <- function(d, color, color_list) {
   p
 }
 
+
+
 ## --------------------------------------------------------------------------
 
 ## ----- HEATMAP PLOTS -----
 
-plot_dendro_heat <- function(trait) {
+plot_trait_heat <- function(trait) {
   heatmap_list <- list()
   for(column in colnames(trait)) {
     p <- plot_ly(
@@ -133,6 +135,45 @@ plot_dendro_heat <- function(trait) {
   )
 }
 
+plot_relation_heat <- function(module, trait) {
+  heatmap_list <- list()
+  for(column in colnames(trait)) {
+    p <- plot_ly(
+      x = rownames(trait),
+      y = column,
+      z = t(trait[[column]]),
+      type = "heatmap",
+      showscale = FALSE,
+      hoverinfo = 'text',
+      text = matrix(paste("Sample:", rownames(trait),
+                          "<br>Column:", rep(c(column), nrow(trait)),
+                          "<br>Value:", t(trait[[column]])), ncol = nrow(trait))
+    )
+    heatmap_list[[column]] <- p
+  }
+  subplot(
+    heatmap_list,
+    nrows = ncol(trait),
+    shareX = TRUE,
+    margin = 0.00025
+  )
+}
+
+plotly_dendro_heat <- function(data_TOM) {
+  p <- plot_ly(
+    x = rownames(data_TOM),
+    y = colnames(data_TOM),
+    z = data_TOM,
+    colorbar = list(title = "Adjacency", len=1),
+    type = "heatmap"
+  ) %>%
+    plotly::layout(
+      title = "Network heatmap",
+      xaxis = list(title = ''),
+      yaxis = list(title = '')
+    )
+  p
+}
 
 ## --------------------------------------------------------------------------
 
