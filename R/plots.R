@@ -575,7 +575,7 @@ variableHeatmapPlot <- function(dge, amount){
 
 topDgeHeatmapPlot <- function(deTab, dge, amount){
   sortdeTab <- deTab[order(rank(deTab$adj.P.Val)),]
-  sortdeTab <- head(sortdeTab, 50)
+  sortdeTab <- head(sortdeTab, amount)
   getnorm <- dge[rownames(sortdeTab),]
   getnorm <- getnorm$counts
   getnorm <- as.data.frame(stack(getnorm))
