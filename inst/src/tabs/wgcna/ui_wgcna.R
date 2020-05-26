@@ -1,8 +1,6 @@
 tab_wgcna <- tabItem(
   tabName = "wgcna",
   align = "center",
-  h1("!!!  UNDER DEVELOPMENT  !!!"),
-  h2("Please don't use me (yet)"),
   br(),
   
   tabsetPanel(

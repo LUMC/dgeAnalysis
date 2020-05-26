@@ -135,6 +135,7 @@ plot_trait_heat <- function(trait) {
   )
 }
 
+
 plot_relation_heat <- function(module, trait) {
   heatmap_list <- list()
   for(column in colnames(trait)) {
@@ -147,7 +148,9 @@ plot_relation_heat <- function(module, trait) {
       hoverinfo = 'text',
       text = matrix(paste("Sample:", rownames(trait),
                           "<br>Column:", rep(c(column), nrow(trait)),
-                          "<br>Value:", t(trait[[column]])), ncol = nrow(trait))
+                          "<br>Value:", t(trait[[column]])
+      ),
+      nrow = nrow(trait), ncol = ncol(trait))
     )
     heatmap_list[[column]] <- p
   }
@@ -159,6 +162,7 @@ plot_relation_heat <- function(module, trait) {
   )
 }
 
+
 plotly_dendro_heat <- function(data_TOM) {
   p <- plot_ly(
     x = rownames(data_TOM),
@@ -169,6 +173,29 @@ plotly_dendro_heat <- function(data_TOM) {
   ) %>%
     plotly::layout(
       title = "Network heatmap",
+      xaxis = list(title = ''),
+      yaxis = list(title = '')
+    )
+  p
+}
+
+
+plot_module_trait_relation_heat <- function(moduleTraitCor, moduleTraitPvalue) {
+  p <- plot_ly(
+    x = colnames(moduleTraitCor),
+    y = rownames(moduleTraitCor),
+    z = moduleTraitCor,
+    colorbar = list(title = "Correlation", len=1),
+    type = "heatmap",
+    hoverinfo = 'text',
+    text = matrix(paste(#"Trait:", colnames(moduleTraitCor),
+                        "<br>Module:", rownames(moduleTraitCor),
+                        "<br>Correlation:", signif(moduleTraitCor, 2),
+                        "<br>P-value:", signif(moduleTraitPvalue, 1)
+    ), nrow = nrow(moduleTraitCor), ncol = ncol(moduleTraitCor))
+  ) %>%
+    plotly::layout(
+      title = "Module & Trait relation",
       xaxis = list(title = ''),
       yaxis = list(title = '')
     )
