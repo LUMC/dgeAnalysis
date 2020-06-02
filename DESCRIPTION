@@ -39,6 +39,6 @@ Imports:
     WGCNA (>= 1.69)
 biocViews: Annotation, Clustering, GeneSetEnrichment, GO, KEGG,
     MultipleComparison, Pathways, Reactome, Visualization,
-    Sequencing, RNASeq, ChIPSeq, GeneExpression, Transcription,
+    Sequencing, RNASeq, GeneExpression, Transcription,
     Normalization, DifferentialExpression, Bayesian, Regression,
-    PrincipalComponent
+    PrincipalComponent, WGCNA
