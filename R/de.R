@@ -2,13 +2,14 @@
 ## ----- Read files -----
 
 
-## readCountsFromTable()
-##  Add all counts that are in samples in SummerizedExperiment
-## Parameters:
-##  data_counts = Dataframe, Containing all raw count data
-##  data_samples = Dataframe, Containing all sample data
-## Returns:
-##  se = SummerizedExperiment, With counts
+#' Add all counts that are in samples in SummerizedExperiment.
+#'
+#' @param data_counts Dataframe, Containing all raw count data
+#' @param data_samples Dataframe, Containing all sample data
+#'
+#' @return se, (SummerizedExperiment) With counts
+#' 
+#' @export
 
 readCountsFromTable <- function(data_counts, data_samples) {
   out <- as.matrix(data_counts[, colnames(data_counts) %in% rownames(data_samples)])
@@ -17,13 +18,14 @@ readCountsFromTable <- function(data_counts, data_samples) {
 }
 
 
-## addSamplesFromTableToSE()
-##  Add samples to the SummerizedExperiment
-## Parameters:
-##  se = SummerizedExperiment, With counts
-##  data_samples = Dataframe, Containing all sample data
-## Returns:
-##  se = SummerizedExperiment, With samples and counts
+#' Add samples to the SummerizedExperiment.
+#'
+#' @param se SummerizedExperiment, With counts
+#' @param data_samples Dataframe, Containing all sample data
+#'
+#' @return se, (SummerizedExperiment) With samples and counts
+#' 
+#' @export
 
 addSamplesFromTableToSE <- function(se, data_samples){
   data_samples <- droplevels(data_samples)
@@ -34,13 +36,14 @@ addSamplesFromTableToSE <- function(se, data_samples){
 }
 
 
-## addAnnotationsFromTableToSE()
-##  Add annotation to the SummerizedExperiment
-## Parameters:
-##  se = SummerizedExperiment, With samples and counts
-##  data_annotation = Dataframe, Containing all annotation data
-## Returns:
-##  se = SummerizedExperiment, With samples, counts and annotation
+#' Add annotation to the SummerizedExperiment.
+#'
+#' @param se SummerizedExperiment, With counts
+#' @param data_annotation Dataframe, Containing all annotation data
+#'
+#' @return se, (SummerizedExperiment) With samples, counts and annotation
+#' 
+#' @export
 
 addAnnotationsFromTableToSE <- function(se, data_annotation){
   features <- intersect(rownames(se), rownames(data_annotation))
@@ -54,13 +57,14 @@ addAnnotationsFromTableToSE <- function(se, data_annotation){
 ## ----- Analysis utility -----
 
 
-## getCount()
-##  Count the read counts per feature to find number of reads that are aligned, not aligned, etc.
-## Parameters:
-##  x = String, Containing the value on which to count reads
-##  raw = Dataframe, Containing count data
-## Returns:
-##  Integer, With total counted reads
+#' Count the read counts per feature to find number of reads that are aligned, not aligned, etc.
+#'
+#' @param x Containing the value/label on which to count reads
+#' @param raw Dataframe, Containing count data
+#'
+#' @return Integer, With total counted reads
+#' 
+#' @export
 
 getCount <- function(x, raw){
   if (x["feature"] %in% rownames(raw)) {
@@ -72,12 +76,13 @@ getCount <- function(x, raw){
 }
 
 
-## alignmentSummary()
-##  Creates dataframe with counts per mapping feature (aligned, not aligned, etc.)
-## Parameters:
-##  se = SummerizedExperiment, With samples, counts (and annotation)
-## Returns:
-##  out = Dataframe, With total counts per available mapping feature
+#' Creates dataframe with counts per mapping feature (aligned, not aligned, etc.).
+#'
+#' @param se SummerizedExperiment, With samples, counts (and annotation)
+#'
+#' @return out, (Dataframe) With total counts per available mapping feature
+#' 
+#' @export
 
 alignmentSummary <- function(se){
   specialFeatures <- rownames(se)[ grepl( "^__", rownames(se) ) ]
@@ -87,13 +92,14 @@ alignmentSummary <- function(se){
 }
 
 
-## complexityData()
-##  Creates dataframe with number of reads per gene, ordered on genes with the most reads assigned.
-## Parameters:
-##  se = SummerizedExperiment, With samples, counts (and annotation)
-##  max = Integer, The maximum rank that is used
-## Returns:
-##  out = Dataframe, With total read counts per gene
+#' Creates dataframe with number of reads per gene, ordered on genes with the most reads assigned.
+#'
+#' @param se SummerizedExperiment, With samples, counts (and annotation)
+#' @param max Integer, The maximum rank that is used
+#'
+#' @return out, (Dataframe) With total read counts per gene
+#' 
+#' @export
 
 complexityData <- function(se, max){
   features <- rownames(se)[ ! grepl( "^__", rownames(se) ) ]
@@ -110,12 +116,14 @@ complexityData <- function(se, max){
 }
 
 
-## stackDge()
-##  Stacks total DGE counts based on: mapping feature (aligned, not aligned, etc.), sample and LogCPM
-## Parameters:
-##  dge = DGE list object, containing samples and counts
-## Returns:
-##  count = Dataframe, With mapping feature, sample and LogCPM
+#' Stacks total DGE counts based on: mapping feature (aligned, not aligned, etc.), sample and LogCPM.
+#'
+#' @param dge DGE list object, containing samples and counts
+#' @param max Integer, The maximum rank that is used
+#'
+#' @return count, (Dataframe) With mapping feature, sample and LogCPM
+#' 
+#' @export
 
 stackDge <- function(dge){
   count <- stack(dge$counts)
@@ -124,14 +132,15 @@ stackDge <- function(dge){
 }
 
 
-## gamConfidenceFit()
-##  Calculates a confidence fit for various plots.
-##  Model used is GAM to calculate predictions
-## Parameters:
-##  deTab = Dataframe, with all analysis results
-##  biasColumn = String, Value on which to calculate confidence
-## Returns:
-##  prediction = Vector, With coordinates of prediction locations (line plot)
+#' Calculates a confidence fit for various plots.
+#' Model used is GAM to calculate predictions.
+#'
+#' @param deTab Dataframe, with all analysis results
+#' @param biasColumn String, Value on which to calculate confidence
+#'
+#' @return prediction, (Vector) With coordinates of prediction locations (line plot)
+#' 
+#' @export
 
 gamConfidenceFit <- function(deTab, biasColumn) {
   method.args = list()

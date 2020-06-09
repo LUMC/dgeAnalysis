@@ -2,15 +2,16 @@
 ## ----- UTIL FUNCTIONS GENE SET ENRICHMENT -----
 
 
-## get_geneList()
-##  Get LogFC from deTab
-##  Add entrez id to geneList
-##  Sort geneList based on LogFC (decreasing)
-##  Remove NA and duplicate names
-## Parameters:
-##  deTab = Dataframe, with all analysis results
-## Returns:
-##  geneList = Vector, Named vector containing gene names and LogFC values
+#' Get LogFC from deTab.
+#' Add entrez id to geneList.
+#' Sort geneList based on LogFC (decreasing).
+#' Remove NA and duplicate names.
+#'
+#' @param deTab Dataframe, with all analysis results
+#'
+#' @return geneList, (Vector) Named vector containing gene names and LogFC values
+#' 
+#' @export
 
 get_geneList <- function(deTab){
   geneList <- deTab$avgLog2FC
@@ -22,14 +23,15 @@ get_geneList <- function(deTab){
 }
 
 
-## update_n()
-##  Sets a new n value
-##  n stands for the number of pathways to show
-## Parameters:
-##  x = Enrichment object, containing enrichment results
-##  showCategory = Integer, number of pathways
-## Returns:
-##  n = Integer, Updated number of pathways to show
+#' Sets a new n value.
+#' n stands for the number of pathways to show.
+#'
+#' @param x Enrichment object, containing enrichment results
+#' @param showCategory Integer, number of pathways
+#'
+#' @return n, (Integer) Updated number of pathways to show
+#' 
+#' @export
 
 update_n <- function(x, showCategory) {
   if (!is.numeric(showCategory)) {
@@ -45,17 +47,18 @@ update_n <- function(x, showCategory) {
 }
 
 
-## extract_geneSet()
-##  Collect genes within a pathway
-##  Gets genes from enrichment result
-##  geneSets names are set based on ID and description
-##  duplicated pathways are removed from the set
-## Parameters:
-##  enrich = Enrichment object, containing enrichment results
-##  slider = Integer, Updated number of pathways to show
-##  selected = Vector, Contains manually selected pathways
-## Returns:
-##  geneSets = vector, Genes found in corresponding pathways
+#' Collect genes within a pathway.
+#' Gets genes from enrichment result.
+#' geneSets names are set based on ID and description.
+#' duplicated pathways are removed from the set.
+#'
+#' @param enrich Enrichment object, containing enrichment results
+#' @param slider Integer, Updated number of pathways to show
+#' @param selected Vector, Contains manually selected pathways
+#'
+#' @return geneSets, (vector) Genes found in corresponding pathways
+#' 
+#' @export
 
 extract_geneSets <- function(enrich, slider, selected) {
   slider <- update_n(enrich, slider)
@@ -69,14 +72,15 @@ extract_geneSets <- function(enrich, slider, selected) {
 }
 
 
-## list2graph()
-##  The inputList is converted to a dataframe
-##  The dataframe is converted to a graph
-##  Igraph object is created based on a vector/list
-## Parameters:
-##  inputList = Vector, containing Gene names and LogFC
-## Returns:
-##  g = Igraph object, Graph with links between genes
+#' The inputList is converted to a dataframe.
+#' The dataframe is converted to a graph.
+#' Igraph object is created based on a vector/list.
+#'
+#' @param inputList Vector, containing Gene names and LogFC
+#'
+#' @return g, (Igraph object) Graph with links between genes
+#' 
+#' @export
 
 list2graph <- function(inputList) {
   ldf <- list2df(inputList)
@@ -85,13 +89,15 @@ list2graph <- function(inputList) {
 }
 
 
-## list2df()
-##  The inputList is converted to a dataframe format
-##  Dataframe object is created based on a vector/list
-## Parameters:
-##  inputList = Vector, containing Gene names and LogFC
-## Returns:
-##  ldf = Dataframe, With all in use genes
+#' The inputList is converted to a dataframe format.
+#' Dataframe object is created based on a vector/list.
+#' Igraph object is created based on a vector/list.
+#'
+#' @param inputList Vector, containing Gene names and LogFC
+#'
+#' @return ldf, (Dataframe) With all in use genes
+#' 
+#' @export
 
 list2df <- function(inputList) {
   ldf <- lapply(1:length(inputList), function(i) {
@@ -105,14 +111,16 @@ list2df <- function(inputList) {
 }
 
 
-## overlap_ratio()
-##  Overlap is calculated and define between x and y
-##  The number of overlaps is returned
-## Parameters:
-##  x = Vector, genes relative to x axis 
-##  y = Vector, genes relative to y axis 
-## Returns:
-##  n = Integer, Number of overlapping values
+#' Overlap is calculated and define between x and y.
+#' The number of overlaps is returned.
+#' Igraph object is created based on a vector/list.
+#'
+#' @param x Vector, genes relative to x axis
+#' @param y Vector, genes relative to y axis
+#'
+#' @return n, (Integer) Number of overlapping values
+#' 
+#' @export
 
 overlap_ratio <- function(x, y) {
   x <- unlist(x)
@@ -122,13 +130,14 @@ overlap_ratio <- function(x, y) {
 }
 
 
-## get_organismID()
-##  The gene IDs are gathered from DE table
-##  The first part of the ID name is kept
-## Parameters:
-##  deTab = Dataframe, with all analysis results
-## Returns:
-##  id = String, Organism ID value
+#' The gene IDs are gathered from DE table.
+#' The first part of the ID name is kept.
+#'
+#' @param deTab Dataframe, with all analysis results
+#'
+#' @return id, (String) Organism ID value
+#' 
+#' @export
 
 get_organismID <- function(deTab){
   tryCatch({
@@ -150,16 +159,17 @@ get_organismID <- function(deTab){
 ## ----- PLOT FUNCTIONS GENE SET ENRICHMENT -----
 
 
-## enrichBarplot()
-##  The enrichment results is filtered based on the number shown of pathways
-##  Descriptions of the pathways are added and the color scale is calculated
-##  A Barplot is created with a bar per pathway
-## Parameters:
-##  enrich = Enrich result, A enrichment results
-##  amount = Integer, Value with the number of pathways to show
-##  value = String, Value with the column name to be used (p-, q- or adjP value)
-## Returns:
-##  p = Plotly object
+#' The enrichment results is filtered based on the number shown of pathways.
+#' Descriptions of the pathways are added and the color scale is calculated.
+#' A Barplot is created with a bar per pathway.
+#'
+#' @param enrich Enrich result, A enrichment results
+#' @param amount Integer, Value with the number of pathways to show
+#' @param value String, Value with the column name to be used (p-, q- or adjP value)
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
 enrichBarplot <- function(enrich, amount, value){
   enrich <- na.omit(enrich[0:amount,])
@@ -202,14 +212,15 @@ enrichBarplot <- function(enrich, amount, value){
 }
 
 
-## emap_plotly()
-##  Pathways are gathered from enrichment result with pathway description
-##  A Igraph object is created with links between pathways
-##  Colors of dots are based on p-value
-## Parameters:
-##  enrich = Enrich result, A enrichment results
-## Returns:
-##  g = Igraph object, containing links between pathways
+#' Pathways are gathered from enrichment result with pathway description.
+#' A Igraph object is created with links between pathways.
+#' Colors of dots are based on p-value.
+#'
+#' @param enrich Enrich result, A enrichment results
+#'
+#' @return g, (Igraph object) containing links between pathways
+#' 
+#' @export
 
 emap_plotly <- function(enrich){
   geneSets <- geneInCategory(enrich)
@@ -249,19 +260,19 @@ emap_plotly <- function(enrich){
 }
 
 
-## cnetPlotly()
-##  Genes are gathered from enrichment result from specific pathway
-##  The geneList is prepared with the right LogFC values and links of genes between multiple pathways
-##  The number of pathways that are shown is defined with cnet_slider
-##  Igraph object is made to create links of genes between multiple pathways
-##  Colors of dots are based on LogFC
-## Parameters:
-##  enrich = Enrich result, A enrichment results
-##  deTab = Dataframe, with all analysis results
-##  geneSets = Martrix object, containing all pathways with corresponding genes
-##  deTab = Dataframe, with all analysis results
-## Returns:
-##  g = Igraph object, containing links of genes multiple pathways
+#' Genes are gathered from enrichment result from specific pathway.
+#' The geneList is prepared with the right LogFC values and links of genes between multiple pathways.
+#' The number of pathways that are shown is defined with cnet_slider.
+#' Igraph object is made to create links of genes between multiple pathways.
+#' Colors of dots are based on LogFC.
+#'
+#' @param enrich Enrich result, A enrichment results
+#' @param deTab Dataframe, with all analysis results
+#' @param geneSets Martrix object, containing all pathways with corresponding genes
+#'
+#' @return g, (Igraph object) containing links of genes multiple pathways
+#' 
+#' @export
 
 cnetPlotly <- function(enrich, geneSets, deTab){
   g <- list2graph(geneSets)
@@ -282,16 +293,18 @@ cnetPlotly <- function(enrich, geneSets, deTab){
   g
 }
 
-## heatplotly()
-##  The genesets are gathered
-##  Side inforamtion like fc is added
-##  Frequency of genes and pathways is calculated and sorted upon
-##  Heatmap is created with genes - pathways - log2FC
-## Parameters:
-##  geneSets = Martrix object, containing all pathways with corresponding genes
-##  deTab = Dataframe, with all analysis results
-## Returns:
-##  p = Plotly object
+
+#' The genesets are gathered.
+#' Side inforamtion like fc is added.
+#' Frequency of genes and pathways is calculated and sorted upon.
+#' Heatmap is created with genes, pathways, and log2FC.
+#'
+#' @param deTab Dataframe, with all analysis results
+#' @param geneSets Martrix object, containing all pathways with corresponding genes
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
 heatplotly <- function(geneSets, deTab) {
   genelist <- list2df(geneSets)
@@ -326,8 +339,7 @@ heatplotly <- function(geneSets, deTab) {
     hoverinfo = 'text',
     text = paste("Pathway:", genelist$categoryID,
                   "<br>Gene:", genelist$geneName,
-                  "<br>Log2FC:", genelist$avgLog2FC)
-    ) %>%
+                  "<br>Log2FC:", genelist$avgLog2FC)) %>%
     plotly::layout(
       title = "Genes in pathway",
       xaxis = list(title = '',
@@ -335,8 +347,7 @@ heatplotly <- function(geneSets, deTab) {
                    categoryarray = genelist$categoryID),
       yaxis = list(title = '',
                    categoryorder = "array",
-                   categoryarray = genelist$geneName)
-      ) %>%
+                   categoryarray = genelist$geneName)) %>%
     config(
       toImageButtonOptions = list(
         format = "png",
@@ -349,23 +360,24 @@ heatplotly <- function(geneSets, deTab) {
 }
 
 
-## plotlyGraph()
-##  Graph layout is set with kamada kawai (kk)
-##  Plots are created with dots as a gene or pathway
-##  Lines between dots show connection of these genes and/or pathways
-##  The geneList is prepared with the right LogFC values and links between genes between multiple pathways
-##  The number of pathways that are shown is defined with cnet_slider
-##  Igraph object is made to create links of genes between multiple pathways
-##  Colors of dots are based on LogFC or P-value
-## Parameters:
-##  g = Igraph object, containing graph data from genes and/or pathays
-##  pwName = String, Name of the shown pathway
-##  getColor = String, Color given to dots (LogFC or P-Values)
-##  cnet = Integer, Number of cnet pathways to show
-##  annoP = Boolean, Show pathway labels yes or no
-##  annoG = Boolean, Show gene labels yes or no
-## Returns:
-##  p = Plotly object
+#' Graph layout is set with kamada kawai (kk).
+#' Plots are created with dots as a gene or pathway.
+#' Lines between dots show connection of these genes and/or pathways.
+#' The geneList is prepared with the right LogFC values and links between genes between multiple pathways.
+#' The number of pathways that are shown is defined with cnet_slider.
+#' Igraph object is made to create links of genes between multiple pathways.
+#' Colors of dots are based on LogFC or P-value.
+#'
+#' @param g Igraph object, containing graph data from genes and/or pathays
+#' @param pwName String, Name of the shown pathway
+#' @param getColor String, Color given to dots (LogFC or P-Values)
+#' @param cnet Integer, Number of cnet pathways to show
+#' @param annoP Boolean, Show pathway labels yes or no
+#' @param annoG Boolean, Show gene labels yes or no
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
 plotlyGraph <- function(g, pwName, getColor, cnet, annoP, annoG){
   G <- g
@@ -392,8 +404,7 @@ plotlyGraph <- function(g, pwName, getColor, cnet, annoP, annoG){
     text = rownames(L_genes),
     key = rownames(L_genes),
     hoverinfo = "text",
-    showlegend = FALSE
-  ) %>%
+    showlegend = FALSE) %>%
     add_trace(
       x = L_cnet$V1,
       y = L_cnet$V2,

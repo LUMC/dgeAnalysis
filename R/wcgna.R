@@ -3,6 +3,18 @@
 
 ## ----- TREE PLOTS -----
 
+
+#' Get heigth information from tree object.
+#' Get labels/names from tree ends.
+#' Calculate start and end positions of tree branches
+#' Save line coordinates in dataframe
+#'
+#' @param tree Hclust object, tree object
+#'
+#' @return new, (Dataframe) dataframe with all dendrogram line coordinates
+#' 
+#' @export
+
 get_dendrogram_data <- function(tree, labels = NULL, 
                                horiz = FALSE, reverseDirection = FALSE,
                                hang = 0.1, xlab = "", ylab = "", axes = TRUE,
@@ -69,6 +81,17 @@ get_dendrogram_data <- function(tree, labels = NULL,
 }
 
 
+#' Get dendrogram data dendro_data().
+#' Plot a dendrogram.
+#'
+#' @param d Hclust object, tree object
+#' @param color String, color samples
+#' @param color_list Vector, Color genes
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
+
 plotly_dendrogram <- function(d, color, color_list) {
   dendro_data <- get_dendrogram_data(d)
   
@@ -77,13 +100,11 @@ plotly_dendrogram <- function(d, color, color_list) {
     x = ~x,
     y = ~y,
     color = I("black"), 
-    hoverinfo = "none"
-  )  %>%
+    hoverinfo = "none")  %>%
     add_segments(
       xend = ~xend,
       yend = ~yend,
-      showlegend = FALSE
-    ) %>%
+      showlegend = FALSE) %>%
     add_markers(
       data = dendro_data[dendro_data$label != "",],
       x = ~x,
@@ -94,22 +115,37 @@ plotly_dendrogram <- function(d, color, color_list) {
         color = color_list
       ),
       text = ~label,
-      hoverinfo = 'text'
-    ) %>%
-    layout(
+      hoverinfo = 'text') %>%
+    plotly::layout(
       dragmode = "zoom",
       title = "Dendrogram with normalized log2CPM values",
       xaxis = list(title = "", showticklabels = FALSE, zeroline = FALSE),
       yaxis = list(title = "Height")
+    ) %>%
+    config(
+      toImageButtonOptions = list(
+        format = "png",
+        filename = "dendro",
+        width = 1500,
+        height = 1000
+      )
     )
   p
 }
 
-
-
 ## --------------------------------------------------------------------------
 
 ## ----- HEATMAP PLOTS -----
+
+
+#' Create heatmap with trait data.
+#' Show sample, trait value (column) and the exact trait value
+#'
+#' @param trait Dataframe, dataframe with all trait values
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
 plot_trait_heat <- function(trait) {
   heatmap_list <- list()
@@ -132,36 +168,26 @@ plot_trait_heat <- function(trait) {
     nrows = ncol(trait),
     shareX = TRUE,
     margin = 0.00025
-  )
-}
-
-
-plot_relation_heat <- function(module, trait) {
-  heatmap_list <- list()
-  for(column in colnames(trait)) {
-    p <- plot_ly(
-      x = rownames(trait),
-      y = column,
-      z = t(trait[[column]]),
-      type = "heatmap",
-      showscale = FALSE,
-      hoverinfo = 'text',
-      text = matrix(paste("Sample:", rownames(trait),
-                          "<br>Column:", rep(c(column), nrow(trait)),
-                          "<br>Value:", t(trait[[column]])
-      ),
-      nrow = nrow(trait), ncol = ncol(trait))
+  ) %>%
+    config(
+      toImageButtonOptions = list(
+        format = "png",
+        filename = "trait_heat",
+        width = 1500,
+        height = 1000
+      )
     )
-    heatmap_list[[column]] <- p
-  }
-  subplot(
-    heatmap_list,
-    nrows = ncol(trait),
-    shareX = TRUE,
-    margin = 0.00025
-  )
 }
 
+
+#' Create heatmap from gene clusters.
+#' Show genes vs genes colored by adjacency
+#'
+#' @param data_TOM WGCNA object, Topology Overlap Matrix
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
 plotly_dendro_heat <- function(data_TOM) {
   p <- plot_ly(
@@ -169,8 +195,7 @@ plotly_dendro_heat <- function(data_TOM) {
     y = colnames(data_TOM),
     z = data_TOM,
     colorbar = list(title = "Adjacency", len=1),
-    type = "heatmap"
-  ) %>%
+    type = "heatmap") %>%
     plotly::layout(
       title = "Network heatmap",
       xaxis = list(title = ''),
@@ -179,6 +204,16 @@ plotly_dendro_heat <- function(data_TOM) {
   p
 }
 
+
+#' Create heatmap with trait data compared to module relations.
+#' Show module name, correlation between trait and module, and the trait p-value
+#'
+#' @param moduleTraitCor Dataframe, dataframe with all trait correlation values
+#' @param moduleTraitPvalue Dataframe, dataframe with all trait p-values
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
 plot_module_trait_relation_heat <- function(moduleTraitCor, moduleTraitPvalue) {
   p <- plot_ly(
@@ -192,12 +227,19 @@ plot_module_trait_relation_heat <- function(moduleTraitCor, moduleTraitPvalue) {
                         "<br>Module:", rownames(moduleTraitCor),
                         "<br>Correlation:", signif(moduleTraitCor, 2),
                         "<br>P-value:", signif(moduleTraitPvalue, 1)
-    ), nrow = nrow(moduleTraitCor), ncol = ncol(moduleTraitCor))
-  ) %>%
+    ), nrow = nrow(moduleTraitCor), ncol = ncol(moduleTraitCor))) %>%
     plotly::layout(
       title = "Module & Trait relation",
       xaxis = list(title = ''),
       yaxis = list(title = '')
+    ) %>%
+    config(
+      toImageButtonOptions = list(
+        format = "png",
+        filename = "trait_relation",
+        width = 1500,
+        height = 1000
+      )
     )
   p
 }
@@ -205,6 +247,17 @@ plot_module_trait_relation_heat <- function(moduleTraitCor, moduleTraitPvalue) {
 ## --------------------------------------------------------------------------
 
 ## ----- POWER PLOTS -----
+
+
+#' Create dot plot with power values (scale independence).
+#' A R^2 cutoff line indicates the min. power levels.
+#'
+#' @param soft Dataframe, soft threshold values per power
+#' @param cutoff Integer, R^2 cutoff value
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
 plot_power <- function(soft, cutoff) {
   soft_combined <- data.frame(
@@ -228,10 +281,26 @@ plot_power <- function(soft, cutoff) {
              x0 = 0,  x1 = 1, xref = "paper",
              y0 = cutoff, y1 = cutoff)
       )
+    ) %>%
+    config(
+      toImageButtonOptions = list(
+        format = "png",
+        filename = "power1",
+        width = 1500,
+        height = 1000
+      )
     )
   p
 }
 
+
+#' Create dot plot with soft power values (mean connectivity).
+#'
+#' @param soft Dataframe, soft threshold values per power
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
 plot_soft <- function(soft) {
   soft_combined <- data.frame(
@@ -250,6 +319,14 @@ plot_soft <- function(soft) {
       title = "Mean connectivity",
       xaxis = list(title = "Soft Threshold (power)"),
       yaxis = list(title = "Mean Connectivity")
+    ) %>%
+    config(
+      toImageButtonOptions = list(
+        format = "png",
+        filename = "power2",
+        width = 1500,
+        height = 1000
+      )
     )
   p
 }
@@ -257,7 +334,17 @@ plot_soft <- function(soft) {
 
 ## --------------------------------------------------------------------------
 
-## ----- DENDRO MODULES -----
+## ----- MODULES BARPLOT -----
+
+#' Barplot with module sizes.
+#' Module sizes are defined in percentages and colors are added
+#' Stacked barplot is returned
+#'
+#' @param color Vector, all module colors of all used genes
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
 plot_modules <- function(color) {
   colorTable <- data.frame(table(color))
@@ -273,9 +360,8 @@ plot_modules <- function(color) {
     color = ~color,
     marker = list(color = colorTable$color),
     text = ~paste(Freq, "Genes"),
-    hoverinfo = "text"
-  ) %>%
-    layout(
+    hoverinfo = "text") %>%
+    plotly::layout(
       barmode = "stack",
       showlegend = FALSE,
       xaxis = list(title = "",

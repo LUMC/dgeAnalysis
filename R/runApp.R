@@ -1,3 +1,7 @@
+#' Start dgeAnalysis application.
+#'
+#' @return Opens application in default web browser
+#' 
 #' @export
 
 startApp <- function() {

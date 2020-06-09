@@ -2,20 +2,21 @@
 ## ----- MARKDOWN FUNCTIONS -----
 
 
-## createDesign()
-##  Create vector from two design values and two matrix values
-##  Check if all values are the same then design will start with ~0
-##  Get column names based on corresponding values in matrix
-##  Paste column names together with +
-##  Create String from vector seprated by ''
-## Parameters:
-##  dge = DGE list object, containing samples and counts
-##  dbase = Vector, base design column
-##  dvalue = Vector, other design columns
-##  matrix_v1 = Vector, containing the left matrix values
-##  matrix_v2 = Vector, containing the right matrix values
-## Returns:
-##  getdesign = String, String with the design formula
+#' Create vector from two design values and two matrix values.
+#' Check if all values are the same then design will start with ~0.
+#' Get column names based on corresponding values in matrix.
+#' Paste column names together with +.
+#' Create String from vector seprated by ''.
+#'
+#' @param dge DGE list object, containing samples and counts
+#' @param dbase Vector, base design column
+#' @param dvalue Vector, other design columns
+#' @param matrix_v1 Vector, containing the left matrix values
+#' @param matrix_v2 Vector, containing the right matrix values
+#'
+#' @return getdesign, (String) String with the design formula
+#' 
+#' @export
 
 createDesign <- function(dge, dbase, dvalue, matrix_v1, matrix_v2) {
   columns <- c(dbase, dvalue)
@@ -52,17 +53,18 @@ createDesign <- function(dge, dbase, dvalue, matrix_v1, matrix_v2) {
 }
 
 
-## relevelSamples()
-##  Create vector from two matrix values
-##  Try to relevel samples on values that are not present in matrix
-## Parameters:
-##  dge = DGE list object, containing samples and counts
-##  dbase = Vector, base design column
-##  dvalue = Vector, other design columns
-##  matrix_v1 = Vector, containing the left matrix values
-##  matrix_v2 = Vector, containing the right matrix values
-## Returns:
-##  dge = DGE list object, containing samples and counts
+#' Create vector from two matrix values.
+#' Try to relevel samples on values that are not present in matrix.
+#'
+#' @param dge DGE list object, containing samples and counts
+#' @param dbase Vector, base design column
+#' @param dvalue Vector, other design columns
+#' @param matrix_v1 Vector, containing the left matrix values
+#' @param matrix_v2 Vector, containing the right matrix values
+#'
+#' @return dge, (DGE list object) containing samples and counts
+#' 
+#' @export
 
 relevelSamples <- function(dge, dbase, dvalue, matrix_v1, matrix_v2) {
   columns <- c(dbase, dvalue)
@@ -77,16 +79,17 @@ relevelSamples <- function(dge, dbase, dvalue, matrix_v1, matrix_v2) {
 }
 
 
-## createMatrix()
-##  Getbase column and use this to create right matrix
-##  Loop through base, nested columns and matrix to create full matrix
-## Parameters:
-##  dge = DGE list object, containing samples and counts
-##  dbase = Vector, base design column
-##  dvalue = Vector, other design columns
-##  matrix = Vector, containing the matrix values
-## Returns:
-##  dge = DGE list object, containing samples and counts
+#' Getbase column and use this to create right matrix.
+#' Loop through base, nested columns and matrix to create full matrix.
+#'
+#' @param dge DGE list object, containing samples and counts
+#' @param dbase Vector, base design column
+#' @param dvalue Vector, other design columns
+#' @param matrix Vector, containing the matrix values
+#'
+#' @return dge, (DGE list object) containing samples and counts
+#' 
+#' @export
 
 createMatrix <- function(dge, dbase, dvalue, matrix) {
   getbase <- NULL
@@ -115,15 +118,16 @@ createMatrix <- function(dge, dbase, dvalue, matrix) {
 }
 
 
-## createContrast()
-##  Create contrast by finding matrix values in the design matrix
-##  Values are assigned based if present in matrix (v1 or v2) else 0
-## Parameters:
-##  design = String, in use design matrix
-##  matrix_v1 = Vector, containing the left matrix values
-##  matrix_v2 = Vector, containing the right matrix values
-## Returns:
-##  contrast = vector, containing the contrasts (0, 1, -1)
+#' Create contrast by finding matrix values in the design matrix.
+#' Values are assigned based if present in matrix (v1 or v2) else 0.
+#'
+#' @param design String, in use design matrix
+#' @param matrix_v1 Vector, containing the left matrix values
+#' @param matrix_v2 Vector, containing the right matrix values
+#'
+#' @return contrast, (vector) containing the contrasts (0, 1, -1)
+#' 
+#' @export
 
 createContrast <- function(design, matrix_v1, matrix_v2) {
   contrast = integer(length(colnames(design)))
@@ -133,4 +137,3 @@ createContrast <- function(design, matrix_v1, matrix_v2) {
 }
 
 ## --------------------------------------------------------------------------
-
