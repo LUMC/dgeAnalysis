@@ -1,5 +1,5 @@
 
-## Sample Tree
+## Sample dendrogram
 output[["wgcna_sample_tree"]] <- renderPlotly({
   tryCatch({
     checkReload()
@@ -11,7 +11,7 @@ output[["wgcna_sample_tree"]] <- renderPlotly({
   })
 })
 
-## Set color of Sample Tree
+## Set color of sample dendrogram
 output[["color_wgcna_tree"]] <- renderUI({
   tryCatch({
     selectInput("color_wgcna_tree", "Color by:",
@@ -119,7 +119,7 @@ output[["wgcna_number_genes"]] <- renderUI({
   })
 })
 
-## Calculate TOMsimilarityFromExpr most variable manually
+## Calculate TOMsimilarityFromExpr most variable MANUALLY
 get_TOM_manual <- reactive({
   showModal(
     modalDialog(
@@ -160,7 +160,7 @@ get_TOM_manual <- reactive({
   })
 })
 
-## Calculate TOMsimilarityFromExpr in blocks automatic (Not available atm)
+## Calculate TOMsimilarityFromExpr in blocks AUTOMATIC (Not available atm)
 get_TOM_auto <- reactive({
   showModal(
     modalDialog(
@@ -201,6 +201,7 @@ get_modules <- reactive({
   dynamicColors
 })
 
+## Module dendrogram
 output[["wgcna_dendro_module"]] <- renderPlotly({
   tryCatch({
     checkReload()
@@ -214,7 +215,7 @@ output[["wgcna_dendro_module"]] <- renderPlotly({
   })
 })
 
-## Module dendrogram get eigengenes
+## Module dendrogram, get module eigengenes (as tree object)
 get_eigengenes <- reactive({
   dynamicColors <- get_modules()
   
@@ -236,6 +237,7 @@ get_eigengenes <- reactive({
   METree
 })
 
+## Heatmap for correletaion between modules and trait data
 output[["wgcna_module_trait"]] <- renderPlotly({
   tryCatch({
     checkReload()
@@ -252,7 +254,7 @@ output[["wgcna_module_trait"]] <- renderPlotly({
   })
 })
 
-## Module dendrogram get eigengenes
+## Module dendrogram, get module eigengenes
 get_relation <- reactive({
   dynamicColors <- get_modules()
   
@@ -272,6 +274,7 @@ get_relation <- reactive({
   MEs
 })
 
+## Heatmap with gene vs gene data
 output[["wgcna_network_heat"]] <- renderPlotly({
   tryCatch({
     checkReload()
@@ -309,12 +312,12 @@ output[["wgcna_trait_info"]] <- renderUI({
 })
 
 output[["wgcna_power_info"]] <- renderUI({
-  infoText <- "Power text"
+  infoText <- "Power (soft threshold) detection"
   informationBox(infoText)
 })
 
 output[["wgcna_module_info"]] <- renderUI({
-  infoText <- "Module dendrogram"
+  infoText <- "Dendrogram with analyzed genes colored by module"
   informationBox(infoText)
 })
 
@@ -324,7 +327,6 @@ output[["wgcna_module_trait_info"]] <- renderUI({
 })
 
 output[["wgcna_network_heat_info"]] <- renderUI({
-  infoText <- "Dendrogram heatmap network"
+  infoText <- "Heatmap gene vs gene visualizing modules"
   informationBox(infoText)
 })
-
