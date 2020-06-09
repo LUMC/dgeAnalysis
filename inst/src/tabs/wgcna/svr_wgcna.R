@@ -90,7 +90,15 @@ output[["wgcna_dendro_gene_module"]] <- renderPlotly({
       list(p1, p2),
       nrows = 2,
       heights = c(0.9, 0.1)
-    )
+    ) %>%
+      config(
+        toImageButtonOptions = list(
+          format = "png",
+          filename = "dendro_module",
+          width = 1500,
+          height = 1000
+        )
+      )
   }, error = function(err) {
     return(NULL)
   })
