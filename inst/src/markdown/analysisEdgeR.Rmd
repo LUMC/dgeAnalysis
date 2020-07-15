@@ -189,8 +189,9 @@ The analysis is performed using edgeR with the normalized counts, design matrix 
 # PERFORM ANALYSIS
 
 normDge <- estimateDisp(normDge, design)
-edfit <- glmFit(normDge, design)
-efit <- glmLRT(edfit, contrast = contrast)
+
+edfit <- glmQLFit(normDge, design)
+efit <- glmQLFTest(edfit, contrast = contrast)
 
 efit$DE <- decideTests(efit, p.value = alpha)
 summary(efit$DE)
