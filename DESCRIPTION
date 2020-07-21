@@ -7,7 +7,7 @@ Author@R:
 Description:
     R shiny tool to perform differential gene expression and view the results interactively.
 Depends: R (>= 3.6.1)
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -21,7 +21,7 @@ Imports:
     knitr (>= 1.27),
     tidyr (>= 1.0.2),
     scales (>= 1.1.0),
-    broom (>= 0.5.4),
+    broom (== 0.5.6),
     plotly (>= 4.9.1),
     igraph (>= 1.2.5),
     reshape2 (>= 1.4.4),
