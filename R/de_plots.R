@@ -710,7 +710,7 @@ ma_plot <- function(deTab){
       data = prediction,
       mode = "lines",
       x = ~avgLog2CPM,
-      y = ~.fitted,
+      y = ~fit,
       text = NA,
       key = NA,
       color = "Fitted",
@@ -718,8 +718,8 @@ ma_plot <- function(deTab){
       name = "Fitted") %>%
     add_ribbons(
       data = prediction,
-      ymin = ~.fitted - 1.96 * .se.fit,
-      ymax = ~.fitted + 1.96 * .se.fit,
+      ymin = ~fit - 1.96 * se.fit,
+      ymax = ~fit + 1.96 * se.fit,
       fillcolor = "rgba(7, 164, 181, 0.25)",
       text = NA,
       key = NA,
@@ -941,7 +941,7 @@ biasPlot <- function(deTab, biasColumn, log, tick, sourceId) {
       data = prediction,
       mode = "lines",
       x = ~get(biasColumn),
-      y = ~.fitted,
+      y = ~fit,
       text = NA,
       key = NA,
       color = "green",
@@ -949,8 +949,8 @@ biasPlot <- function(deTab, biasColumn, log, tick, sourceId) {
       name = "Fitted") %>%
     add_ribbons(
       data = prediction,
-      ymin = ~.fitted - 1.96 * .se.fit,
-      ymax = ~.fitted + 1.96 * .se.fit,
+      ymin = ~fit - 1.96 * se.fit,
+      ymax = ~fit + 1.96 * se.fit,
       fillcolor = "rgba(7, 164, 181, 0.25)",
       text = NA,
       key = NA,
