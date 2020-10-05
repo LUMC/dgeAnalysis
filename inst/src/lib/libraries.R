@@ -17,6 +17,7 @@ if (!require("tidyr")) install.packages("tidyr")
 if (!require("scales")) install.packages("scales")
 if (!require("broom")) install.packages("broom")
 if (!require("plotly")) install.packages("plotly")
+if (!require("rmarkdown")) install.packages("rmarkdown")
 
 ## Pathway analysis
 if (!require("clusterProfiler")) BiocManager::install("clusterProfiler")
