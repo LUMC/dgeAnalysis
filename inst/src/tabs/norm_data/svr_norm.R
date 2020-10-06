@@ -42,6 +42,7 @@ output[["norm_voom_plot"]] <- renderPlotly({
 ## Show amount of genes ledt after filtering
 output[["norm_voom_ngenes"]] <- renderUI({
   tryCatch({
+    checkReload()
     h2("After filtering:", br(), nrow(normDge$counts), "Genes")
   }, error = function(err) {
     return(NULL)
