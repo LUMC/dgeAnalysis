@@ -211,11 +211,10 @@ output[["pathway_from_kegg"]] <- renderUI({
     checkReload()
     enrich <- as.data.frame(get_kegg())
     getpathway <- rownames(enrich)[enrich$Description %in% input$kegg_select]
-    getFromKegg <- includeHTML(paste("https://www.genome.jp/kegg-bin/show_pathway?", getpathway, sep=""))
-    getFromKegg <- gsub('src="', 'src="https://www.genome.jp', getFromKegg)
-    getFromKegg <- gsub('href="', 'href="https://www.genome.jp', getFromKegg)
-    getFromKegg <- gsub("<head.*</head>", "", getFromKegg)
-    getFromKegg <- gsub("<table.*</table>", "", getFromKegg)
+    getpathway <- "hsa05152"
+    getFromKegg <- a(href=paste0("https://www.genome.jp/kegg-bin/show_pathway?", getpathway), target="_blank",
+                     img(src=paste0("https://www.genome.jp/kegg/pathway/", substr(getpathway, 1, 3), "/", getpathway, ".png"))
+    )
     getFromKegg
   }, error = function(err) {
     return(NULL)
