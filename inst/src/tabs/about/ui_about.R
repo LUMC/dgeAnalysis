@@ -20,7 +20,7 @@ tab_about <- tabItem(
   ),
   br(),
   
-  h3(a(href="https://github.com/LUMC/DGE_analysis", "GitHub page")),
+  h3(a(href="https://github.com/LUMC/DGE_analysis", "GitHub page", target="_blank")),
   img(src="lumcLogo.png", width="300px"),
   br(),br(),br(),
   HTML('<hr style="border-color: #0088cc;">'),
