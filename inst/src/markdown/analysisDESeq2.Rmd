@@ -218,6 +218,16 @@ if (!is.null(data_annotation)) {
 deTab <- deTab[intersect(rownames(deTab), rownames(normDge$counts)),]
 normDge$counts <- normDge$counts[intersect(rownames(deTab), rownames(normDge$counts)),]
 
+#ORDER deTab TABLE
+deTab <- rename(deTab, "FDR" = "adj.P.Val")
+deOrder <- c("avgLog2CPM", "avgLog2FC", "P.Value", "FDR", "DE")
+if (!is.null(data_annotation)) {
+  deTab <- deTab[colnames(deTab)
+               [c(1, match(deOrder,names(deTab)), 2:(ncol(deTab)-5))]]
+} else {
+  deTab <- deTab[deOrder]
+}
+
 ```
 
 

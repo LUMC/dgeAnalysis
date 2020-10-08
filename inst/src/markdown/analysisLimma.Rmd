@@ -207,8 +207,19 @@ deTab <- data.frame(topTable(efit, coef=1, n=Inf))
 deTab <- deTab[order(rownames(deTab)),]
 deTab$DE <- c(efit$DE[order(rownames(efit$DE)),])
 
+#ORDER deTab TABLE
+deTab$t <- NULL
+deTab$B <- NULL
 deTab <- rename(deTab, "avgLog2CPM" = "AveExpr")
 deTab <- rename(deTab, "avgLog2FC" = "logFC")
+deTab <- rename(deTab, "FDR" = "adj.P.Val")
+deOrder <- c("avgLog2CPM", "avgLog2FC", "P.Value", "FDR", "DE")
+if (!is.null(data_annotation)) {
+  deTab <- deTab[colnames(deTab)
+               [c(1, match(deOrder,names(deTab)), 2:(ncol(deTab)-5))]]
+} else {
+  deTab <- deTab[deOrder]
+}
 
 ```
 
