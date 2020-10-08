@@ -587,7 +587,7 @@ variableHeatmapPlot <- function(dge, amount){
 #' @export
 
 topDgeHeatmapPlot <- function(deTab, dge, amount){
-  sortdeTab <- deTab[order(rank(deTab$adj.P.Val)),]
+  sortdeTab <- deTab[order(rank(deTab$FDR)),]
   sortdeTab <- head(sortdeTab, amount)
   getnorm <- dge[rownames(sortdeTab),]
   getnorm <- getnorm$counts
@@ -744,7 +744,7 @@ ma_plot <- function(deTab){
 }
 
 
-#' Creates scatter plot with avgLog2FC vs -log10(adj.P.Val).
+#' Creates scatter plot with avgLog2FC vs -log10(FDR).
 #' Two lines are generated indicating LogFC cutoff and p value cutoff.
 #'
 #' @param deTab Dataframe, with all analysis results
@@ -759,7 +759,7 @@ volcanoPlot <- function(deTab, LogCut, PCut){
   p <- plot_ly(
     data = deTab[deTab$DE == 0,],
     x = ~avgLog2FC,
-    y = ~-log10(adj.P.Val),
+    y = ~-log10(FDR),
     type = "scattergl",
     mode = "markers",
     color = ~as.character(DE),
@@ -770,7 +770,7 @@ volcanoPlot <- function(deTab, LogCut, PCut){
     source = "analysis_volcano") %>%
     add_trace(
       x = ~deTab[deTab$DE != 0,]$avgLog2FC,
-      y = ~-log10(deTab[deTab$DE != 0,]$adj.P.Val),
+      y = ~-log10(deTab[deTab$DE != 0,]$FDR),
       color = as.character(deTab[deTab$DE != 0,]$DE),
       alpha = 0.75,
       text = rownames(deTab[deTab$DE != 0,]),
@@ -824,7 +824,7 @@ volcanoPlot <- function(deTab, LogCut, PCut){
 #' @export
 
 barcodePlot <- function(deTab, dge, color, amount, selected) {
-  sortdeTab <- deTab[order(rank(deTab$adj.P.Val)),]
+  sortdeTab <- deTab[order(rank(deTab$FDR)),]
   sortdeTab <- head(sortdeTab, amount)
   getnorm <- dge[c(rownames(sortdeTab), selected),]
   getnorm$counts <- getnorm$counts
@@ -930,7 +930,7 @@ biasPlot <- function(deTab, biasColumn, log, tick, sourceId) {
     y = ~avgLog2FC,
     type = 'scattergl',
     mode = "markers",
-    color = ~adj.P.Val,
+    color = ~FDR,
     alpha = 0.75,
     showlegend = FALSE,
     text = rownames(deTab),
