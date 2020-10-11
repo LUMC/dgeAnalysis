@@ -88,18 +88,19 @@ matrix_v2
 The raw data is processed and pre-filtered, to remove non feature counts. The data is placed in a format (DGE list) which can be used for later analsis.
 
 ```{r showRawData}
-# SHOW RAW DATA
+# READ ALL FILES INTO SE
 
 se <- readCountsFromTable(data_counts, data_samples)
+se <- addSamplesFromTableToSE(se, data_samples)
 
 alignmentSummaryPlot(se)
-complexityPlot(se, TRUE, 1000)
+complexityPlot(se, perc = TRUE, rank = 1000)
 
 ```
 
 
 ```{r filesIntoSE}
-# READ ALL FILES INTO SE
+# ADD ANNOTATION TO SE IF PRESENT
 
 se <- readCountsFromTable(data_counts[!grepl('^__', rownames(data_counts)),], data_samples)
 se <- addSamplesFromTableToSE(se, data_samples)

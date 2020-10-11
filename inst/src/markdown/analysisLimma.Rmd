@@ -91,9 +91,10 @@ The raw data is processed and pre-filtered, to remove non feature counts. The da
 # SHOW RAW DATA
 
 se <- readCountsFromTable(data_counts, data_samples)
+se <- addSamplesFromTableToSE(se, data_samples)
 
 alignmentSummaryPlot(se)
-complexityPlot(se, TRUE, 1000)
+complexityPlot(se, perc = TRUE, rank = 1000)
 
 ```
 
