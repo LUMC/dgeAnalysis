@@ -93,7 +93,8 @@ complexityPlot <- function(se, group_color="None", perc, rank) {
       title = "Gene complexity %",
       xaxis = list(title = 'Rank', type="log"),
       yaxis = if (perc){list(tickformat = "%", title = 'Cumulative fraction of total reads till rank')}
-      else {list(title = 'Cumulative reads till rank')}) %>%
+      else {list(title = 'Cumulative reads till rank')},
+      legend = list(tracegroupgap=0)) %>%
     config(
       toImageButtonOptions = list(
         format = "png",
