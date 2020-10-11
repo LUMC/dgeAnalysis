@@ -13,63 +13,61 @@
 #' 
 #' @export
 
-alignmentSummaryPlot <- function(se, perc=T){
+alignmentSummaryPlot <- function(se, sort_value="None", perc=T){
   lse <- alignmentSummary(se)
   lse$feature <- gsub("_", " ", gsub("__", "", lse$feature))
+  if (sort_value != "None") {
+    for (sample in lse$sample) {
+      lse$order[lse$sample == sample] <- se[[sort_value]][colnames(se) == sample]
+    }
+    lse <- lse[order(lse$order, lse$sample, method="radix"),]
+    lse$sample <- factor(lse$sample, levels = unique(lse$sample))
+  } else {
+    lse$order <- "Sample"
+  }
   
   if (perc) {
     for (var in unique(lse$sample)) {
       temp <- lse[lse$sample == var, ]
       lse$count[lse$sample == var] <- temp$count/(sum(temp$count))
     }
-    
-    p <- plot_ly(
-      data = lse,
-      x = ~count,
-      y = ~sample,
-      orientation = 'h',
-      color = ~feature,
-      type = "bar",
-      text = ~paste(sample, '\n', round(count*100, 2), '%', feature),
-      hoverinfo = 'text') %>% 
-      plotly::layout(
-        title = "Count assignments %",
-        xaxis = list(title = 'Counts', tickformat = "%"),
-        yaxis = list(title = ''),
-        barmode = 'stack') %>%
-      config(
-        toImageButtonOptions = list(
-          format = "png",
-          filename = "alignment_perc",
-          width = 1500,
-          height = 1000
-        )
-      )
-  } else {
-    p <- plot_ly(
-      data = lse,
-      x = ~count,
-      y = ~sample,
-      orientation = 'h',
-      color = ~feature,
-      type = "bar",
-      text = ~paste(sample, '\n', formatC(count, format="f", big.mark=".", digits=0), 'Reads', feature),
-      hoverinfo = 'text') %>% 
-      plotly::layout(
-        title = "Count assignments",
-        xaxis = list(title = 'Counts'),
-        yaxis = list(title = ''),
-        barmode = 'stack') %>%
-      config(
-        toImageButtonOptions = list(
-          format = "png",
-          filename = "alignment",
-          width = 1500,
-          height = 1000
-        )
-      )
   }
-  p
+  
+  plot_list <- c()
+  for (order in unique(lse$order)) {
+    temp <- lse[lse$order == order,]
+    p <- plot_ly(
+      data = temp,
+      x = ~count,
+      y = ~sample,
+      color = ~feature,
+      orientation = 'h',
+      alignmentgroup = ~order,
+      legendgroup = ~feature,
+      type = "bar",
+      showlegend = if(order==unique(lse$order)[1]) {TRUE} else{FALSE},
+      text = if(perc){~paste(sample, '\n', round(count*100, 2), '%', feature)}
+        else {~paste(sample, '\n', formatC(count, format="f", big.mark=".", digits=0), 'Reads', feature)},
+      hoverinfo = 'text') %>%
+      group_by(order) %>% 
+      plotly::layout(
+        barmode = 'stack',
+        title = "Count assignments",
+        xaxis = if(perc) {list(title = 'Counts', tickformat = "%")} else {list(title = 'Counts')},
+        yaxis = if(sort_value != "None") {list(title = "", tickmode = "array", tickvals = length(unique(temp$sample))/2-0.5, ticktext = ~order)}
+          else {list(title = "")},
+        legend = list(tracegroupgap=0)) %>%
+      config(
+        toImageButtonOptions = list(
+          format = "png",
+          filename = "countdistline",
+          width = 1500,
+          height = 1000
+        )
+      )
+    plot_list[[paste0("plot", order)]] <- p
+  }
+  plotly::subplot(plot_list, nrows = length(unique(lse$order)), shareY=T, shareX = T, margin = 0.005)
 }
 
 
@@ -85,53 +83,51 @@ alignmentSummaryPlot <- function(se, perc=T){
 #' 
 #' @export
 
-complexityPlot <- function(se, perc, rank) {
+complexityPlot <- function(se, group_color="None", perc, rank) {
   compData <- complexityData(se, rank)
   
-  if (perc){
-    p <- plot_ly(
-      data = compData,
-      x = ~rank,
-      y = ~fraction,
-      color = ~sample,
-      type = "scattergl",
-      mode = "lines+markers",
-      text = ~paste(sample, "\n", rank, "Genes\n", round(fraction*100, 2), '% Reads\n'),
-      hoverinfo = 'text') %>%
-      plotly::layout(
-        title = "Gene complexity %",
-        xaxis = list(title = 'Rank', type="log"),
-        yaxis = list(tickformat = "%", title = 'Cumulative fraction of total reads till rank')) %>%
-      config(
-        toImageButtonOptions = list(
-          format = "png",
-          filename = "complexity_perc",
-          width = 1500,
-          height = 1000
-        )
+  p <- plot_ly(
+    type = 'scattergl',
+    mode = "lines+markers") %>%
+    plotly::layout(
+      title = "Gene complexity %",
+      xaxis = list(title = 'Rank', type="log"),
+      yaxis = if (perc){list(tickformat = "%", title = 'Cumulative fraction of total reads till rank')}
+      else {list(title = 'Cumulative reads till rank')}) %>%
+    config(
+      toImageButtonOptions = list(
+        format = "png",
+        filename = "countdistline",
+        width = 1500,
+        height = 1000
       )
-  } else {
-    p <- plot_ly(
-      data = compData,
-      x = ~rank,
-      y = ~value,
-      color = ~sample,
-      type = "scattergl",
-      mode = "lines+markers",
-      text = ~paste(sample, "\n", rank, "Genes\n", formatC(value, format="f", big.mark=".", digits=0), 'Reads\n'),
-      hoverinfo = 'text') %>%
-      plotly::layout(
-        title = "Gene complexity",
-        xaxis = list(title = 'Rank', type="log"),
-        yaxis = list(title = 'Cumulative reads till rank')) %>%
-      config(
-        toImageButtonOptions = list(
-          format = "png",
-          filename = "complexity",
-          width = 1500,
-          height = 1000
-        )
-      )
+    )
+  
+  legend_duplic <- c()
+  for (var in colnames(se)) {
+    temp <- compData[compData$sample == var, ]
+    if (group_color != "None") {
+      p <- add_trace(
+        p,
+        x = temp$rank,
+        y = if (perc){temp$fraction} else {temp$value},
+        showlegend = if(!se[[group_color]][colnames(se) == var] %in% legend_duplic) {TRUE} else{FALSE},
+        legendgroup = se[[group_color]][colnames(se) == var],
+        color = rep(se[[group_color]][colnames(se) == var], rank),
+        text = if (perc){paste(temp$sample, "\n", temp$rank, "Genes\n", round(temp$fraction*100, 2), '% Reads\n')}
+          else {paste(temp$sample, "\n", temp$rank, "Genes\n", formatC(temp$value, format="f", big.mark=".", digits=0), 'Reads\n')},
+        hoverinfo = 'text')
+      legend_duplic <- c(legend_duplic, se[[group_color]][colnames(se) == var])
+    } else {
+      p <- add_trace(
+        p,
+        x = temp$rank,
+        y = if (perc){temp$fraction} else {temp$value},
+        color = var,
+        text = if (perc){paste(temp$sample, "\n", temp$rank, "Genes\n", round(temp$fraction*100, 2), '% Reads\n')}
+          else {paste(temp$sample, "\n", temp$rank, "Genes\n", formatC(temp$value, format="f", big.mark=".", digits=0), 'Reads\n')},
+        hoverinfo = 'text')
+    }
   }
   p
 }
