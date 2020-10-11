@@ -6,7 +6,7 @@ Author@R:
   person("Tom", "Kuipers", email = "t.b.kuipers@outlook.com", role = c("aut", "cre"))
 Description:
     R shiny tool to perform differential gene expression and view the results interactively.
-Depends: R (>= 4.0)
+Depends: R (>= 3.6.1)
 RoxygenNote: 7.1.1
 License: MIT + file LICENSE
 Encoding: UTF-8
