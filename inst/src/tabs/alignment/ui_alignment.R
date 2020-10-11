@@ -18,6 +18,7 @@ tab_alignment <- tabItem(
             c("Actual" = "actual",
               "Percentage" = "percent")
           ),
+          uiOutput("group_sum"),
           br(),
           uiOutput("align_sum_info"),
           span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
@@ -43,6 +44,7 @@ tab_alignment <- tabItem(
             c("Actual" = "actual",
               "Percentage" = "percent")
           ),
+          uiOutput("group_color"),
           sliderInput("comp_rank", "Set number of ranks (Genes):", value = 1000,  min = 10,  max = 10000, step=10),
           br(),
           uiOutput("complex_info"),
