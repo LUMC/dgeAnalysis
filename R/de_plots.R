@@ -696,9 +696,7 @@ deRatioPlot <- function(deTab){
   defeatures <- aggregate(deTab$DE, by=list(category=deTab$DE), FUN=length)
   defeatures$perc <- defeatures[,2]/sum(defeatures[,2])
   
-  defeatures$category[which(defeatures$category == 0)] <- "Not sign"
-  defeatures$category[which(defeatures$category == -1)] <- "Down"
-  defeatures$category[which(defeatures$category == 1)] <- "Up"
+  defeatures$category <- c("Down regulated","Not sign.","Up regulated")[match(defeatures$category, c(-1,0,1))]
   
   p <- plot_ly(
     data = defeatures,
@@ -708,8 +706,8 @@ deRatioPlot <- function(deTab){
     type = "bar",
     text = paste(defeatures[,2], "Genes\n", round(defeatures$perc*100, 2), "%"),
     textposition = "auto",
-    textfont= list(color="black"),
-    hovertext = ~paste(category, "expressed"),
+    textfont = list(color="black"),
+    hovertext = ~category,
     hoverinfo = 'text') %>%
     plotly::layout(
       title = "Differential expression ratio",
@@ -957,7 +955,7 @@ pValuePlot <- function(deTab){
 
 ## --------------------------------------------------------------------------
 
-## ----- BIAS PLOT -----
+## ----- BIAS PLOTS -----
 
 
 #' The confidence prediction calculated in the function gamConfidenceFit().
@@ -1021,6 +1019,48 @@ biasPlot <- function(deTab, biasColumn, log, tick, sourceId) {
       toImageButtonOptions = list(
         format = "png",
         filename = "bias",
+        width = 1500,
+        height = 1000
+      )
+    )
+  p
+}
+
+
+#' The number of genes are grouped by strand and DE.
+#' A barplot is created with the # genes divided between + and - strand.
+#'
+#' @param deTab Dataframe, with all analysis results
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
+
+geneStrandBar <- function(deTab) {
+  geneStrand <- as.data.frame(table(deTab$strand, deTab$DE, dnn = c("strand", "DE")))
+  geneStrand$DE <- c("Down regulated","Not sign.","Up regulated")[match(geneStrand$DE, c(-1,0,1))]
+  geneStrand$perc <- geneStrand$Freq/sum(geneStrand$Freq)
+  
+  p <- plot_ly(
+    data = geneStrand,
+    x = ~strand,
+    y = ~Freq,
+    color = ~DE,
+    orientation = 'v',
+    type = "bar",
+    text = ~paste(Freq, "Genes\n", round(perc*100, 2), "%"),
+    textposition = "auto",
+    textfont = list(color="black"),
+    hovertext = ~DE,
+    hoverinfo = 'text') %>%
+    plotly::layout(
+      title = "Gene strand",
+      xaxis = list(title = 'Gene strand'), #, type = "log"),
+      yaxis = list(title = 'Number of genes')) %>%
+    config(
+      toImageButtonOptions = list(
+        format = "png",
+        filename = "geneStrand",
         width = 1500,
         height = 1000
       )
