@@ -7,6 +7,7 @@
 #' A stacked bar plot is created based on sample read counts.
 #'
 #' @param se SummerizedExperiment object, containing samples and counts
+#' @param sort_value String, Sort samples based on a group
 #' @param perc Boolean, Data in percentages
 #'
 #' @return p, (Plotly object) plot
@@ -76,6 +77,7 @@ alignmentSummaryPlot <- function(se, sort_value="None", perc=T){
 #' A dot line plot is created based on the number of reads at rank.
 #'
 #' @param se SummerizedExperiment object, containing samples and counts
+#' @param group_color String, Sort samples based on a group
 #' @param perc Boolean, Data in percentages
 #' @param rank Integer, The number of genes/rank (min=10)
 #'
@@ -526,18 +528,26 @@ samplePca3dPlot <- function(dge, color, getPC1, getPC2, getPC3){
 #' Heatmap with the values left in high_var_cpm.
 #'
 #' @param dge DGE list object, containing samples and counts
+#' @param group_col String, Sort samples based on a group
 #' @param amount Integer, The number of genes shown in plot
 #'
 #' @return p, (Plotly object) plot
 #' 
 #' @export
 
-variableHeatmapPlot <- function(dge, amount){
+variableHeatmapPlot <- function(dge, group_col, amount){
   lcpm <- dge$counts
   var_genes <- apply(lcpm, 1, var)
   select_var <- names(sort(var_genes, decreasing=TRUE))[1:amount]
   high_var_cpm <- lcpm[select_var,]
   high_var_cpm <- as.data.frame(stack(high_var_cpm))
+  
+  if (group_col != "None") {
+    order <- as.data.frame(as.character(dge$samples[[group_col]]), rownames(dge$samples))
+    colnames(order) <- "group"
+    order <- order[order(order$group),, drop=F]
+    high_var_cpm <- high_var_cpm[order(match(high_var_cpm$col,rownames(order))),]
+  }
   
   p <- plot_ly(
     data = high_var_cpm,
@@ -553,7 +563,7 @@ variableHeatmapPlot <- function(dge, amount){
     ) %>%
     plotly::layout(
       title = "Most variable genes",
-      xaxis = list(title = ''),
+      xaxis = list(title = '', categoryorder = "array", categoryarray = ~col),
       yaxis = list(
         title = '',
         categoryorder = "array",
@@ -569,7 +579,6 @@ variableHeatmapPlot <- function(dge, amount){
   p
 }
 
-
 #' The DE table is sorted on FDR/adjPvalue.
 #' The first x genes are kept.
 #' Normalized values are extracted based on the DE genes still present.
@@ -577,18 +586,26 @@ variableHeatmapPlot <- function(dge, amount){
 #'
 #' @param deTab Dataframe, with all analysis results
 #' @param dge DGE list object, containing samples and counts
+#' @param group_col String, Sort samples based on a group
 #' @param amount Integer, The number of genes shown in plot
 #'
 #' @return p, (Plotly object) plot
 #' 
 #' @export
 
-topDgeHeatmapPlot <- function(deTab, dge, amount){
+topDgeHeatmapPlot <- function(deTab, dge, group_col, amount){
   sortdeTab <- deTab[order(rank(deTab$FDR)),]
   sortdeTab <- head(sortdeTab, amount)
   getnorm <- dge[rownames(sortdeTab),]
   getnorm <- getnorm$counts
   getnorm <- as.data.frame(stack(getnorm))
+  
+  if (group_col != "None") {
+    order <- as.data.frame(as.character(dge$samples[[group_col]]), rownames(dge$samples))
+    colnames(order) <- "group"
+    order <- order[order(order$group),, drop=F]
+    getnorm <- getnorm[order(match(getnorm$col,rownames(order))),]
+  }
   
   p <- plot_ly(
     data = getnorm,
@@ -604,7 +621,7 @@ topDgeHeatmapPlot <- function(deTab, dge, amount){
     ) %>%
     plotly::layout(
       title = "Most expressed genes",
-      xaxis = list(title = ''),
+      xaxis = list(title = '', categoryorder = "array", categoryarray = ~col),
       yaxis = list(
         title = '',
         categoryorder = "array",
