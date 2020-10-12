@@ -2,7 +2,7 @@
 % Please edit documentation in R/de_plots.R
 \name{volcanoPlot}
 \alias{volcanoPlot}
-\title{Creates scatter plot with avgLog2FC vs -log10(adj.P.Val).
+\title{Creates scatter plot with avgLog2FC vs -log10(FDR).
 Two lines are generated indicating LogFC cutoff and p value cutoff.}
 \usage{
 volcanoPlot(deTab, LogCut, PCut)
@@ -18,6 +18,6 @@ volcanoPlot(deTab, LogCut, PCut)
 p, (Plotly object) plot
 }
 \description{
-Creates scatter plot with avgLog2FC vs -log10(adj.P.Val).
+Creates scatter plot with avgLog2FC vs -log10(FDR).
 Two lines are generated indicating LogFC cutoff and p value cutoff.
 }

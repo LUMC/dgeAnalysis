@@ -7,12 +7,14 @@ The first x genes are kept.
 Normalized values are extracted based on the DE genes still present.
 Heatmap with the normalized values of genes is created.}
 \usage{
-topDgeHeatmapPlot(deTab, dge, amount)
+topDgeHeatmapPlot(deTab, dge, group_col, amount)
 }
 \arguments{
 \item{deTab}{Dataframe, with all analysis results}
 
 \item{dge}{DGE list object, containing samples and counts}
+
+\item{group_col}{String, Sort samples based on a group}
 
 \item{amount}{Integer, The number of genes shown in plot}
 }

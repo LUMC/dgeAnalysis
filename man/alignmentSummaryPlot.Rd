@@ -6,10 +6,12 @@
 If percentages == TRUE percentages are calculated.
 A stacked bar plot is created based on sample read counts.}
 \usage{
-alignmentSummaryPlot(se, perc = T)
+alignmentSummaryPlot(se, sort_value = "None", perc = T)
 }
 \arguments{
 \item{se}{SummerizedExperiment object, containing samples and counts}
+
+\item{sort_value}{String, Sort samples based on a group}
 
 \item{perc}{Boolean, Data in percentages}
 }

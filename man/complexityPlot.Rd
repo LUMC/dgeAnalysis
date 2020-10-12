@@ -6,10 +6,12 @@
 If percentages == TRUE percentages are calculated.
 A dot line plot is created based on the number of reads at rank.}
 \usage{
-complexityPlot(se, perc, rank)
+complexityPlot(se, group_color = "None", perc, rank)
 }
 \arguments{
 \item{se}{SummerizedExperiment object, containing samples and counts}
+
+\item{group_color}{String, Sort samples based on a group}
 
 \item{perc}{Boolean, Data in percentages}
 

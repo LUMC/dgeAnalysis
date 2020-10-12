@@ -4,7 +4,7 @@
 \alias{startApp}
 \title{Start dgeAnalysis application.}
 \usage{
-startApp()
+startApp(launch.browser = TRUE)
 }
 \value{
 Opens application in default web browser

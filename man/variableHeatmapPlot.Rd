@@ -6,10 +6,12 @@
 Variance is calculated and the first x genes are kept.
 Heatmap with the values left in high_var_cpm.}
 \usage{
-variableHeatmapPlot(dge, amount)
+variableHeatmapPlot(dge, group_col, amount)
 }
 \arguments{
 \item{dge}{DGE list object, containing samples and counts}
+
+\item{group_col}{String, Sort samples based on a group}
 
 \item{amount}{Integer, The number of genes shown in plot}
 }
