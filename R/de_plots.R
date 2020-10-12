@@ -47,16 +47,27 @@ alignmentSummaryPlot <- function(se, sort_value="None", perc=T){
       legendgroup = ~feature,
       type = "bar",
       showlegend = if(order==unique(lse$order)[1]) {TRUE} else{FALSE},
-      text = if(perc){~paste(sample, '\n', round(count*100, 2), '%', feature)}
-        else {~paste(sample, '\n', formatC(count, format="f", big.mark=".", digits=0), 'Reads', feature)},
+      text = if(perc){~paste(sample,
+                             '\n', round(count*100, 2),
+                             '%', feature)
+        } else {~paste(sample, '\n', formatC(count,
+                                             format="f",
+                                             big.mark=".",
+                                             digits=0),
+                       'Reads', feature)},
       hoverinfo = 'text') %>%
       group_by(order) %>% 
       plotly::layout(
         barmode = 'stack',
         title = "Count assignments",
-        xaxis = if(perc) {list(title = 'Counts', tickformat = "%")} else {list(title = 'Counts')},
-        yaxis = if(sort_value != "None") {list(title = "", tickmode = "array", tickvals = length(unique(temp$sample))/2-0.5, ticktext = ~order)}
-          else {list(title = "")},
+        xaxis = if(perc) {list(title = 'Counts',
+                               tickformat = "%")
+          } else {list(title = 'Counts')},
+        yaxis = if(sort_value != "None") {list(title = "",
+                                               tickmode = "array",
+                                               tickvals = length(unique(temp$sample))/2-0.5,
+                                               ticktext = ~order)
+          } else {list(title = "")},
         legend = list(tracegroupgap=0)) %>%
       config(
         toImageButtonOptions = list(
@@ -68,7 +79,13 @@ alignmentSummaryPlot <- function(se, sort_value="None", perc=T){
       )
     plot_list[[paste0("plot", order)]] <- p
   }
-  plotly::subplot(plot_list, nrows = length(unique(lse$order)), shareY=T, shareX = T, margin = 0.005)
+  plotly::subplot(
+    plot_list,
+    nrows = length(unique(lse$order)),
+    shareY=T,
+    shareX = T,
+    margin = 0.005
+  )
 }
 
 
@@ -114,11 +131,21 @@ complexityPlot <- function(se, group_color="None", perc, rank) {
         p,
         x = temp$rank,
         y = if (perc){temp$fraction} else {temp$value},
-        showlegend = if(!se[[group_color]][colnames(se) == var] %in% legend_duplic) {TRUE} else{FALSE},
+        showlegend = if(!se[[group_color]][colnames(se) == var] %in% legend_duplic) {TRUE
+          } else{FALSE},
         legendgroup = se[[group_color]][colnames(se) == var],
         color = rep(se[[group_color]][colnames(se) == var], rank),
-        text = if (perc){paste(temp$sample, "\n", temp$rank, "Genes\n", round(temp$fraction*100, 2), '% Reads\n')}
-          else {paste(temp$sample, "\n", temp$rank, "Genes\n", formatC(temp$value, format="f", big.mark=".", digits=0), 'Reads\n')},
+        text = if (perc){paste(temp$sample,
+                               "\n", temp$rank, "Genes\n",
+                               round(temp$fraction*100, 2),
+                               '% Reads\n')
+          } else {paste(temp$sample,
+                        "\n", temp$rank, "Genes\n",
+                        formatC(temp$value,
+                                format="f",
+                                big.mark=".",
+                                digits=0),
+                        'Reads\n')},
         hoverinfo = 'text')
       legend_duplic <- c(legend_duplic, se[[group_color]][colnames(se) == var])
     } else {
@@ -127,8 +154,17 @@ complexityPlot <- function(se, group_color="None", perc, rank) {
         x = temp$rank,
         y = if (perc){temp$fraction} else {temp$value},
         color = var,
-        text = if (perc){paste(temp$sample, "\n", temp$rank, "Genes\n", round(temp$fraction*100, 2), '% Reads\n')}
-          else {paste(temp$sample, "\n", temp$rank, "Genes\n", formatC(temp$value, format="f", big.mark=".", digits=0), 'Reads\n')},
+        text = if (perc){paste(temp$sample,
+                               "\n", temp$rank, "Genes\n",
+                               round(temp$fraction*100, 2),
+                               '% Reads\n')
+          } else {paste(temp$sample,
+                        "\n", temp$rank, "Genes\n",
+                        formatC(temp$value,
+                                format="f",
+                                big.mark=".",
+                                digits=0),
+                        'Reads\n')},
         hoverinfo = 'text')
     }
   }
@@ -563,7 +599,9 @@ variableHeatmapPlot <- function(dge, group_col, amount){
     ) %>%
     plotly::layout(
       title = "Most variable genes",
-      xaxis = list(title = '', categoryorder = "array", categoryarray = ~col),
+      xaxis = list(title = '',
+                   categoryorder = "array",
+                   categoryarray = ~col),
       yaxis = list(
         title = '',
         categoryorder = "array",
@@ -621,7 +659,9 @@ topDgeHeatmapPlot <- function(deTab, dge, group_col, amount){
     ) %>%
     plotly::layout(
       title = "Most expressed genes",
-      xaxis = list(title = '', categoryorder = "array", categoryarray = ~col),
+      xaxis = list(title = '',
+                   categoryorder = "array",
+                   categoryarray = ~col),
       yaxis = list(
         title = '',
         categoryorder = "array",
