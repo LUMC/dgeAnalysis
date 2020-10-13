@@ -1,6 +1,6 @@
 # dgeAnalysis
 
-This R package contains the R-Shiny application developed to perform differential gene expression analysis.
+This R package contains the R-Shiny application v1.3.1 developed to perform differential gene expression analysis.
 * dgeAnalysis manual: https://github.com/LUMC/dgeAnalysis/blob/master/MANUAL.pdf
 
 ## Installing
@@ -53,7 +53,12 @@ sudo apt-get update && apt-get install \
 ````
 
 Windows RTools:\
-   https://cran.r-project.org/bin/windows/Rtools/Rtools35.exe
+R 3.6.x:\
+&nbsp; https://cran.r-project.org/bin/windows/Rtools/Rtools35.exe \
+R 4.0 and up:\
+&nbsp; https://cran.r-project.org/bin/windows/Rtools/rtools40-i686.exe \
+&nbsp; https://cran.r-project.org/bin/windows/Rtools/rtools40-x86_64.exe
+
 
 ## Fix install problems
 If there are problems installing the application, it might be worth to try installing specific packages manually:
