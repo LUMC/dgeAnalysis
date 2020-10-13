@@ -3,7 +3,7 @@
 output[["var_heat"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    variableHeatmapPlot(inUse_normDge, input$slider_heatmap_var)
+    variableHeatmapPlot(inUse_normDge, input$group_var, input$slider_heatmap_var)
   }, error = function(err) {
     return(NULL)
   })
@@ -18,11 +18,14 @@ output[["heatmap_var_ngenes"]] <- renderUI({
   })
 })
 
-## Sort samples
-output[["heatmap_var_sort"]] <- renderUI({
+## Select a group to sort var heatmap
+output[["group_var"]] <- renderUI({
   tryCatch({
-    selectInput("sort_heatmap_var", "Sort samples by:",
-                colnames(data_samples())
+    checkReload()
+    selectInput(
+      "group_var",
+      "Group by:",
+      c("None"="None", colnames(data_samples()))
     )
   }, error = function(err) {
     return(NULL)
@@ -34,7 +37,21 @@ output[["dge_heat"]] <- renderPlotly({
   tryCatch({
     checkReload()
     if (is.null(inUse_deTab)){return(NULL)}
-    topDgeHeatmapPlot(inUse_deTab, inUse_normDge, input$slider_heatmap_dge)
+    topDgeHeatmapPlot(inUse_deTab, inUse_normDge, input$group_dge, input$slider_heatmap_dge)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Select a group to sort dge heatmap
+output[["group_dge"]] <- renderUI({
+  tryCatch({
+    checkReload()
+    selectInput(
+      "group_dge",
+      "Group by:",
+      c("None"="None", colnames(data_samples()))
+    )
   }, error = function(err) {
     return(NULL)
   })

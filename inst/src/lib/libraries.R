@@ -17,6 +17,7 @@ if (!require("tidyr")) install.packages("tidyr")
 if (!require("scales")) install.packages("scales")
 if (!require("broom")) install.packages("broom")
 if (!require("plotly")) install.packages("plotly")
+if (!require("rmarkdown")) install.packages("rmarkdown")
 
 ## Pathway analysis
 if (!require("clusterProfiler")) BiocManager::install("clusterProfiler")
@@ -27,3 +28,6 @@ if (!require("igraph")) install.packages("igraph")
 if (!require("org.Hs.eg.db")) BiocManager::install("org.Hs.eg.db")
 if (!require("org.Mm.eg.db")) BiocManager::install("org.Mm.eg.db")
 if (!require("reshape2")) install.packages("reshape2")
+
+## WGCNA
+if (!require("WGCNA")) install.packages("WGCNA")

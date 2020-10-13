@@ -1,6 +1,10 @@
+#' Start dgeAnalysis application.
+#'
+#' @return Opens application in default web browser
+#' 
 #' @export
 
-startApp <- function() {
+startApp <- function(launch.browser=TRUE) {
   appDir <- system.file("src", package = "dgeAnalysis")
   
   if (appDir == "") {
@@ -16,5 +20,5 @@ startApp <- function() {
   suppressWarnings(rm(list=c("deTab", "normDge", "inUse_deTab", "inUse_normDge"), envir=.GlobalEnv))
   suppressMessages(source(system.file("src/lib/libraries.R", package = "dgeAnalysis")))
   
-  shiny::runApp(appDir, host="0.0.0.0", port=1402, launch.browser=TRUE)
+  shiny::runApp(appDir, host="0.0.0.0", port=1402, launch.browser=launch.browser)
 }

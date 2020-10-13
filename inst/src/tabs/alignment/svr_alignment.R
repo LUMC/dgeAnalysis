@@ -1,9 +1,22 @@
 
-## get se_counts from table
-get_secounts <- reactive({
-  se_counts <- readCountsFromTable(data_counts(),
-                                   data_samples())
-  se_counts
+## Create se from samples and counts
+get_se <- reactive({
+  se <- readCountsFromTable(data_counts(), data_samples())
+  se <- addSamplesFromTableToSE(se, data_samples())
+})
+
+## Select a group to sort summary plot
+output[["group_sum"]] <- renderUI({
+  tryCatch({
+    checkReload()
+    selectInput(
+      "group_sum",
+      "Group by:",
+      c("None"="None", colnames(data_samples()))
+    )
+  }, error = function(err) {
+    return(NULL)
+  })
 })
 
 ## Create alignment summary plot
@@ -15,7 +28,21 @@ output[["align_sum"]] <- renderPlotly({
     } else {
       perc = T
     }
-    alignmentSummaryPlot(get_secounts(), perc)
+    alignmentSummaryPlot(get_se(), input$group_sum, perc)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Select a group to color complexity plot
+output[["group_color"]] <- renderUI({
+  tryCatch({
+    checkReload()
+    selectInput(
+      "group_color",
+      "Group by:",
+      c("None"="None", colnames(data_samples()))
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -30,7 +57,7 @@ output[["complex"]] <- renderPlotly({
     } else {
       perc = T
     }
-    complexityPlot(get_secounts(), perc, input$comp_rank)
+    complexityPlot(get_se(), input$group_color, perc, input$comp_rank)
   }, error = function(err) {
     return(NULL)
   })

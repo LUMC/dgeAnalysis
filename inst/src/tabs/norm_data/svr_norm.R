@@ -42,6 +42,7 @@ output[["norm_voom_plot"]] <- renderPlotly({
 ## Show amount of genes ledt after filtering
 output[["norm_voom_ngenes"]] <- renderUI({
   tryCatch({
+    checkReload()
     h2("After filtering:", br(), nrow(normDge$counts), "Genes")
   }, error = function(err) {
     return(NULL)
@@ -85,7 +86,7 @@ output[["selected_norm_mds2d"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
     s <- event_data(event = "plotly_selected", source = "norm_mds2d")
-    DT::datatable(data_samples()[unlist(s$key),], options = list(pageLength = 15, scrollX = TRUE))
+    DT::datatable(data_samples()[unlist(s$key),, drop = FALSE], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(NULL)
   })

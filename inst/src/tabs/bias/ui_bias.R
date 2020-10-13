@@ -47,6 +47,25 @@ tab_bias <- tabItem(
       HTML('<hr style="border-color: #0088cc;">'),
       DT::dataTableOutput("selected_biaslength") %>% withSpinner(),
       HTML('<hr style="border-color: #0088cc;">')
+    ),
+    
+    tabPanel(
+      title = "Gene strand",
+      HTML('<hr style="border-color: #0088cc;">'),
+      sidebarLayout(
+        position = "right",
+        sidebarPanel(
+          width = 3,
+          br(),
+          uiOutput("geneStrand_info"),
+          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
+        ), 
+        mainPanel(
+          width = 9,
+          plotlyOutput("geneStrand_bias", height = "600px") %>% withSpinner()
+        )
+      ),
+      HTML('<hr style="border-color: #0088cc;">')
     )
   )
 )

@@ -11,9 +11,9 @@ get_go <- reactive({
     checkReload()
     
     organism <- get_organismID(inUse_deTab)
-    org <- list(ENS="org.Hs.eg.db",
-                ENSMUS="org.Mm.eg.db",
-                ENSRNO="org.Rn.eg.db")
+    org <- list(ENS=org.Hs.eg.db,
+                ENSMUS=org.Mm.eg.db)
+    #ENSRNO=org.Rn.eg.db)
     organism <- org[[organism]]
     
     if (input$choose_go == "enrich") {

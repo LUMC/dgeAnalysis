@@ -91,7 +91,7 @@ output[["selected_raw_mds2d"]] <- DT::renderDataTable({
     checkReload()
     s <- event_data(event = "plotly_selected", source = "raw_mds2d")
     if(is.null(s)){s <- ""}
-    DT::datatable(data_samples()[unlist(s$key),], options = list(pageLength = 15, scrollX = TRUE))
+    DT::datatable(data_samples()[unlist(s$key),, drop = FALSE], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c("No data available")), rownames = FALSE, colnames = ""))
   })

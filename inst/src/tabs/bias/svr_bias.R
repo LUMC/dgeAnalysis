@@ -65,6 +65,16 @@ output[["selectLength"]] <- renderUI({
   })
 })
 
+## feature length bias plot
+output[["geneStrand_bias"]] <- renderPlotly({
+  tryCatch({
+    checkReload()
+    geneStrandBar(inUse_deTab)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
 ## INFORMATION BOXES
 
 output[["gc_bias_info"]] <- renderUI({
@@ -82,5 +92,12 @@ output[["len_bias_info"]] <- renderUI({
         present, a column can be selected with the use of a drop-down button. The columns should
         contain the text: 'length', otherwise they will not be recognized as a column suitable
         for length bias calculations."
+  informationBox(infoText)
+})
+
+output[["geneStrand_info"]] <- renderUI({
+  infoText <- "The gene strand bias plots are generated based on strand info (+ or -) and the number of
+        genes (DE or not). It shows the distribution of genes between strands. The gene strand plot can only 
+        be generated when using an annotation file containing strand information about genes."
   informationBox(infoText)
 })

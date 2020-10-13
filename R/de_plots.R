@@ -2,134 +2,171 @@
 ## ----- ALIGNMENT PLOTS -----
 
 
-## alignmentSummaryPlot()
-##  Calculates Log values in the function alignmentSummary()
-##  If percentages == TRUE percentages are calculated
-##  A stacked bar plot is created based on sample read counts
-## Parameters:
-##  se = SummerizedExperiment object, containing samples and counts
-##  perc = Boolean, Data in percentages (default=TRUE)
-## Returns:
-##  p = Plotly object
+#' Calculates Log values in the function alignmentSummary().
+#' If percentages == TRUE percentages are calculated.
+#' A stacked bar plot is created based on sample read counts.
+#'
+#' @param se SummerizedExperiment object, containing samples and counts
+#' @param sort_value String, Sort samples based on a group
+#' @param perc Boolean, Data in percentages
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
-alignmentSummaryPlot <- function(se, perc=T){
+alignmentSummaryPlot <- function(se, sort_value="None", perc=T){
   lse <- alignmentSummary(se)
   lse$feature <- gsub("_", " ", gsub("__", "", lse$feature))
+  if (sort_value != "None") {
+    for (sample in lse$sample) {
+      lse$order[lse$sample == sample] <- se[[sort_value]][colnames(se) == sample]
+    }
+    lse <- lse[order(lse$order, lse$sample, method="radix"),]
+    lse$sample <- factor(lse$sample, levels = unique(lse$sample))
+  } else {
+    lse$order <- "Sample"
+  }
   
   if (perc) {
     for (var in unique(lse$sample)) {
       temp <- lse[lse$sample == var, ]
       lse$count[lse$sample == var] <- temp$count/(sum(temp$count))
     }
-    
-    p <- plot_ly(
-      data = lse,
-      x = ~count,
-      y = ~sample,
-      orientation = 'h',
-      color = ~feature,
-      type = "bar",
-      text = ~paste(feature, round(count*100, 2), '%\n'),
-      hoverinfo = 'text') %>% 
-      plotly::layout(
-        title = "Count assignments %",
-        xaxis = list(title = 'Counts', tickformat = "%"),
-        yaxis = list(title = ''),
-        barmode = 'stack') %>%
-      config(
-        toImageButtonOptions = list(
-          format = "png",
-          filename = "alignment_perc",
-          width = 1500,
-          height = 1000
-        )
-      )
-  } else {
-    p <- plot_ly(
-      data = lse,
-      x = ~count,
-      y = ~sample,
-      orientation = 'h',
-      color = ~feature,
-      type = "bar",
-      text = ~paste(feature, formatC(count, format="f", big.mark=".", digits=0), 'Reads\n'),
-      hoverinfo = 'text') %>% 
-      plotly::layout(
-        title = "Count assignments",
-        xaxis = list(title = 'Counts'),
-        yaxis = list(title = ''),
-        barmode = 'stack') %>%
-      config(
-        toImageButtonOptions = list(
-          format = "png",
-          filename = "alignment",
-          width = 1500,
-          height = 1000
-        )
-      )
   }
-  p
+  
+  plot_list <- c()
+  for (order in unique(lse$order)) {
+    temp <- lse[lse$order == order,]
+    p <- plot_ly(
+      data = temp,
+      x = ~count,
+      y = ~sample,
+      color = ~feature,
+      orientation = 'h',
+      alignmentgroup = ~order,
+      legendgroup = ~feature,
+      type = "bar",
+      showlegend = if(order==unique(lse$order)[1]) {TRUE} else{FALSE},
+      text = if(perc){~paste(sample,
+                             '\n', round(count*100, 2),
+                             '%', feature)
+        } else {~paste(sample, '\n', formatC(count,
+                                             format="f",
+                                             big.mark=".",
+                                             digits=0),
+                       'Reads', feature)},
+      hoverinfo = 'text') %>%
+      group_by(order) %>% 
+      plotly::layout(
+        barmode = 'stack',
+        title = "Count assignments",
+        xaxis = if(perc) {list(title = 'Counts',
+                               tickformat = "%")
+          } else {list(title = 'Counts')},
+        yaxis = if(sort_value != "None") {list(title = "",
+                                               tickmode = "array",
+                                               tickvals = length(unique(temp$sample))/2-0.5,
+                                               ticktext = ~paste(order, " "))
+          } else {list(title = "")},
+        legend = list(tracegroupgap=0)) %>%
+      config(
+        toImageButtonOptions = list(
+          format = "png",
+          filename = "countdistline",
+          width = 1500,
+          height = 1000
+        )
+      )
+    plot_list[[paste0("plot", order)]] <- p
+  }
+  plotly::subplot(
+    plot_list,
+    nrows = length(unique(lse$order)),
+    shareY=T,
+    shareX = T,
+    margin = 0.005
+  )
 }
 
 
-## complexityPlot()
-##  Calculates count data per rank in the function complexityData()
-##  If percentages == TRUE percentages are calculated
-##  A dot line plot is created based on the number of reads at rank
-## Parameters:
-##  se = SummerizedExperiment object, containing samples and counts
-##  perc = Boolean, Data in percentages (default=TRUE)
-##  rank = The number of genes/rank (min=10)
-## Returns:
-##  p = Plotly object
+#' Calculates count data per rank in the function complexityData().
+#' If percentages == TRUE percentages are calculated.
+#' A dot line plot is created based on the number of reads at rank.
+#'
+#' @param se SummerizedExperiment object, containing samples and counts
+#' @param group_color String, Sort samples based on a group
+#' @param perc Boolean, Data in percentages
+#' @param rank Integer, The number of genes/rank (min=10)
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
-complexityPlot <- function(se, perc, rank) {
+complexityPlot <- function(se, group_color="None", perc, rank) {
   compData <- complexityData(se, rank)
   
-  if (perc){
-    p <- plot_ly(
-      data = compData,
-      x = ~rank,
-      y = ~fraction,
-      color = ~sample,
-      type = "scattergl",
-      mode = "lines+markers",
-      text = ~paste(rank, "Genes\n", round(fraction*100, 2), '% Reads\n'),
-      hoverinfo = 'text') %>%
-      plotly::layout(
-        title = "Gene complexity %",
-        xaxis = list(title = 'Rank', type="log"),
-        yaxis = list(tickformat = "%", title = 'Cumulative fraction of total reads till rank')) %>%
-      config(
-        toImageButtonOptions = list(
-          format = "png",
-          filename = "complexity_perc",
-          width = 1500,
-          height = 1000
-        )
+  p <- plot_ly(
+    type = 'scattergl',
+    mode = "lines+markers") %>%
+    plotly::layout(
+      title = "Gene complexity %",
+      xaxis = list(title = 'Rank', type="log"),
+      yaxis = if (perc){list(tickformat = "%", title = 'Cumulative fraction of total reads till rank')}
+      else {list(title = 'Cumulative reads till rank')},
+      legend = list(tracegroupgap=0)) %>%
+    config(
+      toImageButtonOptions = list(
+        format = "png",
+        filename = "countdistline",
+        width = 1500,
+        height = 1000
       )
-  } else {
-    p <- plot_ly(
-      data = compData,
-      x = ~rank,
-      y = ~value,
-      color = ~sample,
-      type = "scattergl",
-      mode = "lines+markers",
-      text = ~paste(rank, "Genes\n", formatC(value, format="f", big.mark=".", digits=0), 'Reads\n'),
-      hoverinfo = 'text') %>%
-      plotly::layout(
-        title = "Gene complexity",
-        xaxis = list(title = 'Rank', type="log"),
-        yaxis = list(title = 'Cumulative reads till rank')) %>%
-      config(
-        toImageButtonOptions = list(
-          format = "png",
-          filename = "complexity",
-          width = 1500,
-          height = 1000
-        )
-      )
+    )
+  
+  legend_duplic <- c()
+  for (var in colnames(se)) {
+    temp <- compData[compData$sample == var, ]
+    if (group_color != "None") {
+      p <- add_trace(
+        p,
+        x = temp$rank,
+        y = if (perc){temp$fraction} else {temp$value},
+        showlegend = if(!se[[group_color]][colnames(se) == var] %in% legend_duplic) {TRUE
+          } else{FALSE},
+        legendgroup = se[[group_color]][colnames(se) == var],
+        color = rep(se[[group_color]][colnames(se) == var], rank),
+        text = if (perc){paste(temp$sample,
+                               "\n", temp$rank, "Genes\n",
+                               round(temp$fraction*100, 2),
+                               '% Reads\n')
+          } else {paste(temp$sample,
+                        "\n", temp$rank, "Genes\n",
+                        formatC(temp$value,
+                                format="f",
+                                big.mark=".",
+                                digits=0),
+                        'Reads\n')},
+        hoverinfo = 'text')
+      legend_duplic <- c(legend_duplic, se[[group_color]][colnames(se) == var])
+    } else {
+      p <- add_trace(
+        p,
+        x = temp$rank,
+        y = if (perc){temp$fraction} else {temp$value},
+        color = var,
+        text = if (perc){paste(temp$sample,
+                               "\n", temp$rank, "Genes\n",
+                               round(temp$fraction*100, 2),
+                               '% Reads\n')
+          } else {paste(temp$sample,
+                        "\n", temp$rank, "Genes\n",
+                        formatC(temp$value,
+                                format="f",
+                                big.mark=".",
+                                digits=0),
+                        'Reads\n')},
+        hoverinfo = 'text')
+    }
   }
   p
 }
@@ -139,13 +176,15 @@ complexityPlot <- function(se, perc, rank) {
 ## ----- RAW DATA PLOTS / NORMALIZATION PLOTS -----
 
 
-## countDistributionLinePlot()
-##  Stacks count data from dge list in the function stackDge()
-##  A line plot is created based on Log2CPM and the density of the counts
-## Parameters:
-##  dge = DGE list object, containing samples and counts
-## Returns:
-##  p = Plotly object
+#' Stacks count data from dge list in the function stackDge().
+#' A line plot is created based on Log2CPM and the density of the counts.
+#' A dot line plot is created based on the number of reads at rank.
+#'
+#' @param dge DGE list object, containing samples and counts
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
 countDistributionLinePlot <- function(dge){
   stackCounts <- data.frame(stackDge(dge))
@@ -183,13 +222,14 @@ countDistributionLinePlot <- function(dge){
 }
 
 
-## countDistributionBoxPlot()
-##  Stacks count data from dge list in the function stackDge()
-##  A box plot is created based on Log2CPM counts of the samples
-## Parameters:
-##  dge = DGE list object, containing samples and counts
-## Returns:
-##  p = Plotly object
+#' Stacks count data from dge list in the function stackDge().
+#' A box plot is created based on Log2CPM counts of the samples.
+#'
+#' @param dge DGE list object, containing samples and counts
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
 countDistributionBoxPlot <- function(dge){
   stackCounts <- data.frame(stackDge(dge))
@@ -221,14 +261,15 @@ countDistributionBoxPlot <- function(dge){
 }
 
 
-## voomPlot()
-##  Calculates required values with 'voom' method
-##  The plot is created with plotly with values retrieved from the voom object
-## Parameters:
-##  dge = DGE list object, containing samples and counts
-##  sourceId = plot ID, depends on raw/normalized counts
-## Returns:
-##  p = Plotly object
+#' Calculates required values with 'voom' method.
+#' The plot is created with plotly with values retrieved from the voom object.
+#'
+#' @param dge DGE list object, containing samples and counts
+#' @param sourceId plot ID, depends on raw/normalized counts
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
 voomPlot <- function(dge, sourceId){
   v <- voom(2^(dge$counts), save.plot = TRUE)
@@ -269,16 +310,17 @@ voomPlot <- function(dge, sourceId){
 }
 
 
-## multidimensionalScaling2dPlot()
-##  Calculates required values with 'plotMDS' method
-##  The plot is created with plotly with values retrieved from the mds object
-##  Plot is colored based on the selected column
-## Parameters:
-##  dge = DGE list object, containing samples and counts
-##  color = String, Column on wich colors should be based
-##  sourceId = plot ID, depends on raw/normalized counts
-## Returns:
-##  p = Plotly object
+#' Calculates required values with 'plotMDS' method.
+#' The plot is created with plotly with values retrieved from the mds object.
+#' Plot is colored based on the selected column.
+#'
+#' @param dge DGE list object, containing samples and counts
+#' @param color String, Column on wich colors should be based
+#' @param sourceId plot ID, depends on raw/normalized counts
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
 multidimensionalScaling2dPlot <- function(dge, color, sourceId){
   logFC <- plotMDS(dge$counts, ndim = ncol(dge)-1)
@@ -317,15 +359,16 @@ multidimensionalScaling2dPlot <- function(dge, color, sourceId){
 }
 
 
-## multidimensionalScaling3dPlot()
-##  Calculates required values with 'plotMDS' method
-##  The plot is created with plotly with values retrieved from the mds object
-##  Plot is colored based on the selected column
-## Parameters:
-##  dge = DGE list object, containing samples and counts
-##  color = String, Column on wich colors should be based
-## Returns:
-##  p = Plotly object
+#' Calculates required values with 'plotMDS' method.
+#' The plot is created with plotly with values retrieved from the mds object.
+#' Plot is colored based on the selected column.
+#'
+#' @param dge DGE list object, containing samples and counts
+#' @param color String, Column on wich colors should be based
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
 multidimensionalScaling3dPlot <- function(dge, color){
   logFC <- plotMDS(dge$counts, ndim = ncol(dge)-1)
@@ -364,15 +407,16 @@ multidimensionalScaling3dPlot <- function(dge, color){
 ## ----- PCA PLOTS -----
 
 
-## variancePcaPlot()
-##  Columns and rows from DGE list are turned
-##  PCA is calculated with prcomp
-##  PC percentages are calulated
-##  Barplot is created with PC percentages
-## Parameters:
-##  dge = DGE list object, containing samples and counts
-## Returns:
-##  p = Plotly object
+#' Columns and rows from DGE list are turned.
+#' PCA is calculated with prcomp.
+#' PC percentages are calculated.
+#' Barplot is created with PC percentages.
+#'
+#' @param dge DGE list object, containing samples and counts
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
 variancePcaPlot <- function(dge){
   tdge <- t(dge$counts)
@@ -402,18 +446,19 @@ variancePcaPlot <- function(dge){
 }
 
 
-## samplePca2dPlot()
-##  Columns and rows from DGE list are turned
-##  PCA is calculated with prcomp
-##  PC percentages are calulated
-##  Scatter plot is created based on selected PCs
-## Parameters:
-##  dge = DGE list object, containing samples and counts
-##  color = String, Column on wich colors should be based
-##  getPC1 = String, Selected PC to be plotted on x-axis
-##  getPC2 = String, Selected PC to be plotted on y-axis
-## Returns:
-##  p = Plotly object
+#' Columns and rows from DGE list are turned.
+#' PCA is calculated with prcomp.
+#' PC percentages are calculated.
+#' Scatter plot is created based on selected PCs.
+#'
+#' @param dge DGE list object, containing samples and counts
+#' @param color String, Column on wich colors should be based
+#' @param getPC1 String, Selected PC to be plotted on x-axis
+#' @param getPC2 String, Selected PC to be plotted on y-axis
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
 samplePca2dPlot <- function(dge, color, getPC1, getPC2){
   tdge <- t(dge$counts)
@@ -457,19 +502,20 @@ samplePca2dPlot <- function(dge, color, getPC1, getPC2){
 }
 
 
-## samplePca3dPlot()
-##  Columns and rows from DGE list are turned
-##  PCA is calculated with prcomp
-##  PC percentages are calulated
-##  Scatter plot is created based on selected PCs
-## Parameters:
-##  dge = DGE list object, containing samples and counts
-##  color = String, Column on wich colors should be based
-##  getPC1 = String, Selected PC to be plotted on x-axis
-##  getPC2 = String, Selected PC to be plotted on y-axis
-##  getPC3 = String, Selected PC to be plotted on z-axis
-## Returns:
-##  p = Plotly object
+#' Columns and rows from DGE list are turned.
+#' PCA is calculated with prcomp.
+#' PC percentages are calculated.
+#' Scatter plot is created based on selected PCs.
+#'
+#' @param dge DGE list object, containing samples and counts
+#' @param color String, Column on wich colors should be based
+#' @param getPC1 String, Selected PC to be plotted on x-axis
+#' @param getPC2 String, Selected PC to be plotted on y-axis
+#' @param getPC3 String, Selected PC to be plotted on z-axis
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
 samplePca3dPlot <- function(dge, color, getPC1, getPC2, getPC3){
   tdge <- t(dge$counts)
@@ -513,22 +559,31 @@ samplePca3dPlot <- function(dge, color, getPC1, getPC2, getPC3){
 ## ----- HEATMAPS PLOTS -----
 
 
-## variableHeatmapPlot()
-##  LogCPM values of counts are calculated
-##  Variance is calculated and the first x genes are kept
-##  Heatmap with the values left in high_var_cpm
-## Parameters:
-##  dge = DGE list object, containing samples and counts
-##  amount = Integer, The number of genes shown in plot
-## Returns:
-##  p = Plotly object
+#' LogCPM values of counts are calculated.
+#' Variance is calculated and the first x genes are kept.
+#' Heatmap with the values left in high_var_cpm.
+#'
+#' @param dge DGE list object, containing samples and counts
+#' @param group_col String, Sort samples based on a group
+#' @param amount Integer, The number of genes shown in plot
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
-variableHeatmapPlot <- function(dge, amount){
+variableHeatmapPlot <- function(dge, group_col, amount){
   lcpm <- dge$counts
   var_genes <- apply(lcpm, 1, var)
   select_var <- names(sort(var_genes, decreasing=TRUE))[1:amount]
   high_var_cpm <- lcpm[select_var,]
   high_var_cpm <- as.data.frame(stack(high_var_cpm))
+  
+  if (group_col != "None") {
+    order <- as.data.frame(as.character(dge$samples[[group_col]]), rownames(dge$samples))
+    colnames(order) <- "group"
+    order <- order[order(order$group),, drop=F]
+    high_var_cpm <- high_var_cpm[order(match(high_var_cpm$col,rownames(order))),]
+  }
   
   p <- plot_ly(
     data = high_var_cpm,
@@ -544,7 +599,9 @@ variableHeatmapPlot <- function(dge, amount){
     ) %>%
     plotly::layout(
       title = "Most variable genes",
-      xaxis = list(title = ''),
+      xaxis = list(title = '',
+                   categoryorder = "array",
+                   categoryarray = ~col),
       yaxis = list(
         title = '',
         categoryorder = "array",
@@ -560,25 +617,33 @@ variableHeatmapPlot <- function(dge, amount){
   p
 }
 
+#' The DE table is sorted on FDR/adjPvalue.
+#' The first x genes are kept.
+#' Normalized values are extracted based on the DE genes still present.
+#' Heatmap with the normalized values of genes is created.
+#'
+#' @param deTab Dataframe, with all analysis results
+#' @param dge DGE list object, containing samples and counts
+#' @param group_col String, Sort samples based on a group
+#' @param amount Integer, The number of genes shown in plot
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
-## topDgeHeatmapPlot()
-##  The DE table is sorted on FDR/adjPvalue
-##  The first x genes are kept
-##  Normalized values are extracted based on the DE genes still present
-##  Heatmap with the normalized values of genes is created
-## Parameters:
-##  deTab = Dataframe, with all analysis results
-##  dge = DGE list object, containing samples and counts
-##  amount = Integer, The number of genes shown in plot
-## Returns:
-##  p = Plotly object
-
-topDgeHeatmapPlot <- function(deTab, dge, amount){
-  sortdeTab <- deTab[order(rank(deTab$adj.P.Val)),]
-  sortdeTab <- head(sortdeTab, 50)
+topDgeHeatmapPlot <- function(deTab, dge, group_col, amount){
+  sortdeTab <- deTab[order(rank(deTab$FDR)),]
+  sortdeTab <- head(sortdeTab, amount)
   getnorm <- dge[rownames(sortdeTab),]
   getnorm <- getnorm$counts
   getnorm <- as.data.frame(stack(getnorm))
+  
+  if (group_col != "None") {
+    order <- as.data.frame(as.character(dge$samples[[group_col]]), rownames(dge$samples))
+    colnames(order) <- "group"
+    order <- order[order(order$group),, drop=F]
+    getnorm <- getnorm[order(match(getnorm$col,rownames(order))),]
+  }
   
   p <- plot_ly(
     data = getnorm,
@@ -594,7 +659,9 @@ topDgeHeatmapPlot <- function(deTab, dge, amount){
     ) %>%
     plotly::layout(
       title = "Most expressed genes",
-      xaxis = list(title = ''),
+      xaxis = list(title = '',
+                   categoryorder = "array",
+                   categoryarray = ~col),
       yaxis = list(
         title = '',
         categoryorder = "array",
@@ -615,22 +682,21 @@ topDgeHeatmapPlot <- function(deTab, dge, amount){
 ## ----- ANALYSIS PLOTS -----
 
 
-## deRatioPlot()
-##  The number of unique values in column 'DE' are extracted
-##  Percentages of these values are calculated and renamed
-##  Barplot is created with DE results based on percentages
-## Parameters:
-##  deTab = Dataframe, with all analysis results
-## Returns:
-##  p = Plotly object
+#' The number of unique values in column 'DE' are extracted.
+#' Percentages of these values are calculated and renamed.
+#' Barplot is created with DE results based on percentages.
+#'
+#' @param deTab Dataframe, with all analysis results
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
 deRatioPlot <- function(deTab){
   defeatures <- aggregate(deTab$DE, by=list(category=deTab$DE), FUN=length)
   defeatures$perc <- defeatures[,2]/sum(defeatures[,2])
   
-  defeatures$category[which(defeatures$category == 0)] <- "Not sign"
-  defeatures$category[which(defeatures$category == -1)] <- "Down"
-  defeatures$category[which(defeatures$category == 1)] <- "Up"
+  defeatures$category <- c("Down regulated","Not sign.","Up regulated")[match(defeatures$category, c(-1,0,1))]
   
   p <- plot_ly(
     data = defeatures,
@@ -640,8 +706,8 @@ deRatioPlot <- function(deTab){
     type = "bar",
     text = paste(defeatures[,2], "Genes\n", round(defeatures$perc*100, 2), "%"),
     textposition = "auto",
-    textfont= list(color="black"),
-    hovertext = ~paste(category, "expressed"),
+    textfont = list(color="black"),
+    hovertext = ~category,
     hoverinfo = 'text') %>%
     plotly::layout(
       title = "Differential expression ratio",
@@ -659,14 +725,15 @@ deRatioPlot <- function(deTab){
 }
 
 
-## ma_plot()
-##  The confidence prediction calculated in the function gamConfidenceFit()
-##  Confidence is calculated based on avgLog2CPM
-##  Scatterplot is created with DE results and a line showing confidence
-## Parameters:
-##  deTab = Dataframe, with all analysis results
-## Returns:
-##  p = Plotly object
+#' The confidence prediction calculated in the function gamConfidenceFit().
+#' Confidence is calculated based on avgLog2CPM.
+#' Scatterplot is created with DE results and a line showing confidence.
+#'
+#' @param deTab Dataframe, with all analysis results
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
 ma_plot <- function(deTab){
   prediction <- gamConfidenceFit(deTab, "avgLog2CPM")
@@ -695,7 +762,7 @@ ma_plot <- function(deTab){
       data = prediction,
       mode = "lines",
       x = ~avgLog2CPM,
-      y = ~.fitted,
+      y = ~fit,
       text = NA,
       key = NA,
       color = "Fitted",
@@ -703,8 +770,8 @@ ma_plot <- function(deTab){
       name = "Fitted") %>%
     add_ribbons(
       data = prediction,
-      ymin = ~.fitted - 1.96 * .se.fit,
-      ymax = ~.fitted + 1.96 * .se.fit,
+      ymin = ~fit - 1.96 * se.fit,
+      ymax = ~fit + 1.96 * se.fit,
       fillcolor = "rgba(7, 164, 181, 0.25)",
       text = NA,
       key = NA,
@@ -729,21 +796,22 @@ ma_plot <- function(deTab){
 }
 
 
-## volcanoPlot()
-##  Creates scatter plot with avgLog2FC vs -log10(adj.P.Val)
-##  Two lines are generated indicating LogFC cutoff and p value cutoff
-## Parameters:
-##  deTab = Dataframe, with all analysis results
-##  LogCut = Integer, LogFC cutoff for line
-##  PCut = Intege, Pvalue cutoff for line
-## Returns:
-##  p = Plotly object
+#' Creates scatter plot with avgLog2FC vs -log10(FDR).
+#' Two lines are generated indicating LogFC cutoff and p value cutoff.
+#'
+#' @param deTab Dataframe, with all analysis results
+#' @param LogCut Integer, LogFC cutoff for line
+#' @param PCut Integer, Pvalue cutoff for line
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
 volcanoPlot <- function(deTab, LogCut, PCut){
   p <- plot_ly(
     data = deTab[deTab$DE == 0,],
     x = ~avgLog2FC,
-    y = ~-log10(adj.P.Val),
+    y = ~-log10(FDR),
     type = "scattergl",
     mode = "markers",
     color = ~as.character(DE),
@@ -754,7 +822,7 @@ volcanoPlot <- function(deTab, LogCut, PCut){
     source = "analysis_volcano") %>%
     add_trace(
       x = ~deTab[deTab$DE != 0,]$avgLog2FC,
-      y = ~-log10(deTab[deTab$DE != 0,]$adj.P.Val),
+      y = ~-log10(deTab[deTab$DE != 0,]$FDR),
       color = as.character(deTab[deTab$DE != 0,]$DE),
       alpha = 0.75,
       text = rownames(deTab[deTab$DE != 0,]),
@@ -791,23 +859,24 @@ volcanoPlot <- function(deTab, LogCut, PCut){
 }
 
 
-## barcodePlot()
-##  The DE table is sorted on FDR/adjPvalue
-##  The first x genes are kept
-##  Normalized values are extracted based on the DE genes still present
-##  normalized values are stacked
-##  Scatter plot is created with LogCPM values per gene per sample
-## Parameters:
-##  deTab = Dataframe, with all analysis results
-##  dge = DGE list object, containing samples and counts
-##  color = String, Column on wich colors should be based
-##  amount = Integer, The number of genes shown in plot
-##  selected = Vector, Extra selected rownames
-## Returns:
-##  p = Plotly object
+#' The DE table is sorted on FDR/adjPvalue.
+#' The first x genes are kept.
+#' Normalized values are extracted based on the DE genes still present.
+#' Normalized values are stacked.
+#' Scatter plot is created with LogCPM values per gene per sample.
+#'
+#' @param deTab Dataframe, with all analysis results
+#' @param dge DGE list object, containing samples and counts
+#' @param color String, Column on wich colors should be based
+#' @param amount Integer, The number of genes shown in plot
+#' @param selected Vector, Extra selected rownames
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
 barcodePlot <- function(deTab, dge, color, amount, selected) {
-  sortdeTab <- deTab[order(rank(deTab$adj.P.Val)),]
+  sortdeTab <- deTab[order(rank(deTab$FDR)),]
   sortdeTab <- head(sortdeTab, amount)
   getnorm <- dge[c(rownames(sortdeTab), selected),]
   getnorm$counts <- getnorm$counts
@@ -850,14 +919,15 @@ barcodePlot <- function(deTab, dge, color, amount, selected) {
 }
 
 
-## pValuePlot()
-##  The Pvalues are rounded on two decimals
-##  All occurences of pvalues are counted
-##  Bar plot is created with the p value vs occurence
-## Parameters:
-##  deTab = Dataframe, with all analysis results
-## Returns:
-##  p = Plotly object
+#' The Pvalues are rounded on two decimals.
+#' All occurences of pvalues are counted.
+#' Bar plot is created with the p value vs occurence.
+#'
+#' @param deTab Dataframe, with all analysis results
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
 pValuePlot <- function(deTab){
   pvalue <- round(deTab$P.Value, digits=2)
@@ -885,19 +955,20 @@ pValuePlot <- function(deTab){
 
 ## --------------------------------------------------------------------------
 
-## ----- BIAS PLOT -----
+## ----- BIAS PLOTS -----
 
 
-## biasPlot()
-##  The confidence prediction calculated in the function gamConfidenceFit()
-##  Confidence is calculated based on the GC or length
-##  Scatterplot is created with avgLog2FC and corresponding bias value
-## Parameters:
-##  deTab = Dataframe, with all analysis results
-##  biasColumn = String, Column indicating bias values (GC or length)
-##  log = Boolean, Show plot in Log scale
-## Returns:
-##  p = Plotly object
+#' The confidence prediction calculated in the function gamConfidenceFit().
+#' Confidence is calculated based on the GC or length.
+#' Scatterplot is created with avgLog2FC and corresponding bias value.
+#'
+#' @param deTab Dataframe, with all analysis results
+#' @param biasColumn String, Column indicating bias values (GC or length)
+#' @param log Boolean, Show plot in Log scale
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
 
 biasPlot <- function(deTab, biasColumn, log, tick, sourceId) {
   if (is.null(biasColumn)) {
@@ -911,7 +982,7 @@ biasPlot <- function(deTab, biasColumn, log, tick, sourceId) {
     y = ~avgLog2FC,
     type = 'scattergl',
     mode = "markers",
-    color = ~adj.P.Val,
+    color = ~FDR,
     alpha = 0.75,
     showlegend = FALSE,
     text = rownames(deTab),
@@ -922,7 +993,7 @@ biasPlot <- function(deTab, biasColumn, log, tick, sourceId) {
       data = prediction,
       mode = "lines",
       x = ~get(biasColumn),
-      y = ~.fitted,
+      y = ~fit,
       text = NA,
       key = NA,
       color = "green",
@@ -930,8 +1001,8 @@ biasPlot <- function(deTab, biasColumn, log, tick, sourceId) {
       name = "Fitted") %>%
     add_ribbons(
       data = prediction,
-      ymin = ~.fitted - 1.96 * .se.fit,
-      ymax = ~.fitted + 1.96 * .se.fit,
+      ymin = ~fit - 1.96 * se.fit,
+      ymax = ~fit + 1.96 * se.fit,
       fillcolor = "rgba(7, 164, 181, 0.25)",
       text = NA,
       key = NA,
@@ -955,17 +1026,60 @@ biasPlot <- function(deTab, biasColumn, log, tick, sourceId) {
   p
 }
 
+
+#' The number of genes are grouped by strand and DE.
+#' A barplot is created with the # genes divided between + and - strand.
+#'
+#' @param deTab Dataframe, with all analysis results
+#'
+#' @return p, (Plotly object) plot
+#' 
+#' @export
+
+geneStrandBar <- function(deTab) {
+  geneStrand <- as.data.frame(table(deTab$strand, deTab$DE, dnn = c("strand", "DE")))
+  geneStrand$DE <- c("Down regulated","Not sign.","Up regulated")[match(geneStrand$DE, c(-1,0,1))]
+  geneStrand$perc <- geneStrand$Freq/sum(geneStrand$Freq)
+  
+  p <- plot_ly(
+    data = geneStrand,
+    x = ~strand,
+    y = ~Freq,
+    color = ~DE,
+    orientation = 'v',
+    type = "bar",
+    text = ~paste(Freq, "Genes\n", round(perc*100, 2), "%"),
+    textposition = "auto",
+    textfont = list(color="black"),
+    hovertext = ~DE,
+    hoverinfo = 'text') %>%
+    plotly::layout(
+      title = "Gene strand",
+      xaxis = list(title = 'Gene strand'), #, type = "log"),
+      yaxis = list(title = 'Number of genes')) %>%
+    config(
+      toImageButtonOptions = list(
+        format = "png",
+        filename = "geneStrand",
+        width = 1500,
+        height = 1000
+      )
+    )
+  p
+}
+
 ## --------------------------------------------------------------------------
 
 ## ----- INFORMATION BOX -----
 
 
-## informationBox()
-##  Template for plot information
-## Parameters:
-##  infoText = String, Explanation of a plot
-## Returns:
-##  Shiny Box object
+#' Template for plot information.
+#'
+#' @param infoText String, Explanation of a plot
+#'
+#' @return Shiny Box object
+#' 
+#' @export
 
 informationBox <- function(infoText) {
   tryCatch({

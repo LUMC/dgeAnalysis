@@ -13,6 +13,7 @@ tab_heatmaps <- tabItem(
         sidebarPanel(
           width = 3,
           uiOutput("heatmap_var_ngenes"),
+          uiOutput("group_var"),
           br(),
           uiOutput("var_heat_info"),
           span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
@@ -33,6 +34,7 @@ tab_heatmaps <- tabItem(
         sidebarPanel(
           width = 3,
           uiOutput("heatmap_dge_ngenes"),
+          uiOutput("group_dge"),
           br(),
           uiOutput("dge_heat_info"),
           span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
