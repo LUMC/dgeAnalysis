@@ -6,8 +6,16 @@ observeEvent(input$app_mode, {
     runjs('$("#show_view_analysis").css({"border-radius": "25px","border": "3px solid rgba(0,0,0,0)"});')
     runjs('$("#show_new_analysis").css({"border-radius": "25px", "border": "3px solid #0088cc"});')
     tryCatch({
-      inUse_normDge <<- normDge
-      inUse_deTab <<- deTab
+      if (exists("normDge")) {
+        inUse_normDge <<- normDge
+      } else {
+        inUse_normDge <<- data.frame()
+      }
+      if (exists("deTab")) {
+        inUse_deTab <<- deTab
+      } else {
+        inUse_deTab <<- data.frame()
+      }
     }, error = function(err) {
       return(NULL)
     })
