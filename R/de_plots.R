@@ -66,7 +66,7 @@ alignmentSummaryPlot <- function(se, sort_value="None", perc=T){
         yaxis = if(sort_value != "None") {list(title = "",
                                                tickmode = "array",
                                                tickvals = length(unique(temp$sample))/2-0.5,
-                                               ticktext = ~order)
+                                               ticktext = ~paste(order, " "))
           } else {list(title = "")},
         legend = list(tracegroupgap=0)) %>%
       config(
