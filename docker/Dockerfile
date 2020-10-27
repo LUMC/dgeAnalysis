@@ -1,4 +1,4 @@
-FROM rocker/r-ver:3.6.1
+FROM rocker/r-ver:3.6.3
 
 # Install Ubuntu packages
 RUN apt-get update && apt-get install -y \

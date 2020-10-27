@@ -102,7 +102,7 @@ alignmentSummaryPlot <- function(se, sort_value="None", perc=T){
 #' 
 #' @export
 
-complexityPlot <- function(se, group_color="None", perc, rank) {
+complexityPlot <- function(se, group_color="None", perc=T, rank=1000) {
   compData <- complexityData(se, rank)
   
   p <- plot_ly(

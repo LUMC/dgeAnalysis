@@ -94,7 +94,7 @@ se <- readCountsFromTable(data_counts, data_samples)
 se <- addSamplesFromTableToSE(se, data_samples)
 
 alignmentSummaryPlot(se)
-complexityPlot(se, perc = TRUE, rank = 1000)
+complexityPlot(se)
 
 ```
 
