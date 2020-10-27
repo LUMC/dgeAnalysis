@@ -56,7 +56,7 @@
 
 /*background dashboard*/
 .content-wrapper, .right-side {
-  background-color: #f9f9f9;
+  background-color: #fcfcfc;
 }
 
 /*header color*/
@@ -72,7 +72,7 @@
 .skin-blue .main-sidebar {
   border-right-width: 15px;
   border-right-style: solid;
-  border-image: linear-gradient(to right, #d9d9d9, #f9f9f9) 1 100%;
+  border-image: linear-gradient(to right, #d9d9d9, #fcfcfc) 1 100%;
 }
 
 /*navbar text color*/
@@ -162,7 +162,7 @@
 }
 .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li>a:hover {
   color: #0088cc;
-  background-color: #f9f9f9;
+  background-color: #fcfcfc;
   border: 1px solid #0088cc;
   border-bottom-color: transparent;
 }
@@ -372,7 +372,7 @@ table.dataTable tr.selected td{
 
 .modal-dialog {
   top: 100px;
-  background-color: #f9f9f9;
+  background-color: #fcfcfc;
   font-size: 25px;
   border-radius: 20px;
   border: 5px solid #0088cc;
@@ -398,3 +398,30 @@ table.dataTable tr.selected td{
 }
 
 /* --- image scroll */
+
+/* plotly --- */
+
+.hovertext path {
+  fill: #ffffff !important;
+  opacity: 0.90;
+  stroke: #0088cc !important;
+  stroke-linecap: round;
+}
+.hovertext text {
+  fill: #000000 !important;
+}
+
+.js-plotly-plot .plotly .main-svg {
+  background: none !important;
+}
+.js-plotly-plot .plotly .main-svg .legend .bg {
+  fill: none !important;
+}
+
+.js-plotly-plot .plotly:hover div[id^="modebar-"] .modebar-group {
+  background: none !important;
+}
+
+/* --- plotly */
+
+
