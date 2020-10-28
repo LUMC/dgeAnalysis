@@ -11,17 +11,17 @@
 #' @param perc Boolean, Data in percentages
 #'
 #' @return p, (Plotly object) plot
-#' 
+#'
 #' @export
 
-alignmentSummaryPlot <- function(se, sort_value="None", perc=T){
+alignmentSummaryPlot <- function(se, sort_value = "None", perc = T) {
   lse <- alignmentSummary(se)
   lse$feature <- gsub("_", " ", gsub("__", "", lse$feature))
   if (sort_value != "None") {
     for (sample in lse$sample) {
       lse$order[lse$sample == sample] <- se[[sort_value]][colnames(se) == sample]
     }
-    lse <- lse[order(lse$order, lse$sample, method="radix"),]
+    lse <- lse[order(lse$order, lse$sample, method = "radix"), ]
     lse$sample <- factor(lse$sample, levels = unique(lse$sample))
   } else {
     lse$order <- "Sample"
@@ -29,46 +29,71 @@ alignmentSummaryPlot <- function(se, sort_value="None", perc=T){
   
   if (perc) {
     for (var in unique(lse$sample)) {
-      temp <- lse[lse$sample == var, ]
-      lse$count[lse$sample == var] <- temp$count/(sum(temp$count))
+      temp <- lse[lse$sample == var,]
+      lse$count[lse$sample == var] <- temp$count / (sum(temp$count))
     }
   }
   
   plot_list <- c()
   for (order in unique(lse$order)) {
-    temp <- lse[lse$order == order,]
+    temp <- lse[lse$order == order, ]
     p <- plot_ly(
       data = temp,
-      x = ~count,
-      y = ~sample,
-      color = ~feature,
+      x = ~ count,
+      y = ~ sample,
+      color = ~ feature,
       orientation = 'h',
-      alignmentgroup = ~order,
-      legendgroup = ~feature,
+      alignmentgroup = ~ order,
+      legendgroup = ~ feature,
       type = "bar",
-      showlegend = if(order==unique(lse$order)[1]) {TRUE} else{FALSE},
-      text = if(perc){~paste(sample,
-                             '\n', round(count*100, 2),
-                             '%', feature)
-        } else {~paste(sample, '\n', formatC(count,
-                                             format="f",
-                                             big.mark=".",
-                                             digits=0),
-                       'Reads', feature)},
-      hoverinfo = 'text') %>%
-      group_by(order) %>% 
+      showlegend = if (order == unique(lse$order)[1]) {
+        TRUE
+      } else{
+        FALSE
+      },
+      text = if (perc) {
+        ~ paste(sample,
+                '\n', round(count * 100, 2),
+                '%', feature)
+      } else {
+        ~ paste(
+          sample,
+          '\n',
+          formatC(
+            count,
+            format = "f",
+            big.mark = ".",
+            digits = 0
+          ),
+          'Reads',
+          feature
+        )
+      },
+      hoverinfo = 'text'
+    ) %>%
+      group_by(order) %>%
       plotly::layout(
         barmode = 'stack',
         title = "Count assignments",
-        xaxis = if(perc) {list(title = 'Counts',
-                               tickformat = "%")
-          } else {list(title = 'Counts')},
-        yaxis = if(sort_value != "None") {list(title = "",
-                                               tickmode = "array",
-                                               tickvals = length(unique(temp$sample))/2-0.5,
-                                               ticktext = ~paste(order, " "))
-          } else {list(title = "")},
-        legend = list(tracegroupgap=0)) %>%
+        xaxis = if (perc) {
+          list(title = 'Counts',
+               tickformat = "%")
+        } else {
+          list(title = 'Counts')
+        },
+        yaxis = if (sort_value != "None") {
+          list(
+            title = "",
+            tickmode = "array",
+            tickvals = length(unique(temp$sample)) /
+              2 - 0.5,
+            ticktext = ~ paste(order, " ")
+          )
+        } else {
+          list(title = "")
+        },
+        legend = list(tracegroupgap = 0)
+      ) %>%
       config(
         toImageButtonOptions = list(
           format = "png",
@@ -82,7 +107,7 @@ alignmentSummaryPlot <- function(se, sort_value="None", perc=T){
   plotly::subplot(
     plot_list,
     nrows = length(unique(lse$order)),
-    shareY=T,
+    shareY = T,
     shareX = T,
     margin = 0.005
   )
@@ -99,77 +124,120 @@ alignmentSummaryPlot <- function(se, sort_value="None", perc=T){
 #' @param rank Integer, The number of genes/rank (min=10)
 #'
 #' @return p, (Plotly object) plot
-#' 
+#'
 #' @export
 
-complexityPlot <- function(se, group_color="None", perc=T, rank=1000) {
-  compData <- complexityData(se, rank)
-  
-  p <- plot_ly(
-    type = 'scattergl',
-    mode = "lines+markers") %>%
-    plotly::layout(
-      title = "Gene complexity %",
-      xaxis = list(title = 'Rank', type="log"),
-      yaxis = if (perc){list(tickformat = "%", title = 'Cumulative fraction of total reads till rank')}
-      else {list(title = 'Cumulative reads till rank')},
-      legend = list(tracegroupgap=0)) %>%
-    config(
-      toImageButtonOptions = list(
-        format = "png",
-        filename = "countdistline",
-        width = 1500,
-        height = 1000
+complexityPlot <- function(se, group_color = "None", perc = T, rank = 1000) {
+    compData <- complexityData(se, rank)
+    
+    p <- plot_ly(type = 'scattergl',
+                 mode = "lines+markers") %>%
+      plotly::layout(
+        title = "Gene complexity %",
+        xaxis = list(title = 'Rank', type = "log"),
+        yaxis = if (perc) {
+          list(tickformat = "%", title = 'Cumulative fraction of total reads till rank')
+        }
+        else {
+          list(title = 'Cumulative reads till rank')
+        },
+        legend = list(tracegroupgap = 0)
+      ) %>%
+      config(
+        toImageButtonOptions = list(
+          format = "png",
+          filename = "countdistline",
+          width = 1500,
+          height = 1000
+        )
       )
-    )
-  
-  legend_duplic <- c()
-  for (var in colnames(se)) {
-    temp <- compData[compData$sample == var, ]
-    if (group_color != "None") {
-      p <- add_trace(
-        p,
-        x = temp$rank,
-        y = if (perc){temp$fraction} else {temp$value},
-        showlegend = if(!se[[group_color]][colnames(se) == var] %in% legend_duplic) {TRUE
-          } else{FALSE},
-        legendgroup = se[[group_color]][colnames(se) == var],
-        color = rep(se[[group_color]][colnames(se) == var], rank),
-        text = if (perc){paste(temp$sample,
-                               "\n", temp$rank, "Genes\n",
-                               round(temp$fraction*100, 2),
-                               '% Reads\n')
-          } else {paste(temp$sample,
-                        "\n", temp$rank, "Genes\n",
-                        formatC(temp$value,
-                                format="f",
-                                big.mark=".",
-                                digits=0),
-                        'Reads\n')},
-        hoverinfo = 'text')
-      legend_duplic <- c(legend_duplic, se[[group_color]][colnames(se) == var])
-    } else {
-      p <- add_trace(
-        p,
-        x = temp$rank,
-        y = if (perc){temp$fraction} else {temp$value},
-        color = var,
-        text = if (perc){paste(temp$sample,
-                               "\n", temp$rank, "Genes\n",
-                               round(temp$fraction*100, 2),
-                               '% Reads\n')
-          } else {paste(temp$sample,
-                        "\n", temp$rank, "Genes\n",
-                        formatC(temp$value,
-                                format="f",
-                                big.mark=".",
-                                digits=0),
-                        'Reads\n')},
-        hoverinfo = 'text')
+    
+    legend_duplic <- c()
+    for (var in colnames(se)) {
+      temp <- compData[compData$sample == var,]
+      if (group_color != "None") {
+        p <- add_trace(
+          p,
+          x = temp$rank,
+          y = if (perc) {
+            temp$fraction
+          } else {
+            temp$value
+          },
+          showlegend = if (!se[[group_color]][colnames(se) == var] %in% legend_duplic) {
+            TRUE
+          } else{
+            FALSE
+          },
+          legendgroup = se[[group_color]][colnames(se) == var],
+          color = rep(se[[group_color]][colnames(se) == var], rank),
+          text = if (perc) {
+            paste(
+              temp$sample,
+              "\n",
+              temp$rank,
+              "Genes\n",
+              round(temp$fraction * 100, 2),
+              '% Reads\n'
+            )
+          } else {
+            paste(
+              temp$sample,
+              "\n",
+              temp$rank,
+              "Genes\n",
+              formatC(
+                temp$value,
+                format = "f",
+                big.mark = ".",
+                digits = 0
+              ),
+              'Reads\n'
+            )
+          },
+          hoverinfo = 'text'
+        )
+        legend_duplic <- c(legend_duplic, se[[group_color]][colnames(se) == var])
+      } else {
+        p <- add_trace(
+          p,
+          x = temp$rank,
+          y = if (perc) {
+            temp$fraction
+          } else {
+            temp$value
+          },
+          color = var,
+          text = if (perc) {
+            paste(
+              temp$sample,
+              "\n",
+              temp$rank,
+              "Genes\n",
+              round(temp$fraction * 100, 2),
+              '% Reads\n'
+            )
+          } else {
+            paste(
+              temp$sample,
+              "\n",
+              temp$rank,
+              "Genes\n",
+              formatC(
+                temp$value,
+                format = "f",
+                big.mark = ".",
+                digits = 0
+              ),
+              'Reads\n'
+            )
+          },
+          hoverinfo = 'text'
+        )
+      }
     }
+    p
   }
-  p
-}
 
 ## --------------------------------------------------------------------------
 
@@ -183,20 +251,20 @@ complexityPlot <- function(se, group_color="None", perc=T, rank=1000) {
 #' @param dge DGE list object, containing samples and counts
 #'
 #' @return p, (Plotly object) plot
-#' 
+#'
 #' @export
 
-countDistributionLinePlot <- function(dge){
+countDistributionLinePlot <- function(dge) {
   stackCounts <- data.frame(stackDge(dge))
   
-  p <- plot_ly(
-    type = 'scattergl',
-    mode = 'lines',
-    source = "dist_line") %>%
+  p <- plot_ly(type = 'scattergl',
+               mode = 'lines',
+               source = "dist_line") %>%
     plotly::layout(
       title = "Gene count distribution",
       xaxis = list(title = 'Log2CPM'),
-      yaxis = list(title = 'Density')) %>%
+      yaxis = list(title = 'Density')
+    ) %>%
     config(
       toImageButtonOptions = list(
         format = "png",
@@ -206,7 +274,7 @@ countDistributionLinePlot <- function(dge){
       )
     )
   for (var in unique(stackCounts$sample)) {
-    temp <- stackCounts[stackCounts$sample == var, ]
+    temp <- stackCounts[stackCounts$sample == var,]
     density <- density(temp$logCPM)
     p <- add_trace(
       p,
@@ -216,7 +284,8 @@ countDistributionLinePlot <- function(dge){
       text = var,
       hoverinfo = 'text',
       fill = 'tozeroy',
-      alpha = 0.05)
+      alpha = 0.05
+    )
   }
   p
 }
@@ -228,15 +297,14 @@ countDistributionLinePlot <- function(dge){
 #' @param dge DGE list object, containing samples and counts
 #'
 #' @return p, (Plotly object) plot
-#' 
+#'
 #' @export
 
-countDistributionBoxPlot <- function(dge){
+countDistributionBoxPlot <- function(dge) {
   stackCounts <- data.frame(stackDge(dge))
   
-  p <- plot_ly(
-    type = 'box',
-    boxpoints = FALSE) %>%
+  p <- plot_ly(type = 'box',
+               boxpoints = FALSE) %>%
     config(
       toImageButtonOptions = list(
         format = "png",
@@ -246,16 +314,16 @@ countDistributionBoxPlot <- function(dge){
       )
     )
   for (var in unique(stackCounts$sample)) {
-    temp <- stackCounts[stackCounts$sample == var, ]
-    p <- add_trace(
-      p,
-      y = temp$logCPM,
-      name = var,
-      alpha = 0.5) %>%
+    temp <- stackCounts[stackCounts$sample == var,]
+    p <- add_trace(p,
+                   y = temp$logCPM,
+                   name = var,
+                   alpha = 0.5) %>%
       plotly::layout(
         title = "Gene count distribution",
         xaxis = list(title = ''),
-        yaxis = list(title = 'Log2CPM'))
+        yaxis = list(title = 'Log2CPM')
+      )
   }
   p
 }
@@ -268,44 +336,45 @@ countDistributionBoxPlot <- function(dge){
 #' @param sourceId plot ID, depends on raw/normalized counts
 #'
 #' @return p, (Plotly object) plot
-#' 
+#'
 #' @export
 
-voomPlot <- function(dge, sourceId){
-  v <- voom(2^(dge$counts), save.plot = TRUE)
+voomPlot <- function(dge, sourceId) {
+  v <- voom(2 ^ (dge$counts), save.plot = TRUE)
   
   p <- plot_ly(
-    x = ~v$voom.xy$x,
-    y = ~v$voom.xy$y,
+    x = ~ v$voom.xy$x,
+    y = ~ v$voom.xy$y,
     type = "scattergl",
     mode = "markers",
     color = "Voom",
     alpha = 0.75,
     text = names(v$voom.xy$x),
     hoverinfo = 'text',
-    key = ~names(v$voom.xy$x),
-    source = sourceId) %>%
+    key = ~ names(v$voom.xy$x),
+    source = sourceId
+  ) %>%
     add_trace(
       mode = "lines",
       x = v$voom.line$x,
       y = v$voom.line$y,
       hoverinfo = 'none',
       line = list(color = "rgba(7, 164, 181, 1)"),
-      name = "Voom average") %>%
+      name = "Voom average"
+    ) %>%
     plotly::layout(
       title = "Voom",
       xaxis = list(title = 'Average Log2 Count'),
       yaxis = list(title = 'SQRT(Standard Deviation)'),
       clickmode = "event+select",
-      dragmode = "select") %>%
-    config(
-      toImageButtonOptions = list(
-        format = "png",
-        filename = sourceId,
-        width = 1500,
-        height = 1000
-      )
-    )
+      dragmode = "select"
+    ) %>%
+    config(toImageButtonOptions = list(
+      format = "png",
+      filename = sourceId,
+      width = 1500,
+      height = 1000
+    ))
   p
 }
 
@@ -319,42 +388,42 @@ voomPlot <- function(dge, sourceId){
 #' @param sourceId plot ID, depends on raw/normalized counts
 #'
 #' @return p, (Plotly object) plot
-#' 
+#'
 #' @export
 
-multidimensionalScaling2dPlot <- function(dge, color, sourceId){
-  logFC <- plotMDS(dge$counts, ndim = ncol(dge)-1)
+multidimensionalScaling2dPlot <- function(dge, color, sourceId) {
+  logFC <- plotMDS(dge$counts, ndim = ncol(dge) - 1)
   for_plots <- data.frame(logFC$cmdscale.out)
-  for_plots$group <- dge$samples[,color]
+  for_plots$group <- dge$samples[, color]
   
   p <- plot_ly(
     data = for_plots,
-    x = ~X1,
-    y = ~X2,
+    x = ~ X1,
+    y = ~ X2,
     type = "scattergl",
     mode = "markers",
-    color = ~for_plots$group,
+    color = ~ for_plots$group,
     text = rownames(for_plots),
     hoverinfo = 'text',
-    marker = list(size=15,
+    marker = list(size = 15,
                   line = list(color = '#999999',
                               width = 1)),
-    key = ~rownames(for_plots),
-    source = sourceId) %>%
+    key = ~ rownames(for_plots),
+    source = sourceId
+  ) %>%
     plotly::layout(
       title = paste("MDS Plot 2D"),
       xaxis = list(title = 'MDS1'),
       yaxis = list(title = 'MDS2'),
       clickmode = "event+select",
-      dragmode = "select") %>%
-    config(
-      toImageButtonOptions = list(
-        format = "png",
-        filename = sourceId,
-        width = 1500,
-        height = 1000
-      )
-    )
+      dragmode = "select"
+    ) %>%
+    config(toImageButtonOptions = list(
+      format = "png",
+      filename = sourceId,
+      width = 1500,
+      height = 1000
+    ))
   p
 }
 
@@ -367,38 +436,38 @@ multidimensionalScaling2dPlot <- function(dge, color, sourceId){
 #' @param color String, Column on wich colors should be based
 #'
 #' @return p, (Plotly object) plot
-#' 
+#'
 #' @export
 
-multidimensionalScaling3dPlot <- function(dge, color){
-  logFC <- plotMDS(dge$counts, ndim = ncol(dge)-1)
+multidimensionalScaling3dPlot <- function(dge, color) {
+  logFC <- plotMDS(dge$counts, ndim = ncol(dge) - 1)
   for_plots <- data.frame(logFC$cmdscale.out)
-  for_plots$group <- dge$samples[,color]
+  for_plots$group <- dge$samples[, color]
   
   p <- plot_ly(
     data = for_plots,
-    x = ~X1,
-    y = ~X2,
-    z = ~X3,
-    color = ~for_plots$group,
+    x = ~ X1,
+    y = ~ X2,
+    z = ~ X3,
+    color = ~ for_plots$group,
     text = rownames(for_plots),
-    hoverinfo = 'text') %>%
-    add_markers(marker = list(size=5, opacity = 0.75)) %>%
+    hoverinfo = 'text'
+  ) %>%
+    add_markers(marker = list(size = 5, opacity = 0.75)) %>%
     plotly::layout(
       title = paste("MDS Plot 3D"),
       scene = list(
         xaxis = list(title = 'MDS1'),
         yaxis = list(title = 'MDS2'),
-        zaxis = list(title = 'MDS3'))
-    ) %>%
-    config(
-      toImageButtonOptions = list(
-        format = "png",
-        filename = "mds3d",
-        width = 1500,
-        height = 1000
+        zaxis = list(title = 'MDS3')
       )
-    )
+    ) %>%
+    config(toImageButtonOptions = list(
+      format = "png",
+      filename = "mds3d",
+      width = 1500,
+      height = 1000
+    ))
   p
 }
 
@@ -415,25 +484,27 @@ multidimensionalScaling3dPlot <- function(dge, color){
 #' @param dge DGE list object, containing samples and counts
 #'
 #' @return p, (Plotly object) plot
-#' 
+#'
 #' @export
 
-variancePcaPlot <- function(dge){
+variancePcaPlot <- function(dge) {
   tdge <- t(dge$counts)
   tdge[!is.finite(tdge)] <- 0
-  pca <- prcomp(tdge, center=TRUE)
-  percent <- data.frame(summary( pca )$importance[2,])
+  pca <- prcomp(tdge, center = TRUE)
+  percent <- data.frame(summary(pca)$importance[2, ])
   colnames(percent) <- "percent"
   
   p <- plot_ly(
     data = percent,
     x = rownames(percent),
-    y = ~percent,
-    type = "bar") %>% 
+    y = ~ percent,
+    type = "bar"
+  ) %>%
     plotly::layout(
       title = "PCA Scree",
-      xaxis = list(title = 'Component', categoryorder='trace'),
-      yaxis = list(title = 'Percentage', tickformat = ".2%")) %>%
+      xaxis = list(title = 'Component', categoryorder = 'trace'),
+      yaxis = list(title = 'Percentage', tickformat = ".2%")
+    ) %>%
     config(
       toImageButtonOptions = list(
         format = "png",
@@ -457,47 +528,51 @@ variancePcaPlot <- function(dge){
 #' @param getPC2 String, Selected PC to be plotted on y-axis
 #'
 #' @return p, (Plotly object) plot
-#' 
+#'
 #' @export
 
-samplePca2dPlot <- function(dge, color, getPC1, getPC2){
+samplePca2dPlot <- function(dge, color, getPC1, getPC2) {
   tdge <- t(dge$counts)
   tdge[!is.finite(tdge)] <- 0
-  pca <- prcomp(tdge, center=TRUE)
-  percent <- data.frame(summary( pca )$importance[2,])
+  pca <- prcomp(tdge, center = TRUE)
+  percent <- data.frame(summary(pca)$importance[2, ])
   colnames(percent) <- "percent"
   
-  pca <- data.frame(scale(tdge, center=T, scale=F)%*%pca$rotation)
-  pca$group <- dge$samples[,color]
+  pca <- data.frame(scale(tdge, center = T, scale = F) %*% pca$rotation)
+  pca$group <- dge$samples[, color]
   
   p <- plot_ly(
     data = pca,
     x = pca[[getPC1]],
-    y = pca[[getPC2]], 
+    y = pca[[getPC2]],
     type = "scattergl",
     mode = "markers",
-    color=~pca$group,
+    color =  ~ pca$group,
     text = rownames(pca),
     hoverinfo = 'text',
-    marker = list(size=15,
+    marker = list(size = 15,
                   line = list(color = '#999999',
                               width = 1)),
-    key = ~rownames(pca),
-    source = "pca_pca2d") %>%
+    key = ~ rownames(pca),
+    source = "pca_pca2d"
+  ) %>%
     plotly::layout(
       title = 'PCA 2D',
-      xaxis = list(title = paste0(getPC1, " (", round(percent[getPC1,]*100, 2), "%)")),
-      yaxis = list(title = paste0(getPC2, " (", round(percent[getPC2,]*100, 2), "%)")),
+      xaxis = list(title = paste0(
+        getPC1, " (", round(percent[getPC1, ] * 100, 2), "%)"
+      )),
+      yaxis = list(title = paste0(
+        getPC2, " (", round(percent[getPC2, ] * 100, 2), "%)"
+      )),
       clickmode = "event+select",
-      dragmode = "select") %>%
-    config(
-      toImageButtonOptions = list(
-        format = "png",
-        filename = "pca2d",
-        width = 1500,
-        height = 1000
-      )
-    )
+      dragmode = "select"
+    ) %>%
+    config(toImageButtonOptions = list(
+      format = "png",
+      filename = "pca2d",
+      width = 1500,
+      height = 1000
+    ))
   p
 }
 
@@ -514,43 +589,47 @@ samplePca2dPlot <- function(dge, color, getPC1, getPC2){
 #' @param getPC3 String, Selected PC to be plotted on z-axis
 #'
 #' @return p, (Plotly object) plot
-#' 
+#'
 #' @export
 
-samplePca3dPlot <- function(dge, color, getPC1, getPC2, getPC3){
+samplePca3dPlot <- function(dge, color, getPC1, getPC2, getPC3) {
   tdge <- t(dge$counts)
   tdge[!is.finite(tdge)] <- 0
-  pca <- prcomp(tdge, center=TRUE)
-  percent <- data.frame(summary( pca )$importance[2,])
+  pca <- prcomp(tdge, center = TRUE)
+  percent <- data.frame(summary(pca)$importance[2, ])
   colnames(percent) <- "percent"
   
-  pca <- data.frame(scale(tdge, center=T, scale=F)%*%pca$rotation)
-  pca$group <- dge$samples[,color]
+  pca <- data.frame(scale(tdge, center = T, scale = F) %*% pca$rotation)
+  pca$group <- dge$samples[, color]
   
   p <- plot_ly(
     data = pca,
     x = pca[[getPC1]],
     y = pca[[getPC2]],
     z = pca[[getPC3]],
-    color = ~pca$group,
+    color = ~ pca$group,
     text = rownames(pca),
-    hoverinfo = 'text') %>%
-    add_markers(marker = list(size=5, opacity = 0.75)) %>%
-    plotly::layout(
-      title = 'PCA 3D',
-      scene = list(
-        xaxis = list(title = paste0(getPC1, " (", round(percent[getPC1,]*100, 2), "%)")),
-        yaxis = list(title = paste0(getPC2, " (", round(percent[getPC2,]*100, 2), "%)")),
-        zaxis = list(title = paste0(getPC3, " (", round(percent[getPC3,]*100, 2), "%)")))
-    ) %>%
-    config(
-      toImageButtonOptions = list(
-        format = "png",
-        filename = "pca3d",
-        width = 1500,
-        height = 1000
-      )
-    )
+    hoverinfo = 'text'
+  ) %>%
+    add_markers(marker = list(size = 5, opacity = 0.75)) %>%
+    plotly::layout(title = 'PCA 3D',
+                   scene = list(
+                     xaxis = list(title = paste0(
+                       getPC1, " (", round(percent[getPC1, ] * 100, 2), "%)"
+                     )),
+                     yaxis = list(title = paste0(
+                       getPC2, " (", round(percent[getPC2, ] * 100, 2), "%)"
+                     )),
+                     zaxis = list(title = paste0(
+                       getPC3, " (", round(percent[getPC3, ] * 100, 2), "%)"
+                     ))
+                   )) %>%
+    config(toImageButtonOptions = list(
+      format = "png",
+      filename = "pca3d",
+      width = 1500,
+      height = 1000
+    ))
   p
 }
 
@@ -568,44 +647,53 @@ samplePca3dPlot <- function(dge, color, getPC1, getPC2, getPC3){
 #' @param amount Integer, The number of genes shown in plot
 #'
 #' @return p, (Plotly object) plot
-#' 
+#'
 #' @export
 
-variableHeatmapPlot <- function(dge, group_col, amount){
+variableHeatmapPlot <- function(dge, group_col, amount) {
   lcpm <- dge$counts
   var_genes <- apply(lcpm, 1, var)
-  select_var <- names(sort(var_genes, decreasing=TRUE))[1:amount]
-  high_var_cpm <- lcpm[select_var,]
+  select_var <- names(sort(var_genes, decreasing = TRUE))[1:amount]
+  high_var_cpm <- lcpm[select_var, ]
   high_var_cpm <- as.data.frame(stack(high_var_cpm))
   
   if (group_col != "None") {
     order <- as.data.frame(as.character(dge$samples[[group_col]]), rownames(dge$samples))
     colnames(order) <- "group"
-    order <- order[order(order$group),, drop=F]
-    high_var_cpm <- high_var_cpm[order(match(high_var_cpm$col,rownames(order))),]
+    order <- order[order(order$group), , drop = F]
+    high_var_cpm <- high_var_cpm[order(match(high_var_cpm$col, rownames(order))), ]
   }
   
   p <- plot_ly(
     data = high_var_cpm,
-    x = ~col,
-    y = ~row,
-    z = ~value,
-    colorbar = list(title = "Log2CPM", len=1),
+    x = ~ col,
+    y = ~ row,
+    z = ~ value,
+    colorbar = list(title = "Log2CPM", len = 1),
     type = "heatmap",
     hoverinfo = 'text',
-    text = paste("Sample:", high_var_cpm$col,
-                 "<br>Gene:", high_var_cpm$row,
-                 "<br>Log2CPM:", high_var_cpm$value)
-    ) %>%
+    text = paste(
+      "Sample:",
+      high_var_cpm$col,
+      "<br>Gene:",
+      high_var_cpm$row,
+      "<br>Log2CPM:",
+      high_var_cpm$value
+    )
+  ) %>%
     plotly::layout(
       title = "Most variable genes",
-      xaxis = list(title = '',
-                   categoryorder = "array",
-                   categoryarray = ~col),
+      xaxis = list(
+        title = '',
+        categoryorder = "array",
+        categoryarray = ~ col
+      ),
       yaxis = list(
         title = '',
         categoryorder = "array",
-        autorange = "reversed")) %>%
+        autorange = "reversed"
+      )
+    ) %>%
     config(
       toImageButtonOptions = list(
         format = "png",
@@ -628,44 +716,53 @@ variableHeatmapPlot <- function(dge, group_col, amount){
 #' @param amount Integer, The number of genes shown in plot
 #'
 #' @return p, (Plotly object) plot
-#' 
+#'
 #' @export
 
-topDgeHeatmapPlot <- function(deTab, dge, group_col, amount){
-  sortdeTab <- deTab[order(rank(deTab$FDR)),]
+topDgeHeatmapPlot <- function(deTab, dge, group_col, amount) {
+  sortdeTab <- deTab[order(rank(deTab$FDR)), ]
   sortdeTab <- head(sortdeTab, amount)
-  getnorm <- dge[rownames(sortdeTab),]
+  getnorm <- dge[rownames(sortdeTab), ]
   getnorm <- getnorm$counts
   getnorm <- as.data.frame(stack(getnorm))
   
   if (group_col != "None") {
     order <- as.data.frame(as.character(dge$samples[[group_col]]), rownames(dge$samples))
     colnames(order) <- "group"
-    order <- order[order(order$group),, drop=F]
-    getnorm <- getnorm[order(match(getnorm$col,rownames(order))),]
+    order <- order[order(order$group), , drop = F]
+    getnorm <- getnorm[order(match(getnorm$col, rownames(order))), ]
   }
   
   p <- plot_ly(
     data = getnorm,
-    x = ~col,
-    y = ~row,
-    z = ~value,
-    colorbar = list(title = "Log2CPM", len=1),
+    x = ~ col,
+    y = ~ row,
+    z = ~ value,
+    colorbar = list(title = "Log2CPM", len = 1),
     type = "heatmap",
     hoverinfo = 'text',
-    text = paste("Sample:", getnorm$col,
-                 "<br>Gene:", getnorm$row,
-                 "<br>Log2CPM:", getnorm$value)
-    ) %>%
+    text = paste(
+      "Sample:",
+      getnorm$col,
+      "<br>Gene:",
+      getnorm$row,
+      "<br>Log2CPM:",
+      getnorm$value
+    )
+  ) %>%
     plotly::layout(
       title = "Most expressed genes",
-      xaxis = list(title = '',
-                   categoryorder = "array",
-                   categoryarray = ~col),
+      xaxis = list(
+        title = '',
+        categoryorder = "array",
+        categoryarray = ~ col
+      ),
       yaxis = list(
         title = '',
         categoryorder = "array",
-        autorange = "reversed")) %>%
+        autorange = "reversed"
+      )
+    ) %>%
     config(
       toImageButtonOptions = list(
         format = "png",
@@ -689,30 +786,31 @@ topDgeHeatmapPlot <- function(deTab, dge, group_col, amount){
 #' @param deTab Dataframe, with all analysis results
 #'
 #' @return p, (Plotly object) plot
-#' 
+#'
 #' @export
 
-deRatioPlot <- function(deTab){
-  defeatures <- aggregate(deTab$DE, by=list(category=deTab$DE), FUN=length)
-  defeatures$perc <- defeatures[,2]/sum(defeatures[,2])
-  
-  defeatures$category <- c("Down regulated","Not sign.","Up regulated")[match(defeatures$category, c(-1,0,1))]
+deRatioPlot <- function(deTab) {
+  defeatures <- aggregate(deTab$DE, by = list(category = deTab$DE), FUN = length)
+  defeatures$perc <- defeatures[, 2] / sum(defeatures[, 2])
+  defeatures$category <- c("Down regulated", "Not sign.", "Up regulated")[match(defeatures$category, c(-1, 0, 1))]
   
   p <- plot_ly(
     data = defeatures,
     x = "",
-    y = ~perc,
-    color = ~category,
+    y = ~ perc,
+    color = ~ category,
     type = "bar",
-    text = paste(defeatures[,2], "Genes\n", round(defeatures$perc*100, 2), "%"),
+    text = paste(defeatures[, 2], "Genes\n", round(defeatures$perc * 100, 2), "%"),
     textposition = "auto",
-    textfont = list(color="black"),
-    hovertext = ~category,
-    hoverinfo = 'text') %>%
+    textfont = list(color = "black"),
+    hovertext = ~ category,
+    hoverinfo = 'text'
+  ) %>%
     plotly::layout(
       title = "Differential expression ratio",
       xaxis = list(title = ""),
-      yaxis = list(tickformat = "%", title = "Ratio")) %>%
+      yaxis = list(tickformat = "%", title = "Ratio")
+    ) %>%
     config(
       toImageButtonOptions = list(
         format = "png",
@@ -732,66 +830,69 @@ deRatioPlot <- function(deTab){
 #' @param deTab Dataframe, with all analysis results
 #'
 #' @return p, (Plotly object) plot
-#' 
+#'
 #' @export
 
-ma_plot <- function(deTab){
+ma_plot <- function(deTab) {
   prediction <- gamConfidenceFit(deTab, "avgLog2CPM")
   
   p <- plot_ly(
-    data = deTab[deTab$DE == 0,],
-    x = ~avgLog2CPM,
-    y = ~avgLog2FC,
+    data = deTab[deTab$DE == 0, ],
+    x = ~ avgLog2CPM,
+    y = ~ avgLog2FC,
     type = "scattergl",
     mode = "markers",
-    color = ~as.character(DE),
+    color = ~ as.character(DE),
     alpha = 0.75,
-    text = rownames(deTab[deTab$DE == 0,]),
+    text = rownames(deTab[deTab$DE == 0, ]),
     hoverinfo = 'text',
-    key = ~rownames(deTab[deTab$DE == 0,]),
-    source = "analysis_ma") %>%
+    key = ~ rownames(deTab[deTab$DE == 0, ]),
+    source = "analysis_ma"
+  ) %>%
     add_trace(
-      x = ~deTab[deTab$DE != 0,]$avgLog2CPM,
-      y = ~deTab[deTab$DE != 0,]$avgLog2FC,
-      color = as.character(deTab[deTab$DE != 0,]$DE),
+      x = ~ deTab[deTab$DE != 0, ]$avgLog2CPM,
+      y = ~ deTab[deTab$DE != 0, ]$avgLog2FC,
+      color = as.character(deTab[deTab$DE != 0, ]$DE),
       alpha = 0.75,
-      text = rownames(deTab[deTab$DE != 0,]),
+      text = rownames(deTab[deTab$DE != 0, ]),
       hoverinfo = 'text',
-      key = ~rownames(deTab[deTab$DE != 0,])) %>%
+      key = ~ rownames(deTab[deTab$DE != 0, ])
+    ) %>%
     add_trace(
       data = prediction,
       mode = "lines",
-      x = ~avgLog2CPM,
-      y = ~fit,
+      x = ~ avgLog2CPM,
+      y = ~ fit,
       text = NA,
       key = NA,
       color = "Fitted",
       line = list(color = 'rgba(7, 164, 181, 1)'),
-      name = "Fitted") %>%
+      name = "Fitted"
+    ) %>%
     add_ribbons(
       data = prediction,
-      ymin = ~fit - 1.96 * se.fit,
-      ymax = ~fit + 1.96 * se.fit,
+      ymin = ~ fit - 1.96 * se.fit,
+      ymax = ~ fit + 1.96 * se.fit,
       fillcolor = "rgba(7, 164, 181, 0.25)",
       text = NA,
       key = NA,
       color = "Standard Error",
       line = list(color = 'rgba(0, 0, 0, 0)'),
-      name = "Standard Error") %>%
+      name = "Standard Error"
+    ) %>%
     plotly::layout(
       title = "MA",
       xaxis = list(title = 'Average Log2 CPM'),
       yaxis = list(title = 'Average Log2 FC'),
       clickmode = "event+select",
-      dragmode = "select") %>%
-    config(
-      toImageButtonOptions = list(
-        format = "png",
-        filename = "ma",
-        width = 1500,
-        height = 1000
-      )
-    )
+      dragmode = "select"
+    ) %>%
+    config(toImageButtonOptions = list(
+      format = "png",
+      filename = "ma",
+      width = 1500,
+      height = 1000
+    ))
   p
 }
 
@@ -804,45 +905,65 @@ ma_plot <- function(deTab){
 #' @param PCut Integer, Pvalue cutoff for line
 #'
 #' @return p, (Plotly object) plot
-#' 
+#'
 #' @export
 
-volcanoPlot <- function(deTab, LogCut, PCut){
+volcanoPlot <- function(deTab, LogCut, PCut) {
   p <- plot_ly(
-    data = deTab[deTab$DE == 0,],
-    x = ~avgLog2FC,
-    y = ~-log10(FDR),
+    data = deTab[deTab$DE == 0, ],
+    x = ~ avgLog2FC,
+    y = ~ -log10(FDR),
     type = "scattergl",
     mode = "markers",
-    color = ~as.character(DE),
+    color = ~ as.character(DE),
     alpha = 0.75,
-    text = rownames(deTab[deTab$DE == 0,]),
+    text = rownames(deTab[deTab$DE == 0, ]),
     hoverinfo = 'text',
-    key = ~rownames(deTab[deTab$DE == 0,]),
-    source = "analysis_volcano") %>%
+    key = ~ rownames(deTab[deTab$DE == 0, ]),
+    source = "analysis_volcano"
+  ) %>%
     add_trace(
-      x = ~deTab[deTab$DE != 0,]$avgLog2FC,
-      y = ~-log10(deTab[deTab$DE != 0,]$FDR),
-      color = as.character(deTab[deTab$DE != 0,]$DE),
+      x = ~ deTab[deTab$DE != 0, ]$avgLog2FC,
+      y = ~ -log10(deTab[deTab$DE != 0, ]$FDR),
+      color = as.character(deTab[deTab$DE != 0, ]$DE),
       alpha = 0.75,
-      text = rownames(deTab[deTab$DE != 0,]),
+      text = rownames(deTab[deTab$DE != 0, ]),
       hoverinfo = 'text',
-      key = ~rownames(deTab[deTab$DE != 0,])) %>%
+      key = ~ rownames(deTab[deTab$DE != 0, ])
+    ) %>%
     plotly::layout(
       title = "Volcano",
       xaxis = list(title = 'Average Log2 FC'),
       yaxis = list(title = '- Log10 P-Value'),
       shapes = list(
-        list(type = "line",  line = list(color = "red"),
-             x0 = 0,  x1 = 1, xref = "paper",
-             y0 = PCut, y1 = PCut),
+        list(
+          type = "line",
+          line = list(color = "red"),
+          x0 = 0,
+          x1 = 1,
+          xref = "paper",
+          y0 = PCut,
+          y1 = PCut
+        ),
         
-        list(type = "line",  line = list(color = "red"),
-             x0 = LogCut,  x1 = LogCut,
-             y0 = 0, y1 = 1, yref = "paper"),
-        list(type = "line",  line = list(color = "red"),
-             x0 = -LogCut,  x1 = -LogCut,
-             y0 = 0, y1 = 1, yref = "paper")
+        list(
+          type = "line",
+          line = list(color = "red"),
+          x0 = LogCut,
+          x1 = LogCut,
+          y0 = 0,
+          y1 = 1,
+          yref = "paper"
+        ),
+        list(
+          type = "line",
+          line = list(color = "red"),
+          x0 = -LogCut,
+          x1 = -LogCut,
+          y0 = 0,
+          y1 = 1,
+          yref = "paper"
+        )
       ),
       clickmode = "event+select",
       dragmode = "select"
@@ -872,13 +993,13 @@ volcanoPlot <- function(deTab, LogCut, PCut){
 #' @param selected Vector, Extra selected rownames
 #'
 #' @return p, (Plotly object) plot
-#' 
+#'
 #' @export
 
 barcodePlot <- function(deTab, dge, color, amount, selected) {
-  sortdeTab <- deTab[order(rank(deTab$FDR)),]
+  sortdeTab <- deTab[order(rank(deTab$FDR)), ]
   sortdeTab <- head(sortdeTab, amount)
-  getnorm <- dge[c(rownames(sortdeTab), selected),]
+  getnorm <- dge[c(rownames(sortdeTab), selected), ]
   getnorm$counts <- getnorm$counts
   stack1 <- as.data.frame(stack(getnorm$counts))
   stack1$group <- getnorm$samples[[color]][stack1$col]
@@ -890,23 +1011,30 @@ barcodePlot <- function(deTab, dge, color, amount, selected) {
   p <- plot_ly(
     type = "scattergl",
     mode = "markers",
-    marker = list(symbol = "line-ns-open",
-                  size = 250/(amount+length(selected)),
-                  line = list(width=2)))
+    marker = list(
+      symbol = "line-ns-open",
+      size = 250 / (amount + length(selected)),
+      line = list(width = 2)
+    )
+  )
   p <- add_trace(
     p,
-    x = ~stack1$value,
-    y = ~stack1$row,
-    color = ~stack1$group,
+    x = ~ stack1$value,
+    y = ~ stack1$row,
+    color = ~ stack1$group,
     text = stack1$col,
-    hoverinfo = 'text') %>%
+    hoverinfo = 'text'
+  ) %>%
     plotly::layout(
       title = "Barcode",
       xaxis = list(title = 'Log2 CPM'),
-      yaxis = list(title = '',
-                   categoryorder = "array",
-                   autorange = "reversed"),
-      autosize = T) %>%
+      yaxis = list(
+        title = '',
+        categoryorder = "array",
+        autorange = "reversed"
+      ),
+      autosize = T
+    ) %>%
     config(
       toImageButtonOptions = list(
         format = "png",
@@ -926,30 +1054,30 @@ barcodePlot <- function(deTab, dge, color, amount, selected) {
 #' @param deTab Dataframe, with all analysis results
 #'
 #' @return p, (Plotly object) plot
-#' 
+#'
 #' @export
 
-pValuePlot <- function(deTab){
-  pvalue <- round(deTab$P.Value, digits=2)
-  pvalue <- aggregate(pvalue, by=list(p=pvalue), FUN=length)
+pValuePlot <- function(deTab) {
+  pvalue <- round(deTab$P.Value, digits = 2)
+  pvalue <- aggregate(pvalue, by = list(p = pvalue), FUN = length)
   
   p <- plot_ly(
     data = pvalue,
-    x = ~p,
-    y = ~x,
-    type = "bar") %>%
+    x = ~ p,
+    y = ~ x,
+    type = "bar"
+  ) %>%
     plotly::layout(
       title = "P-Value",
       xaxis = list(title = 'P-Value'),
-      yaxis = list(title = 'Count')) %>%
-    config(
-      toImageButtonOptions = list(
-        format = "png",
-        filename = "pvalue",
-        width = 1500,
-        height = 1000
-      )
-    )
+      yaxis = list(title = 'Count')
+    ) %>%
+    config(toImageButtonOptions = list(
+      format = "png",
+      filename = "pvalue",
+      width = 1500,
+      height = 1000
+    ))
   p
 }
 
@@ -967,7 +1095,7 @@ pValuePlot <- function(deTab){
 #' @param log Boolean, Show plot in Log scale
 #'
 #' @return p, (Plotly object) plot
-#' 
+#'
 #' @export
 
 biasPlot <- function(deTab, biasColumn, log, tick, sourceId) {
@@ -978,51 +1106,58 @@ biasPlot <- function(deTab, biasColumn, log, tick, sourceId) {
   
   p <- plot_ly(
     data = deTab,
-    x = ~get(biasColumn),
-    y = ~avgLog2FC,
+    x = ~ get(biasColumn),
+    y = ~ avgLog2FC,
     type = 'scattergl',
     mode = "markers",
-    color = ~FDR,
+    color = ~ FDR,
     alpha = 0.75,
     showlegend = FALSE,
     text = rownames(deTab),
     hoverinfo = 'text',
     key = rownames(deTab),
-    source = sourceId) %>%
+    source = sourceId
+  ) %>%
     add_trace(
       data = prediction,
       mode = "lines",
-      x = ~get(biasColumn),
-      y = ~fit,
+      x = ~ get(biasColumn),
+      y = ~ fit,
       text = NA,
       key = NA,
       color = "green",
       line = list(color = 'rgba(7, 164, 181, 1)'),
-      name = "Fitted") %>%
+      name = "Fitted"
+    ) %>%
     add_ribbons(
       data = prediction,
-      ymin = ~fit - 1.96 * se.fit,
-      ymax = ~fit + 1.96 * se.fit,
+      ymin = ~ fit - 1.96 * se.fit,
+      ymax = ~ fit + 1.96 * se.fit,
       fillcolor = "rgba(7, 164, 181, 0.25)",
       text = NA,
       key = NA,
       color = "green",
       line = list(color = 'rgba(0, 0, 0, 0)'),
-      name = "Standard Error") %>%
+      name = "Standard Error"
+    ) %>%
     plotly::layout(
       title = paste("Bias based on", biasColumn),
-      xaxis = list(title = biasColumn, type = log, tickformat = tick), #, type = "log"),
+      xaxis = list(
+        title = biasColumn,
+        type = log,
+        tickformat = tick
+      ),
+      #, type = "log"),
       yaxis = list(title = 'Average Log2 FC'),
       clickmode = "event+select",
-      dragmode = "select") %>%
-    config(
-      toImageButtonOptions = list(
-        format = "png",
-        filename = "bias",
-        width = 1500,
-        height = 1000
-      )
-    )
+      dragmode = "select"
+    ) %>%
+    config(toImageButtonOptions = list(
+      format = "png",
+      filename = "bias",
+      width = 1500,
+      height = 1000
+    ))
   p
 }
 
@@ -1033,30 +1168,32 @@ biasPlot <- function(deTab, biasColumn, log, tick, sourceId) {
 #' @param deTab Dataframe, with all analysis results
 #'
 #' @return p, (Plotly object) plot
-#' 
+#'
 #' @export
 
 geneStrandBar <- function(deTab) {
   geneStrand <- as.data.frame(table(deTab$strand, deTab$DE, dnn = c("strand", "DE")))
-  geneStrand$DE <- c("Down regulated","Not sign.","Up regulated")[match(geneStrand$DE, c(-1,0,1))]
-  geneStrand$perc <- geneStrand$Freq/sum(geneStrand$Freq)
+  geneStrand$DE <- c("Down regulated", "Not sign.", "Up regulated")[match(geneStrand$DE, c(-1, 0, 1))]
+  geneStrand$perc <- geneStrand$Freq / sum(geneStrand$Freq)
   
   p <- plot_ly(
     data = geneStrand,
-    x = ~strand,
-    y = ~Freq,
-    color = ~DE,
+    x = ~ strand,
+    y = ~ Freq,
+    color = ~ DE,
     orientation = 'v',
     type = "bar",
-    text = ~paste(Freq, "Genes\n", round(perc*100, 2), "%"),
+    text = ~ paste(Freq, "Genes\n", round(perc * 100, 2), "%"),
     textposition = "auto",
-    textfont = list(color="black"),
-    hovertext = ~DE,
-    hoverinfo = 'text') %>%
+    textfont = list(color = "black"),
+    hovertext = ~ DE,
+    hoverinfo = 'text'
+  ) %>%
     plotly::layout(
       title = "Gene strand",
-      xaxis = list(title = 'Gene strand'), #, type = "log"),
-      yaxis = list(title = 'Number of genes')) %>%
+      xaxis = list(title = 'Gene strand'),
+      yaxis = list(title = 'Number of genes')
+    ) %>%
     config(
       toImageButtonOptions = list(
         format = "png",
@@ -1078,7 +1215,7 @@ geneStrandBar <- function(deTab) {
 #' @param infoText String, Explanation of a plot
 #'
 #' @return Shiny Box object
-#' 
+#'
 #' @export
 
 informationBox <- function(infoText) {
@@ -1090,10 +1227,8 @@ informationBox <- function(infoText) {
       width = 12,
       collapsible = TRUE,
       collapsed = FALSE,
-      span(
-        infoText,
-        style = "padding-left: 5px; text-align: justify; display: block;"
-      ),
+      span(infoText,
+           style = "padding-left: 5px; text-align: justify; display: block;"),
       style = "padding-left: unset;"
     )
   }, error = function(err) {

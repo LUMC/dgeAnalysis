@@ -15,7 +15,7 @@
 #' @param matrix_v2 Vector, containing the right matrix values
 #'
 #' @return getdesign, (String) String with the design formula
-#' 
+#'
 #' @export
 
 createDesign <- function(dge, dbase, dvalue, matrix_v1, matrix_v2) {
@@ -24,7 +24,9 @@ createDesign <- function(dge, dbase, dvalue, matrix_v1, matrix_v2) {
   getdesign <- "~"
   
   tryCatch({
-    if (isTRUE(all.equal(sort(unique(matrix)), sort(as.vector(unique(dge[[dbase]])))))) {
+    if (isTRUE(all.equal(sort(unique(matrix)), sort(as.vector(unique(
+      dge[[dbase]]
+    )))))) {
       getdesign <- "~0+"
     }
   }, error = function(err) {
@@ -63,20 +65,23 @@ createDesign <- function(dge, dbase, dvalue, matrix_v1, matrix_v2) {
 #' @param matrix_v2 Vector, containing the right matrix values
 #'
 #' @return dge, (DGE list object) containing samples and counts
-#' 
+#'
 #' @export
 
-relevelSamples <- function(dge, dbase, dvalue, matrix_v1, matrix_v2) {
-  columns <- c(dbase, dvalue)
-  for (value in columns) {
-    newRef <- as.character(dge$samples[[value]][!dge$samples[[value]] %in% c(matrix_v1, matrix_v2)][1])
-    if (is.na(newRef)) {
-      newRef <- as.character(dge$samples[[value]][1])
+relevelSamples <-
+  function(dge, dbase, dvalue, matrix_v1, matrix_v2) {
+    columns <- c(dbase, dvalue)
+    for (value in columns) {
+      newRef <-
+        as.character(dge$samples[[value]][!dge$samples[[value]] %in% c(matrix_v1, matrix_v2)][1])
+      if (is.na(newRef)) {
+        newRef <- as.character(dge$samples[[value]][1])
+      }
+      dge$samples[[value]] <-
+        relevel(as.factor(dge$samples[[value]]), ref = newRef)
     }
-    dge$samples[[value]] <- relevel(as.factor(dge$samples[[value]]), ref = newRef)
+    dge
   }
-  dge
-}
 
 
 #' Getbase column and use this to create right matrix.
@@ -88,7 +93,7 @@ relevelSamples <- function(dge, dbase, dvalue, matrix_v1, matrix_v2) {
 #' @param matrix Vector, containing the matrix values
 #'
 #' @return dge, (DGE list object) containing samples and counts
-#' 
+#'
 #' @export
 
 createMatrix <- function(dge, dbase, dvalue, matrix) {
@@ -126,7 +131,7 @@ createMatrix <- function(dge, dbase, dvalue, matrix) {
 #' @param matrix_v2 Vector, containing the right matrix values
 #'
 #' @return contrast, (vector) containing the contrasts (0, 1, -1)
-#' 
+#'
 #' @export
 
 createContrast <- function(design, matrix_v1, matrix_v2) {
