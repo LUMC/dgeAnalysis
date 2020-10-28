@@ -1,7 +1,7 @@
 
 tab_bias <- tabItem(
   tabName = "bias",
-  align="center",
+  align = "center",
   br(),
   
   tabsetPanel(
@@ -15,8 +15,8 @@ tab_bias <- tabItem(
           uiOutput("selectGC"),
           br(),
           uiOutput("gc_bias_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("gc_bias", height = "600px") %>% withSpinner()
@@ -37,8 +37,8 @@ tab_bias <- tabItem(
           uiOutput("selectLength"),
           br(),
           uiOutput("len_bias_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("len_bias", height = "600px") %>% withSpinner()
@@ -58,8 +58,8 @@ tab_bias <- tabItem(
           width = 3,
           br(),
           uiOutput("geneStrand_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("geneStrand_bias", height = "600px") %>% withSpinner()

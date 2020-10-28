@@ -1,13 +1,17 @@
 
 tab_enrich_reactome <- tabItem(
   tabName = "enrich_reactome",
-  align="center",
+  align = "center",
   br(),
   
-  radioButtons("choose_reactome", "Select enrichment type:",
-               inline = TRUE,
-               c("Gene set enrichment" = "gse",
-                 "Over represented enrichment" = "enrich")
+  radioButtons(
+    "choose_reactome",
+    "Select enrichment type:",
+    inline = TRUE,
+    c(
+      "Gene set enrichment" = "gse",
+      "Over represented enrichment" = "enrich"
+    )
   ),
   
   tabsetPanel(
@@ -30,14 +34,16 @@ tab_enrich_reactome <- tabItem(
             inputId = "bar_reactome_value",
             label = "Color plot with:",
             selected = "pvalue",
-            c("P-Value" = "pvalue",
+            c(
+              "P-Value" = "pvalue",
               "Adjusted P-Value" = "p.adjust",
-              "Q-Value" = "qvalues")
+              "Q-Value" = "qvalues"
+            )
           ),
           br(),
           uiOutput("reactome_barplot_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("reactome_barplot", height = "600px") %>% withSpinner()
@@ -53,15 +59,22 @@ tab_enrich_reactome <- tabItem(
         position = "right",
         sidebarPanel(
           width = 3,
-          sliderInput("cnet_reactome_slider", "Amount of shown pathways:", 5, min = 0, max = 15, step=1),
+          sliderInput(
+            "cnet_reactome_slider",
+            "Amount of shown pathways:",
+            5,
+            min = 0,
+            max = 15,
+            step = 1
+          ),
           uiOutput("cnet_reactome_select_pathway"),
           tags$b("Labels on/off:"),
           checkboxInput("cnet_reactome_annoP", "Pathway labels", value = TRUE),
           checkboxInput("cnet_reactome_annoG", "Gene labels", value = FALSE),
           br(),
           uiOutput("cnet_reactome_plot_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("cnet_reactome_plot", height = "600px") %>% withSpinner()
@@ -79,12 +92,19 @@ tab_enrich_reactome <- tabItem(
         position = "right",
         sidebarPanel(
           width = 3,
-          sliderInput("heat_reactome_slider", "Number of shown pathways:", 5, min = 0, max = 15, step=1),
+          sliderInput(
+            "heat_reactome_slider",
+            "Number of shown pathways:",
+            5,
+            min = 0,
+            max = 15,
+            step = 1
+          ),
           uiOutput("heat_reactome_select_pathway"),
           br(),
           uiOutput("heat_reactome_plot_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("heat_reactome_plot", height = "600px") %>% withSpinner()
@@ -106,8 +126,8 @@ tab_enrich_reactome <- tabItem(
           checkboxInput("reactome_network_annoP", "Pathway labels", value = FALSE),
           br(),
           uiOutput("reactome_network_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("gsea_reactome_plot", height = "600px") %>% withSpinner()

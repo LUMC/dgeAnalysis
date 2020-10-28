@@ -1,13 +1,17 @@
 
 tab_enrich_do <- tabItem(
   tabName = "enrich_do",
-  align="center",
+  align = "center",
   br(),
   
-  radioButtons("choose_do", "Select enrichment type:",
-               inline = TRUE,
-               c("Gene set enrichment" = "gse",
-                 "Over represented enrichment" = "enrich")
+  radioButtons(
+    "choose_do",
+    "Select enrichment type:",
+    inline = TRUE,
+    c(
+      "Gene set enrichment" = "gse",
+      "Over represented enrichment" = "enrich"
+    )
   ),
   
   tabsetPanel(
@@ -30,14 +34,16 @@ tab_enrich_do <- tabItem(
             inputId = "bar_do_value",
             label = "Color plot with:",
             selected = "pvalue",
-            c("P-Value" = "pvalue",
+            c(
+              "P-Value" = "pvalue",
               "Adjusted P-Value" = "p.adjust",
-              "Q-Value" = "qvalues")
+              "Q-Value" = "qvalues"
+            )
           ),
           br(),
           uiOutput("do_barplot_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("do_barplot", height = "600px") %>% withSpinner()
@@ -53,15 +59,22 @@ tab_enrich_do <- tabItem(
         position = "right",
         sidebarPanel(
           width = 3,
-          sliderInput("cnet_do_slider", "Amount of shown pathways:", 5, min = 0, max = 15, step=1),
+          sliderInput(
+            "cnet_do_slider",
+            "Amount of shown pathways:",
+            5,
+            min = 0,
+            max = 15,
+            step = 1
+          ),
           uiOutput("cnet_do_select_pathway"),
           tags$b("Labels on/off:"),
           checkboxInput("cnet_do_annoP", "Pathway labels", value = TRUE),
           checkboxInput("cnet_do_annoG", "Gene labels", value = FALSE),
           br(),
           uiOutput("cnet_do_plot_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("cnet_do_plot", height = "600px") %>% withSpinner()
@@ -79,12 +92,19 @@ tab_enrich_do <- tabItem(
         position = "right",
         sidebarPanel(
           width = 3,
-          sliderInput("heat_do_slider", "Number of shown pathways:", 5, min = 0, max = 15, step=1),
+          sliderInput(
+            "heat_do_slider",
+            "Number of shown pathways:",
+            5,
+            min = 0,
+            max = 15,
+            step = 1
+          ),
           uiOutput("heat_do_select_pathway"),
           br(),
           uiOutput("heat_do_plot_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("heat_do_plot", height = "600px") %>% withSpinner()
@@ -106,8 +126,8 @@ tab_enrich_do <- tabItem(
           checkboxInput("do_network_annoP", "Pathway labels", value = FALSE),
           br(),
           uiOutput("do_network_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("gsea_do_plot", height = "600px") %>% withSpinner()
@@ -119,8 +139,8 @@ tab_enrich_do <- tabItem(
     tabPanel(
       title = "Pathways from RGD",
       HTML('<hr style="border-color: #0088cc;">'),
-      uiOutput("select_do_pathway", align="center"),
-      htmlOutput("pathway_from_do", align="center") %>% withSpinner(),
+      uiOutput("select_do_pathway", align = "center"),
+      htmlOutput("pathway_from_do", align = "center") %>% withSpinner(),
       HTML('<hr style="border-color: #0088cc;">')
     )
   )

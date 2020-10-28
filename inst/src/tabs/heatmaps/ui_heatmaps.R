@@ -1,7 +1,7 @@
 
 tab_heatmaps <- tabItem(
   tabName = "heatmaps",
-  align="center",
+  align = "center",
   br(),
   
   tabsetPanel(
@@ -16,8 +16,8 @@ tab_heatmaps <- tabItem(
           uiOutput("group_var"),
           br(),
           uiOutput("var_heat_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("var_heat", height = "600px") %>% withSpinner()
@@ -37,8 +37,8 @@ tab_heatmaps <- tabItem(
           uiOutput("group_dge"),
           br(),
           uiOutput("dge_heat_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("dge_heat", height = "600px") %>% withSpinner()
