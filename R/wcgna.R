@@ -54,12 +54,11 @@ get_dendrogram_data <- function(tree,
   singleton.x[tree$order] = c(1:n)
   cluster.x = rep(NA, n)
   
-  new <-
-    data.frame(matrix(
-      ncol = 5,
-      nrow = 0,
-      dimnames = list(NULL, c("label", "x", "y", "xend", "yend"))
-    ))
+  new <- data.frame(matrix(
+    ncol = 5,
+    nrow = 0,
+    dimnames = list(NULL, c("label", "x", "y", "xend", "yend"))
+  ))
   for (m in 1:nMerge) {
     o1 = tree$merge[m, 1]
     o2 = tree$merge[m, 2]

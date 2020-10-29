@@ -85,8 +85,7 @@ alignmentSummaryPlot <- function(se, sort_value = "None", perc = T) {
           list(
             title = "",
             tickmode = "array",
-            tickvals = length(unique(temp$sample)) /
-              2 - 0.5,
+            tickvals = length(unique(temp$sample)) / 2 - 0.5,
             ticktext = ~ paste(order, " ")
           )
         } else {

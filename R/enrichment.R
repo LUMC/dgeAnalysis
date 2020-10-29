@@ -182,7 +182,7 @@ enrichBarplot <- function(enrich, amount, value) {
     length.out = 10
   )[2:9]
   p <- plot_ly(
-    enrich,
+    data = enrich,
     x = ~ Count,
     y = ~ Description,
     orientation = 'h',
