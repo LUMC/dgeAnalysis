@@ -107,12 +107,18 @@ output[["group_analysis_bar"]] <- renderUI({
 })
 
 ## Add specific gene to barplot
-updateSelectizeInput(
-  session = session,
-  inputId = 'selected_analysis_bar',
-  choices = rownames(inUse_deTab),
-  server = TRUE
-)
+observe({
+  tryCatch({
+    updateSelectizeInput(
+      session = session,
+      inputId = 'selected_analysis_bar',
+      choices = rownames(inUse_deTab),
+      server = TRUE
+    )
+  }, error = function(err) {
+    return(NULL)
+  })
+})
 
 ## P value plots
 output[["p_val_plot"]] <- renderPlotly({
