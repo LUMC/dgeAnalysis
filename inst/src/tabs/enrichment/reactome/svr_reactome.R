@@ -30,9 +30,7 @@ get_reactome <- reactive({
     } else {
       showModal(modalDialog(
         h1("Enrichment is running..."),
-        h4(
-          "Reactome enrichment based on all genes (with entrezID) and Log2FC"
-        ),
+        h4("Reactome enrichment based on all genes (with entrezID) and Log2FC"),
         img(src = "loading.gif", width = "50%"),
         footer = NULL
       ))
@@ -111,9 +109,9 @@ output[["bar_reactome_slider"]] <- renderUI({
     checkReload()
     enrich <- as.data.frame(get_reactome())
     sliderInput(
-      "bar_reactome_slider",
-      "Amount of shown pathways:",
-      nrow(enrich) / 2,
+      inputId = "bar_reactome_slider",
+      label = "Amount of shown pathways:",
+      value = nrow(enrich) / 2,
       min = 1,
       max = nrow(enrich),
       step = 1

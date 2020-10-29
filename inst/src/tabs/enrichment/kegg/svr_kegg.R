@@ -32,9 +32,7 @@ get_kegg <- reactive({
     } else {
       showModal(modalDialog(
         h1("Enrichment is running..."),
-        h4(
-          "KEGG enrichment based on all genes (with entrezID) and Log2FC"
-        ),
+        h4("KEGG enrichment based on all genes (with entrezID) and Log2FC"),
         img(src = "loading.gif", width = "50%"),
         footer = NULL
       ))
@@ -111,9 +109,9 @@ output[["bar_kegg_slider"]] <- renderUI({
     checkReload()
     enrich <- as.data.frame(get_kegg())
     sliderInput(
-      "bar_kegg_slider",
-      "Amount of shown pathways:",
-      nrow(enrich) / 2,
+      inputId = "bar_kegg_slider",
+      label = "Amount of shown pathways:",
+      value = nrow(enrich) / 2,
       min = 1,
       max = nrow(enrich),
       step = 1
@@ -253,8 +251,9 @@ output[["select_kegg_pathway"]] <- renderUI({
   tryCatch({
     checkReload()
     enrich <- as.data.frame(get_kegg())
-    selectInput("kegg_select", "Select a pathway:",
-                enrich$Description)
+    selectInput(inputId = "kegg_select",
+                label = "Select a pathway:",
+                choices = enrich$Description)
   }, error = function(err) {
     return(NULL)
   })
@@ -265,26 +264,21 @@ output[["pathway_from_kegg"]] <- renderUI({
   tryCatch({
     checkReload()
     enrich <- as.data.frame(get_kegg())
-    getpathway <-
-      rownames(enrich)[enrich$Description %in% input$kegg_select]
+    getpathway <- rownames(enrich)[enrich$Description %in% input$kegg_select]
     getpathway <- "hsa05152"
-    getFromKegg <-
-      a(
-        href = paste0(
-          "https://www.genome.jp/kegg-bin/show_pathway?",
-          getpathway
-        ),
-        target = "_blank",
-        img(
-          src = paste0(
-            "https://www.genome.jp/kegg/pathway/",
-            substr(getpathway, 1, 3),
-            "/",
-            getpathway,
-            ".png"
-          )
+    getFromKegg <- a(
+      href = paste0("https://www.genome.jp/kegg-bin/show_pathway?", getpathway),
+      target = "_blank",
+      img(
+        src = paste0(
+          "https://www.genome.jp/kegg/pathway/",
+          substr(getpathway, 1, 3),
+          "/",
+          getpathway,
+          ".png"
         )
       )
+    )
     getFromKegg
   }, error = function(err) {
     return(NULL)

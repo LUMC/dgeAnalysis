@@ -29,9 +29,9 @@ output[["selectGC"]] <- renderUI({
   tryCatch({
     checkReload()
     selectInput(
-      "selectGC",
-      "Show bias based on:",
-      grep(
+      inputId = "selectGC",
+      label = "Show bias based on:",
+      choices = grep(
         'gc$',
         colnames(inUse_deTab),
         value = TRUE,
@@ -73,9 +73,9 @@ output[["selectLength"]] <- renderUI({
   tryCatch({
     checkReload()
     selectInput(
-      "selectLength",
-      "Show bias based on:",
-      grep(
+      inputId = "selectLength",
+      label = "Show bias based on:",
+      choices = grep(
         'length$',
         colnames(inUse_deTab),
         value = TRUE,

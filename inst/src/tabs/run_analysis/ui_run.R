@@ -11,28 +11,28 @@ tab_run_analysis <- tabItem(
     column(
       width = 6,
       radioButtons(
-        "analysis_method",
-        "Choose analysis method:",
+        inputId = "analysis_method",
+        label = "Choose analysis method:",
         inline = TRUE,
         selected = "analysisEdgeR",
-        c(
+        choices = c(
           "Limma/Voom" = "analysisLimma",
           "EdgeR" = "analysisEdgeR",
           "DESeq2" = "analysisDESeq2"
         )
-      ),
+      ), 
       br(),
       sliderInput(
-        "alpha_value",
-        "Set FDR cutoff (adjusted P-Value):",
+        inputId = "alpha_value",
+        label = "Set FDR cutoff (adjusted P-Value):",
         value = 0.05,
         min = 0.01,
         max = 1,
         step = 0.01
       ),
       sliderInput(
-        "cpm_value",
-        "Set Log2CPM cutoff:",
+        inputId = "cpm_value",
+        label = "Set Log2CPM cutoff:",
         value = 1,
         min = 0,
         max = 10,
@@ -43,12 +43,12 @@ tab_run_analysis <- tabItem(
       width = 6,
       uiOutput("design_base"),
       radioButtons(
-        "design_type",
-        "",
+        inputId = "design_type",
+        label = "",
         inline = TRUE,
-        c("Basic design" = "basic",
-          "Advanced design" = "advanced")
-      ),
+        choices = c("Basic design" = "basic",
+                    "Advanced design" = "advanced")
+      ), 
       uiOutput("design_value"),
       uiOutput("matrix")
     )
@@ -77,8 +77,8 @@ tab_run_analysis <- tabItem(
   
   HTML('<hr style="border-color: #0088cc;">'),
   
-  actionButton("run_button",
-               "Run Analysis"),
+  actionButton(inputId = "run_button",
+               label = "Run Analysis"), 
   
   br()
 )

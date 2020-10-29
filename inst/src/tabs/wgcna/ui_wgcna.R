@@ -49,27 +49,27 @@ tab_wgcna <- tabItem(
         sidebarPanel(
           width = 3,
           sliderInput(
-            "power_cutoff",
-            "R^2 cutoff",
-            0.8,
+            inputId = "power_cutoff",
+            label = "R^2 cutoff",
+            value = 0.8,
             min = 0,
             max = 1,
             step = 0.01
           ),
           sliderInput(
-            "power_numberOf",
-            "Number of powers",
-            25,
+            inputId = "power_numberOf",
+            label = "Number of powers",
+            value = 25,
             min = 1,
             max = 50,
             step = 1
           ),
           radioButtons(
-            "setPowerTab",
-            "Choose plot:",
-            c("SFT index" = "power",
-              "Connectivity" = "soft")
-          ),
+            inputId = "setPowerTab",
+            label = "Choose plot:",
+            choices = c("SFT index" = "power",
+                        "Connectivity" = "soft")
+          ), 
           br(),
           uiOutput("wgcna_power_info"),
           span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
@@ -90,9 +90,9 @@ tab_wgcna <- tabItem(
         sidebarPanel(
           width = 3,
           sliderInput(
-            "module_power",
-            "Number of powers",
-            6,
+            inputId = "module_power",
+            label = "Number of powers",
+            value = 6,
             min = 1,
             max = 50,
             step = 1

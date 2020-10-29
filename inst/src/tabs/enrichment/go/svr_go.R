@@ -113,9 +113,9 @@ output[["bar_go_slider"]] <- renderUI({
     checkReload()
     enrich <- as.data.frame(get_go())
     sliderInput(
-      "bar_go_slider",
-      "Amount of shown pathways:",
-      nrow(enrich) / 2,
+      inputId = "bar_go_slider",
+      label = "Amount of shown pathways:",
+      value = nrow(enrich) / 2,
       min = 1,
       max = nrow(enrich),
       step = 1
@@ -251,8 +251,9 @@ output[["select_go_pathway"]] <- renderUI({
   tryCatch({
     checkReload()
     enrich <- as.data.frame(get_go())
-    selectInput("go_select", "Select a pathway:",
-                enrich$Description)
+    selectInput(inputId = "go_select",
+                label = "Select a pathway:",
+                choices = enrich$Description)
   }, error = function(err) {
     return(NULL)
   })

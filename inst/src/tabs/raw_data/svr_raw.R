@@ -86,8 +86,11 @@ output[["un_cluster_2d"]] <- renderPlotly({
 ## Set color of mds 2d
 output[["group_raw_mds2d"]] <- renderUI({
   tryCatch({
-    selectInput("group_raw_mds2d", "Color by:",
-                colnames(data_samples()))
+    selectInput(
+      inputId = "group_raw_mds2d",
+      label = "Color by:",
+      choices = colnames(data_samples())
+    )
   }, error = function(err) {
     return(NULL)
   })

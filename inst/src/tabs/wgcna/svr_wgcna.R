@@ -14,8 +14,11 @@ output[["wgcna_sample_tree"]] <- renderPlotly({
 ## Set color of sample dendrogram
 output[["color_wgcna_tree"]] <- renderUI({
   tryCatch({
-    selectInput("color_wgcna_tree", "Color by:",
-                colnames(data_samples()))
+    selectInput(
+      inputId = "color_wgcna_tree",
+      label = "Color by:",
+      choices = colnames(data_samples())
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -117,9 +120,9 @@ output[["wgcna_number_genes"]] <- renderUI({
       max_genes <- 5000
     }
     sliderInput(
-      "wgcna_number_genes",
-      "Number of genes",
-      1000,
+      inputId = "wgcna_number_genes",
+      label = "Number of genes",
+      value = 1000,
       min = 10,
       max = max_genes,
       step = 10

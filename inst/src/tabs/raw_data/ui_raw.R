@@ -49,8 +49,8 @@ tab_raw_data <- tabItem(
         sidebarPanel(
           width = 3,
           sliderInput(
-            "slider_raw_voom",
-            "Set Log2CPM cutoff:",
+            inputId = "slider_raw_voom",
+            label = "Set Log2CPM cutoff:",
             value = 1,
             min = 0,
             max = 10,

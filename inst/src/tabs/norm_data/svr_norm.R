@@ -79,8 +79,11 @@ output[["norm_un_cluster_2d"]] <- renderPlotly({
 ## Set color of mds 2d
 output[["group_norm_mds2d"]] <- renderUI({
   tryCatch({
-    selectInput("group_norm_mds2d", "Color by:",
-                colnames(data_samples()))
+    selectInput(
+      inputId = "group_norm_mds2d",
+      label = "Color by:",
+      choices = colnames(data_samples())
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -110,8 +113,11 @@ output[["norm_un_cluster_3d"]] <- renderPlotly({
 ## Set color of mds 3d
 output[["group_norm_mds3d"]] <- renderUI({
   tryCatch({
-    selectInput("group_norm_mds3d", "Color by:",
-                colnames(data_samples()))
+    selectInput(
+      inputId = "group_norm_mds3d",
+      label = "Color by:",
+      choices = colnames(data_samples())
+    )
   }, error = function(err) {
     return(NULL)
   })

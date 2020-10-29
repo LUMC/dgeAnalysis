@@ -74,9 +74,11 @@ output[["design_base"]] <- renderUI({
       return(NULL)
     }
     
-    selectInput("design_base",
-                "Select base column for comparison:",
-                colnames(data_samples()))
+    selectInput(
+      inputId = "design_base",
+      label = "Select base column for comparison:",
+      choices = colnames(data_samples())
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -89,17 +91,19 @@ output[["design_value"]] <- renderUI({
       return(NULL)
     }
     if (input$design_type == "basic") {
-      checkboxGroupInput("design_value",
-                         "",
-                         choices = character(0),
-                         inline = TRUE)
+      checkboxGroupInput(
+        inputId = "design_value",
+        label = "",
+        choices = character(0),
+        inline = TRUE
+      )
     } else {
       showNotification(ui = "WARNING: This type of analysis is 'more advanced'! Make sure you know what you are doing!",
                        duration = 5,
                        type = "warning")
       checkboxGroupInput(
-        "design_value",
-        "Select nested columns, relative to base column:",
+        inputId = "design_value",
+        label = "Select nested columns, relative to base column:",
         choices = colnames(data_samples())[!colnames(data_samples()) %in% input$design_base],
         inline = TRUE
       )
@@ -254,11 +258,11 @@ output[["setGeneName"]] <- renderUI({
     }
     
     radioButtons(
-      "setGeneName",
-      "Use gene ID or gene symbols:",
+      inputId = "setGeneName",
+      label = "Use gene ID or gene symbols:",
       inline = TRUE,
-      c("Gene ID" = "id",
-        "Gene Symbol" = "symbol")
+      choices = c("Gene ID" = "id",
+                  "Gene Symbol" = "symbol")
     )
   }, error = function(err) {
     return(NULL)

@@ -5,14 +5,14 @@ tab_enrich_do <- tabItem(
   br(),
   
   radioButtons(
-    "choose_do",
-    "Select enrichment type:",
+    inputId = "choose_do",
+    label = "Select enrichment type:",
     inline = TRUE,
-    c(
+    choices = c(
       "Gene set enrichment" = "gse",
       "Over represented enrichment" = "enrich"
     )
-  ),
+  ), 
   
   tabsetPanel(
     tabPanel(
@@ -34,12 +34,12 @@ tab_enrich_do <- tabItem(
             inputId = "bar_do_value",
             label = "Color plot with:",
             selected = "pvalue",
-            c(
+            choices = c(
               "P-Value" = "pvalue",
               "Adjusted P-Value" = "p.adjust",
               "Q-Value" = "qvalues"
             )
-          ),
+          ), 
           br(),
           uiOutput("do_barplot_info"),
           span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
@@ -60,17 +60,21 @@ tab_enrich_do <- tabItem(
         sidebarPanel(
           width = 3,
           sliderInput(
-            "cnet_do_slider",
-            "Amount of shown pathways:",
-            5,
+            inputId = "cnet_do_slider",
+            label = "Amount of shown pathways:",
+            value = 5,
             min = 0,
             max = 15,
             step = 1
-          ),
+          ), 
           uiOutput("cnet_do_select_pathway"),
           tags$b("Labels on/off:"),
-          checkboxInput("cnet_do_annoP", "Pathway labels", value = TRUE),
-          checkboxInput("cnet_do_annoG", "Gene labels", value = FALSE),
+          checkboxInput(inputId = "cnet_do_annoP",
+                        label = "Pathway labels",
+                        value = TRUE),
+          checkboxInput(inputId = "cnet_do_annoG",
+                        label = "Gene labels",
+                        value = FALSE), 
           br(),
           uiOutput("cnet_do_plot_info"),
           span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
@@ -93,9 +97,9 @@ tab_enrich_do <- tabItem(
         sidebarPanel(
           width = 3,
           sliderInput(
-            "heat_do_slider",
-            "Number of shown pathways:",
-            5,
+            inputId = "heat_do_slider",
+            label = "Number of shown pathways:",
+            value = 5,
             min = 0,
             max = 15,
             step = 1
@@ -123,7 +127,9 @@ tab_enrich_do <- tabItem(
         sidebarPanel(
           width = 3,
           tags$b("Labels on/off:"),
-          checkboxInput("do_network_annoP", "Pathway labels", value = FALSE),
+          checkboxInput(inputId = "do_network_annoP",
+                        label = "Pathway labels",
+                        value = FALSE), 
           br(),
           uiOutput("do_network_info"),
           span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")

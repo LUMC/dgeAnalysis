@@ -9,9 +9,11 @@ get_se <- reactive({
 output[["group_sum"]] <- renderUI({
   tryCatch({
     checkReload()
-    selectInput("group_sum",
-                "Group by:",
-                c("None" = "None", colnames(data_samples())))
+    selectInput(
+      inputId = "group_sum",
+      label = "Group by:",
+      choices = c("None" = "None", colnames(data_samples()))
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -36,9 +38,11 @@ output[["align_sum"]] <- renderPlotly({
 output[["group_color"]] <- renderUI({
   tryCatch({
     checkReload()
-    selectInput("group_color",
-                "Group by:",
-                c("None" = "None", colnames(data_samples())))
+    selectInput(
+      inputId = "group_color",
+      label = "Group by:",
+      choices = c("None" = "None", colnames(data_samples()))
+    )
   }, error = function(err) {
     return(NULL)
   })

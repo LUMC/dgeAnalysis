@@ -8,9 +8,9 @@ tab_upload <- tabItem(
     inputId = "app_mode",
     label = "Set analysis mode",
     inline = TRUE,
-    c("New analysis" = "new",
-      "View analysis" = "view")
-  ),
+    choices = c("New analysis" = "new",
+                "View analysis" = "view")
+  ), 
   
   fluidRow(column(
     width = 6,
@@ -20,8 +20,25 @@ tab_upload <- tabItem(
       br(),
       br(),
       fileInput(
-        "file_samples",
-        "Choose your samples (metadata) file:",
+        inputId = "file_samples",
+        label = "Choose your samples (metadata) file:",
+        multiple = FALSE,
+        accept = c(
+          "CSV",
+          ".csv",
+          "TSV",
+          ".tsv",
+          "TXT",
+          ".txt",
+          "ZIP",
+          ".zip",
+          "GZ",
+          ".gz"
+        )
+      ), 
+      fileInput(
+        inputId = "file_counts",
+        label = "Choose your raw counts file:",
         multiple = FALSE,
         accept = c(
           "CSV",
@@ -37,25 +54,8 @@ tab_upload <- tabItem(
         )
       ),
       fileInput(
-        "file_counts",
-        "Choose your raw counts file:",
-        multiple = FALSE,
-        accept = c(
-          "CSV",
-          ".csv",
-          "TSV",
-          ".tsv",
-          "TXT",
-          ".txt",
-          "ZIP",
-          ".zip",
-          "GZ",
-          ".gz"
-        )
-      ),
-      fileInput(
-        "file_annotation",
-        "Choose your annotation file:",
+        inputId = "file_annotation",
+        label = "Choose your annotation file:",
         multiple = FALSE,
         accept = c(
           "CSV",
@@ -86,8 +86,8 @@ tab_upload <- tabItem(
       id = "show_view_analysis",
       br(),
       fileInput(
-        "file_samples_view",
-        "Choose your samples (metadata) file:",
+        inputId = "file_samples_view",
+        label = "Choose your samples (metadata) file:",
         multiple = FALSE,
         accept = c(
           "CSV",
@@ -103,8 +103,8 @@ tab_upload <- tabItem(
         )
       ),
       fileInput(
-        "file_counts_view",
-        "Choose your raw counts file:",
+        inputId = "file_counts_view",
+        label = "Choose your raw counts file:",
         multiple = FALSE,
         accept = c(
           "CSV",
@@ -120,8 +120,8 @@ tab_upload <- tabItem(
         )
       ),
       fileInput(
-        "file_norm_view",
-        "Choose your normalized counts file:",
+        inputId = "file_norm_view",
+        label = "Choose your normalized counts file:",
         multiple = FALSE,
         accept = c(
           "CSV",
@@ -137,8 +137,8 @@ tab_upload <- tabItem(
         )
       ),
       fileInput(
-        "file_detab_view",
-        "Choose your DE file:",
+        inputId = "file_detab_view",
+        label = "Choose your DE file:",
         multiple = FALSE,
         accept = c(
           "CSV",

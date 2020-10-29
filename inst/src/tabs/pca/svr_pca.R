@@ -25,8 +25,11 @@ output[["samples_pca_2d"]] <- renderPlotly({
 ## Set color of PCA 2d
 output[["group_pca2d"]] <- renderUI({
   tryCatch({
-    selectInput("group_pca2d", "Color by:",
-                colnames(data_samples()))
+    selectInput(
+      inputId = "group_pca2d",
+      label = "Color by:",
+      choices = colnames(data_samples())
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -35,8 +38,11 @@ output[["group_pca2d"]] <- renderUI({
 ## Set color of PCA 2d
 output[["group_pca2d"]] <- renderUI({
   tryCatch({
-    selectInput("group_pca2d", "Color by:",
-                colnames(data_samples()))
+    selectInput(
+      inputId = "group_pca2d",
+      label = "Color by:",
+      choices = colnames(data_samples())
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -47,11 +53,17 @@ output[["setpc_pca2d"]] <- renderUI({
   tryCatch({
     all_pc <- sprintf("PC%s", seq(1:ncol(inUse_normDge$counts)))
     tagList(
-      selectInput("set_pca2d_pc1", "Select X-axis PC:",
-                  all_pc),
-      selectInput("set_pca2d_pc2", "Select Y-axis PC:",
-                  all_pc,
-                  selected = "PC2")
+      selectInput(
+        inputId = "set_pca2d_pc1",
+        label = "Select X-axis PC:",
+        choices = all_pc
+      ),
+      selectInput(
+        inputId = "set_pca2d_pc2",
+        label = "Select Y-axis PC:",
+        choices = all_pc,
+        selected = "PC2"
+      )
     )
   }, error = function(err) {
     return(NULL)
@@ -93,8 +105,11 @@ output[["samples_pca_3d"]] <- renderPlotly({
 ## Set color of PCA 3d
 output[["group_pca3d"]] <- renderUI({
   tryCatch({
-    selectInput("group_pca3d", "Color by:",
-                colnames(data_samples()))
+    selectInput(
+      inputId = "group_pca3d",
+      label = "Color by:",
+      choices = colnames(data_samples())
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -105,14 +120,23 @@ output[["setpc_pca3d"]] <- renderUI({
   tryCatch({
     all_pc <- sprintf("PC%s", seq(1:ncol(inUse_normDge$counts)))
     tagList(
-      selectInput("set_pca3d_pc1", "Select X-axis PC:",
-                  all_pc),
-      selectInput("set_pca3d_pc2", "Select Y-axis PC:",
-                  all_pc,
-                  selected = "PC2"),
-      selectInput("set_pca3d_pc3", "Select Z-axis PC:",
-                  all_pc,
-                  selected = "PC3")
+      selectInput(
+        inputId = "set_pca3d_pc1",
+        label = "Select X-axis PC:",
+        choices = all_pc
+      ),
+      selectInput(
+        inputId = "set_pca3d_pc2",
+        label = "Select Y-axis PC:",
+        choices = all_pc,
+        selected = selected = "PC2"
+      ),
+      selectInput(
+        inputId = "set_pca3d_pc3",
+        label = "Select Z-axis PC:",
+        choices = all_pc,
+        selected = "PC3"
+      )
     )
   }, error = function(err) {
     return(NULL)

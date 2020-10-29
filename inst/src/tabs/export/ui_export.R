@@ -7,9 +7,9 @@ tab_export <- tabItem(
   br(),
   h2("Download tables"),
   selectInput(
-    "dataset_select",
-    "",
-    c(
+    inputId = "dataset_select",
+    label = "",
+    choices = c(
       "Normalized counts" = "normCounts",
       "Log2 Normalized counts" = "normCountslog2",
       "Full DE table" = "deTab",
@@ -20,7 +20,7 @@ tab_export <- tabItem(
       "GO pathways" = "go",
       "DO pathways" = "do"
     )
-  ),
+  ), 
   downloadButton("downloadCSV", label = "Download as CSV"),
   downloadButton("downloadTSV", label = "Download as TSV"),
   br(),

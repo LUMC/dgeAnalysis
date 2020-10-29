@@ -107,18 +107,12 @@ output[["group_analysis_bar"]] <- renderUI({
 })
 
 ## Add specific gene to barplot
-output[["analysis_bar_select_gene"]] <- renderUI({
-  tryCatch({
-    selectInput(
-      inputId = "selected_analysis_bar",
-      label = "Add specific genes:",
-      multiple = TRUE,
-      choices = c("Click to add gene" = "", rownames(inUse_deTab))
-    )
-  }, error = function(err) {
-    return(NULL)
-  })
-})
+updateSelectizeInput(
+  session = session,
+  inputId = 'selected_analysis_bar',
+  choices = rownames(inUse_deTab),
+  server = TRUE
+)
 
 ## P value plots
 output[["p_val_plot"]] <- renderPlotly({

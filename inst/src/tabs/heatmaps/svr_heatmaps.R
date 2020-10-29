@@ -13,8 +13,8 @@ output[["var_heat"]] <- renderPlotly({
 output[["heatmap_var_ngenes"]] <- renderUI({
   tryCatch({
     sliderInput(
-      "slider_heatmap_var",
-      "Set the number of genes to show:",
+      inputId = "slider_heatmap_var",
+      label = "Set the number of genes to show:",
       value = 100,
       min = 2,
       max = nrow(inUse_normDge),
@@ -29,9 +29,11 @@ output[["heatmap_var_ngenes"]] <- renderUI({
 output[["group_var"]] <- renderUI({
   tryCatch({
     checkReload()
-    selectInput("group_var",
-                "Group by:",
-                c("None" = "None", colnames(data_samples())))
+    selectInput(
+      inputId = "group_var",
+      label = "Group by:",
+      choices = c("None" = "None", colnames(data_samples()))
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -57,9 +59,11 @@ output[["dge_heat"]] <- renderPlotly({
 output[["group_dge"]] <- renderUI({
   tryCatch({
     checkReload()
-    selectInput("group_dge",
-                "Group by:",
-                c("None" = "None", colnames(data_samples())))
+    selectInput(
+      inputId = "group_dge",
+      label = "Group by:",
+      choices = c("None" = "None", colnames(data_samples()))
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -69,8 +73,8 @@ output[["group_dge"]] <- renderUI({
 output[["heatmap_dge_ngenes"]] <- renderUI({
   tryCatch({
     sliderInput(
-      "slider_heatmap_dge",
-      "Set the number of genes to show:",
+      inputId = "slider_heatmap_dge",
+      label = "Set the number of genes to show:",
       value = 100,
       min = 2,
       max = nrow(inUse_normDge),
