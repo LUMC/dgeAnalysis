@@ -14,7 +14,7 @@ source("R/de_plots.R", local = TRUE)
 source("R/wcgna.R", local = TRUE)
 
 shiny::runApp(
-  "inst/src/",
+  appDir = "inst/src/",
   host = "0.0.0.0",
   port = 1402,
   launch.browser = TRUE
