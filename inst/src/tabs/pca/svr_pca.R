@@ -129,7 +129,7 @@ output[["setpc_pca3d"]] <- renderUI({
         inputId = "set_pca3d_pc2",
         label = "Select Y-axis PC:",
         choices = all_pc,
-        selected = selected = "PC2"
+        selected = "PC2"
       ),
       selectInput(
         inputId = "set_pca3d_pc3",
