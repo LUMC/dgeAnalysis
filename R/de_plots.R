@@ -1171,7 +1171,7 @@ biasPlot <- function(deTab, biasColumn, log, tick, sourceId) {
 #' @export
 
 geneStrandBar <- function(deTab) {
-  geneStrand <- as.data.frame(table(deTab$strand, deTab$DE, dnn = c("strand", "DE")))
+  geneStrand <- as.data.frame(table(deTab$geneStrand, deTab$DE, dnn = c("strand", "DE")))
   geneStrand$DE <- c("Down regulated", "Not sign.", "Up regulated")[match(geneStrand$DE, c(-1, 0, 1))]
   geneStrand$perc <- geneStrand$Freq / sum(geneStrand$Freq)
   
