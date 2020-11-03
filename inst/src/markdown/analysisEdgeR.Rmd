@@ -61,11 +61,10 @@ alpha <- params$alpha
 
 
 ```{r filterData}
-# FILTER DATA IF NESSECARY
+# FILTER DATA IF NECESSARY
 
-#Filter if nessecary
-data_samples <- data_samples[!rownames(data_samples) %in% excluded_samples, , drop=FALSE]
-data_counts <- data_counts[,!colnames(data_counts) %in% excluded_samples]
+data_samples <- data_samples[!rownames(data_samples) %in% excluded_samples, , drop = FALSE]
+data_counts <- data_counts[, !colnames(data_counts) %in% excluded_samples]
 
 ```
 
@@ -102,7 +101,7 @@ complexityPlot(se)
 ```{r filesIntoSE}
 # ADD ANNOTATION TO SE IF PRESENT
 
-se <- readCountsFromTable(data_counts[!grepl('^__', rownames(data_counts)),], data_samples)
+se <- readCountsFromTable(data_counts[!grepl('^__', rownames(data_counts)), ], data_samples)
 se <- addSamplesFromTableToSE(se, data_samples)
 if (!is.null(data_annotation)) {
   se <- addAnnotationsFromTableToSE(se, data_annotation)
@@ -115,10 +114,12 @@ if (!is.null(data_annotation)) {
 ```{r dge}
 # GET AND CREATE DGE
 
-dge <- DGEList(counts = assay(se), samples = colData(se), genes = rowData(se))
+dge <- DGEList(counts = assay(se),
+               samples = colData(se),
+               genes = rowData(se))
 row.names(dge$genes) <- row.names(dge$counts)
 
-dge <- dge[ rowSums( abs( dge$counts ) ) > 1, ]
+dge <- dge[rowSums(abs(dge$counts)) > 1,]
 
 tempDge <- dge
 tempDge$counts <- cpm(dge, log = TRUE)
@@ -132,9 +133,10 @@ The raw data is filtered based on the input values provided.
 ```{r selectedFeatures}
 # GET SELECTED FEATURES
 
-edger <- calcNormFactors( dge, method = "TMM")
+edger <- calcNormFactors(dge, method = "TMM")
 counts <- cpm(edger, log = TRUE)
-selectedFeatures <- rownames( edger )[ apply( counts, 1, function( v ) sum( v >= cpm_value ) ) >= 1/4 * ncol( counts ) ]
+selectedFeatures <- rownames(edger)[apply(counts, 1, function(v)
+  sum(v >= cpm_value)) >= 1 / 4 * ncol(counts)]
 
 ```
 
@@ -142,7 +144,7 @@ selectedFeatures <- rownames( edger )[ apply( counts, 1, function( v ) sum( v >=
 ```{r highExpressed}
 # GET HIGH EXPRESSED FEATURES
 
-highExprDge <- dge[ selectedFeatures,, keep.lib.sizes = FALSE ]
+highExprDge <- dge[selectedFeatures, , keep.lib.sizes = FALSE]
 
 ```
 
@@ -152,7 +154,7 @@ The filtered data is normalized using TMM.
 ```{r normalize}
 # NORMALIZE DATA
 
-normDge <- calcNormFactors( highExprDge, method = "TMM")
+normDge <- calcNormFactors(highExprDge, method = "TMM")
 
 tempDge <- normDge
 tempDge$counts <- cpm(normDge, log = TRUE)
@@ -170,7 +172,7 @@ The design matrix and contrasts are created, based on input values.
 get_design <- createDesign(normDge$samples, design_base, design_value, matrix_v1, matrix_v2)
 get_design
 normDge <- relevelSamples(normDge, design_base, design_value, matrix_v1, matrix_v2)
-design <- model.matrix(eval(parse(text=get_design)), normDge$samples)
+design <- model.matrix(eval(parse(text = get_design)), normDge$samples)
 design
 
 get_matrix1 <- createMatrix(normDge, design_base, design_value, matrix_v1)
@@ -203,9 +205,9 @@ summary(efit$DE)
 ```{r create_deTab}
 # CREATE deTab TABLE
 
-deTab <- topTags(efit, n=Inf)$table
-deTab <- deTab[order(rownames(deTab)),]
-deTab$DE <- c(efit$DE[order(rownames(efit$DE)),])
+deTab <- topTags(efit, n = Inf)$table
+deTab <- deTab[order(rownames(deTab)), ]
+deTab$DE <- c(efit$DE[order(rownames(efit$DE)), ])
 
 #ORDER deTab TABLE
 deTab$F <- NULL
@@ -215,7 +217,7 @@ deTab <- rename(deTab, "P.Value" = "PValue")
 deOrder <- c("avgLog2CPM", "avgLog2FC", "P.Value", "FDR", "DE")
 if (!is.null(data_annotation)) {
   deTab <- deTab[colnames(deTab)
-               [c(1, match(deOrder,names(deTab)), 2:(ncol(deTab)-5))]]
+                 [c(1, match(deOrder, names(deTab)), 2:(ncol(deTab) - 5))]]
 } else {
   deTab <- deTab[deOrder]
 }
@@ -224,11 +226,11 @@ if (!is.null(data_annotation)) {
 
 
 ```{r changeToSymbol}
-# CHANGE GENE ID TO SYMBOL IF NESSECARY
+# CHANGE GENE ID TO SYMBOL IF NECESSARY
 
 if (setGeneName == "symbol" && !is.null(data_annotation)) {
   tempCol <- rownames(deTab)
-  rownames(deTab) <- make.names(deTab$geneName, unique=TRUE)
+  rownames(deTab) <- make.names(deTab$geneName, unique = TRUE)
   deTab$geneName <- tempCol
   colnames(deTab)[1] <- "geneId"
   rownames(normDge$counts) <- rownames(deTab)
@@ -253,7 +255,7 @@ Results are saved, so they can be retrieved by the application.
 # SAVE ANALYSIS
 
 normDge$counts <- cpm(normDge, log = TRUE)
-save(deTab, normDge, file="analysis.RData")
+save(deTab, normDge, file = "analysis.RData")
 
 ```
 

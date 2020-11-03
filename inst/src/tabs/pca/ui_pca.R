@@ -1,7 +1,7 @@
 
 tab_pca <- tabItem(
   tabName = "pca",
-  align="center",
+  align = "center",
   br(),
   
   tabsetPanel(
@@ -13,8 +13,8 @@ tab_pca <- tabItem(
         sidebarPanel(
           width = 3,
           uiOutput("variance_pca_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("variance_pca", height = "600px") %>% withSpinner()
@@ -34,8 +34,8 @@ tab_pca <- tabItem(
           uiOutput("setpc_pca2d"),
           br(),
           uiOutput("samples_pca_2d_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("samples_pca_2d", height = "600px") %>% withSpinner()
@@ -57,8 +57,8 @@ tab_pca <- tabItem(
           uiOutput("setpc_pca3d"),
           br(),
           uiOutput("samples_pca_3d_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("samples_pca_3d", height = "600px") %>% withSpinner()

@@ -1,22 +1,26 @@
 
 tab_export <- tabItem(
   tabName = "export",
-  align="center",
+  align = "center",
   HTML('<hr style="border-color: #0088cc;">'),
   br(),
   br(),
   h2("Download tables"),
-  selectInput("dataset_select", "",
-              c("Normalized counts" = "normCounts",
-                "Log2 Normalized counts" = "normCountslog2",
-                "Full DE table" = "deTab",
-                "DE genes only" = "deg",
-                "PC values per gene (PCA)" = "pcGene",
-                "KEGG pathways" = "kegg",
-                "Reactome pathways" = "reactome",
-                "GO pathways" = "go",
-                "DO pathways" = "do")
-  ),
+  selectInput(
+    inputId = "dataset_select",
+    label = "",
+    choices = c(
+      "Normalized counts" = "normCounts",
+      "Log2 Normalized counts" = "normCountslog2",
+      "Full DE table" = "deTab",
+      "DE genes only" = "deg",
+      "PC values per gene (PCA)" = "pcGene",
+      "KEGG pathways" = "kegg",
+      "Reactome pathways" = "reactome",
+      "GO pathways" = "go",
+      "DO pathways" = "do"
+    )
+  ), 
   downloadButton("downloadCSV", label = "Download as CSV"),
   downloadButton("downloadTSV", label = "Download as TSV"),
   br(),

@@ -9,7 +9,9 @@ output[["detab_table"]] <- DT::renderDataTable({
       DT::datatable(inUse_deTab[inUse_deTab$DE != 0,], options = list(pageLength = 50, scrollX = TRUE))
     }
   }, error = function(err) {
-    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
+    return(DT::datatable(data.frame(c(
+      "No data available in table"
+    )), rownames = FALSE, colnames = ""))
   })
 })
 
@@ -37,10 +39,14 @@ output[["ma_plot"]] <- renderPlotly({
 output[["selected_ma"]] <- DT::renderDataTable({
   tryCatch({
     s <- event_data(event = "plotly_selected", source = "analysis_ma")
-    if(is.null(s)){s <- ""}
+    if (is.null(s)) {
+      s <- ""
+    }
     DT::datatable(inUse_deTab[s$key,], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
-    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
+    return(DT::datatable(data.frame(c(
+      "No data available in table"
+    )), rownames = FALSE, colnames = ""))
   })
 })
 
@@ -48,7 +54,9 @@ output[["selected_ma"]] <- DT::renderDataTable({
 output[["volcano_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    volcanoPlot(inUse_deTab, input$vulcanoLogCut, -log10(input$vulcanoPCut))
+    volcanoPlot(inUse_deTab,
+                input$vulcanoLogCut,
+                -log10(input$vulcanoPCut))
   }, error = function(err) {
     return(NULL)
   })
@@ -58,10 +66,14 @@ output[["volcano_plot"]] <- renderPlotly({
 output[["selected_volcano"]] <- DT::renderDataTable({
   tryCatch({
     s <- event_data(event = "plotly_selected", source = "analysis_volcano")
-    if(is.null(s)){s <- ""}
+    if (is.null(s)) {
+      s <- ""
+    }
     DT::datatable(inUse_deTab[s$key,], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
-    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
+    return(DT::datatable(data.frame(c(
+      "No data available in table"
+    )), rownames = FALSE, colnames = ""))
   })
 })
 
@@ -69,7 +81,13 @@ output[["selected_volcano"]] <- DT::renderDataTable({
 output[["barcode_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    barcodePlot(inUse_deTab, inUse_normDge, input$group_analysis_bar, input$slider_barcode, input$selected_analysis_bar)
+    barcodePlot(
+      inUse_deTab,
+      inUse_normDge,
+      input$group_analysis_bar,
+      input$slider_barcode,
+      input$selected_analysis_bar
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -78,9 +96,10 @@ output[["barcode_plot"]] <- renderPlotly({
 ## Set color of barcode
 output[["group_analysis_bar"]] <- renderUI({
   tryCatch({
-    selectInput(inputId = "group_analysis_bar",
-                label = "Color by:",
-                choices = colnames(data_samples())
+    selectInput(
+      inputId = "group_analysis_bar",
+      label = "Color by:",
+      choices = colnames(data_samples())
     )
   }, error = function(err) {
     return(NULL)
@@ -88,12 +107,13 @@ output[["group_analysis_bar"]] <- renderUI({
 })
 
 ## Add specific gene to barplot
-output[["analysis_bar_select_gene"]] <- renderUI({
+observe({
   tryCatch({
-    selectInput(inputId = "selected_analysis_bar",
-                label = "Add specific genes:",
-                multiple = TRUE,
-                choices = c("Click to add gene" = "", rownames(inUse_deTab))
+    updateSelectizeInput(
+      session = session,
+      inputId = 'selected_analysis_bar',
+      choices = rownames(inUse_deTab),
+      server = TRUE
     )
   }, error = function(err) {
     return(NULL)
@@ -113,15 +133,17 @@ output[["p_val_plot"]] <- renderPlotly({
 ## INFORMATION BOXES
 
 output[["de_ratio_info"]] <- renderUI({
-  infoText <- "The DE ratio plot gives a quick overview of the amount of differentially expressed genes. 
+  infoText <-
+    "The DE ratio plot gives a quick overview of the amount of differentially expressed genes.
         (down, not and up-regulated) The exact amount of genes are shown inside the plot. The dispersion
-        of the Y-axis is based on the percentages. This is calculated based on the total amount of genes 
+        of the Y-axis is based on the percentages. This is calculated based on the total amount of genes
         after filtering."
   informationBox(infoText)
 })
 
 output[["ma_plot_info"]] <- renderUI({
-  infoText <- "The MA plot (Mean average), plots all genes after filtering. This plot creates a figure with
+  infoText <-
+    "The MA plot (Mean average), plots all genes after filtering. This plot creates a figure with
         log-intensity ratios (M-values) and log-intensity averages (A-values). The MA plot can give a
         view of all genes and their amount of expression in a comparison of two groups. On the
         X-axis the Log2CPM values (A) are plotted against the Log2FC values on the Y-axis (M). In
@@ -131,7 +153,8 @@ output[["ma_plot_info"]] <- renderUI({
 })
 
 output[["volcano_plot_info"]] <- renderUI({
-  infoText <- "The volcano plot also shows the most expressed genes and can give a good view of the
+  infoText <-
+    "The volcano plot also shows the most expressed genes and can give a good view of the
         expression results. The X-axis contains the Log2FC (magnitude of change) and the Y-axis
         shows -Log10 p-value (statistical significance). A great benefit of the volcano plot is that it
         makes genes with a high fold-change, who are statistically significant, well visible. If genes
@@ -141,7 +164,8 @@ output[["volcano_plot_info"]] <- renderUI({
 })
 
 output[["barcode_plot_info"]] <- renderUI({
-  infoText <- "The barcode plot shows the most expressed genes. The X-axis shows the Log2CPM
+  infoText <-
+    "The barcode plot shows the most expressed genes. The X-axis shows the Log2CPM
         for every sample per gene. The Y-axis shows most expressed genes (from top to
         bottom). Every bar stands for a sample. With this plot differences between samples for a
         specific gene is visible."
@@ -149,7 +173,8 @@ output[["barcode_plot_info"]] <- renderUI({
 })
 
 output[["p_val_plot_info"]] <- renderUI({
-  infoText <- "The p-value plot is used as a quality control plot. When all bars, for example, are all the
+  infoText <-
+    "The p-value plot is used as a quality control plot. When all bars, for example, are all the
         same height, then the analysis can be described as “noisy”. The ideal pattern would be that
         bars around a p-value of zero are high. Next, the bars should get lower in a nice (steep)
         curve and should be (almost) zero at the p-value of one."

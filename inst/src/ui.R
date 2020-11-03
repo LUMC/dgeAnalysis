@@ -31,14 +31,12 @@ ui <- dashboardPage(
     collapsed = FALSE,
     width = 350,
     
-    sidebarMenu(
-      sidebarMenuOutput("sidebar_tabs")
-    )
+    sidebarMenu(sidebarMenuOutput("sidebar_tabs"))
   ),
   dashboardBody(
     useShinyjs(),
     includeCSS("css/styles.css", local = TRUE),
-    tags$head(tags$link(rel="shortcut icon", href = "lumcFavicon.png")),
+    tags$head(tags$link(rel = "shortcut icon", href = "lumcFavicon.png")),
     
     tabItems(
       tab_home,

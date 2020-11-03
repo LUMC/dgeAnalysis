@@ -1,7 +1,7 @@
 
 tab_about <- tabItem(
   tabName = "about",
-  align="center",
+  align = "center",
   br(),
   
   HTML('<hr style="border-color: #0088cc;">'),
@@ -14,15 +14,19 @@ tab_about <- tabItem(
   h3("Version:", as.character(packageVersion("dgeAnalysis"))),
   h2("Developed by LUMC-SASC team"),
   h3("Tom Kuipers"),
-  h4(
-    "Leon Mei", tags$br(),
-    "Davy Cats", tags$br()
-  ),
+  h4("Leon Mei", tags$br(),
+     "Davy Cats", tags$br()),
   br(),
   
-  h3(a(href="https://github.com/LUMC/DGE_analysis", "GitHub page", target="_blank")),
-  img(src="lumcLogo.png", width="300px"),
-  br(),br(),br(),
+  h3(
+    a(href = "https://github.com/LUMC/DGE_analysis",
+      "GitHub page",
+      target = "_blank")
+  ),
+  img(src = "lumcLogo.png", width = "300px"),
+  br(),
+  br(),
+  br(),
   HTML('<hr style="border-color: #0088cc;">'),
   
   h2("Session info"),

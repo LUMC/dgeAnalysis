@@ -5,49 +5,72 @@ get_reactome <- reactive({
     checkReload()
     
     organism <- get_organismID(inUse_deTab)
-    org <- list(ENSCEL="celegans",
-                ENS="human",
-                ENSMUS="mouse",
-                ENSRNO="rat")
+    org <- list(
+      ENSCEL = "celegans",
+      ENS = "human",
+      ENSMUS = "mouse",
+      ENSRNO = "rat"
+    )
     organism <- org[[organism]]
     
     if (input$choose_reactome == "enrich") {
-      showModal(
-        modalDialog(
-          h1("Enrichment is running..."),
-          h4("Reactome enrichment based on DE genes (with entrezID)"),
-          img(src="loading.gif", width = "50%"),
-          footer=NULL
+      showModal(modalDialog(
+        h1("Enrichment is running..."),
+        h4("Reactome enrichment based on DE genes (with entrezID)"),
+        img(src = "loading.gif", width = "50%"),
+        footer = NULL
+      ))
+      suppressMessages(
+        enrich <- ReactomePA::enrichPathway(
+          inUse_deTab$entrez[inUse_deTab$DE != 0],
+          organism = organism,
+          pvalueCutoff = 0.05
         )
       )
-      suppressMessages(enrich <- ReactomePA::enrichPathway(inUse_deTab$entrez[inUse_deTab$DE!=0], organism=organism, pvalueCutoff=0.05))
     } else {
-      showModal(
-        modalDialog(
-          h1("Enrichment is running..."),
-          h4("Reactome enrichment based on all genes (with entrezID) and Log2FC"),
-          img(src="loading.gif", width = "50%"),
-          footer=NULL
-        )
-      )
+      showModal(modalDialog(
+        h1("Enrichment is running..."),
+        h4("Reactome enrichment based on all genes (with entrezID) and Log2FC"),
+        img(src = "loading.gif", width = "50%"),
+        footer = NULL
+      ))
       set.seed(1234)
       geneList <- get_geneList(inUse_deTab)
-      suppressMessages(enrich <- ReactomePA::gsePathway(geneList, organism=organism, nPerm=10000, pvalueCutoff=0.05, verbose=FALSE, seed=TRUE))
+      suppressMessages(
+        enrich <- ReactomePA::gsePathway(
+          geneList,
+          organism = organism,
+          nPerm = 10000,
+          pvalueCutoff = 0.05,
+          verbose = FALSE,
+          seed = TRUE
+        )
+      )
       enrich@result$Count <- lengths(strsplit(enrich$core_enrichment, "/"))
     }
     
     removeModal()
     if (nrow(as.data.frame(enrich)) == 0) {
-      showNotification(ui = "Reactome enrichment has not found any enriched terms!", duration = 5, type = "warning")
+      showNotification(ui = "Reactome enrichment has not found any enriched terms!",
+                       duration = 5,
+                       type = "warning")
     } else {
-      showNotification(ui = "Reactome enrichment has been succesful!", duration = 5, type = "message")
+      showNotification(ui = "Reactome enrichment has been succesful!",
+                       duration = 5,
+                       type = "message")
     }
     enrich
   }, error = function(err) {
     removeModal()
-    showNotification(ui = "Reactome enrichment failed with an error!", duration = 5, type = "error")
-    showNotification(ui = "Reactome enrichment supports: ENSCEL, ENS, ENSMUS and ENSRNO", duration = 10, type = "error")
-    showNotification(ui = as.character(err), duration = 10, type = "error")
+    showNotification(ui = "Reactome enrichment failed with an error!",
+                     duration = 5,
+                     type = "error")
+    showNotification(ui = "Reactome enrichment supports: ENSCEL, ENS, ENSMUS and ENSRNO",
+                     duration = 10,
+                     type = "error")
+    showNotification(ui = as.character(err),
+                     duration = 10,
+                     type = "error")
     print(err)
     return(NULL)
   })
@@ -58,10 +81,12 @@ output[["reactome_data_table"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
     enrich <- as.data.frame(get_reactome())
-    enrich <- enrich[,!(colnames(enrich) %in% c("ID", "leading_edge", "core_enrichment", "geneID"))]
+    enrich <- enrich[, !(colnames(enrich) %in% c("ID", "leading_edge", "core_enrichment", "geneID"))]
     DT::datatable(enrich, options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
-    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
+    return(DT::datatable(data.frame(c(
+      "No data available in table"
+    )), rownames = FALSE, colnames = ""))
   })
 })
 
@@ -70,7 +95,9 @@ output[["reactome_barplot"]] <- renderPlotly({
   tryCatch({
     checkReload()
     enrich <- as.data.frame(get_reactome())
-    enrichBarplot(enrich, input$bar_reactome_slider, input$bar_reactome_value)
+    enrichBarplot(enrich,
+                  input$bar_reactome_slider,
+                  input$bar_reactome_value)
   }, error = function(err) {
     return(NULL)
   })
@@ -81,7 +108,14 @@ output[["bar_reactome_slider"]] <- renderUI({
   tryCatch({
     checkReload()
     enrich <- as.data.frame(get_reactome())
-    sliderInput("bar_reactome_slider", "Amount of shown pathways:", nrow(enrich)/2, min = 1, max = nrow(enrich), step=1)
+    sliderInput(
+      inputId = "bar_reactome_slider",
+      label = "Amount of shown pathways:",
+      value = nrow(enrich) / 2,
+      min = 1,
+      max = nrow(enrich),
+      step = 1
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -93,9 +127,18 @@ output[["cnet_reactome_plot"]] <- renderPlotly({
     checkReload()
     enrich <- get_reactome()
     
-    geneSets <- extract_geneSets(enrich, input$cnet_reactome_slider, input$reactome_select_pathway)
+    geneSets <- extract_geneSets(enrich,
+                                 input$cnet_reactome_slider,
+                                 input$reactome_select_pathway)
     graphData <- cnetPlotly(enrich, geneSets, inUse_deTab)
-    plotlyGraph(graphData, "Gene-Concept Network", "Log2FC", length(geneSets), input$cnet_reactome_annoP, input$cnet_reactome_annoG)
+    plotlyGraph(
+      graphData,
+      "Gene-Concept Network",
+      "Log2FC",
+      length(geneSets),
+      input$cnet_reactome_annoP,
+      input$cnet_reactome_annoG
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -105,10 +148,11 @@ output[["cnet_reactome_plot"]] <- renderPlotly({
 output[["cnet_reactome_select_pathway"]] <- renderUI({
   tryCatch({
     enrich <- as.data.frame(get_reactome())
-    selectInput(inputId = "reactome_select_pathway",
-                label = "Add specific pathway:",
-                multiple = TRUE,
-                choices = c("Click to add pathway" = "", enrich$Description)
+    selectInput(
+      inputId = "reactome_select_pathway",
+      label = "Add specific pathway:",
+      multiple = TRUE,
+      choices = c("Click to add pathway" = "", enrich$Description)
     )
   }, error = function(err) {
     return(NULL)
@@ -121,15 +165,19 @@ output[["cnet_reactome_table"]] <- DT::renderDataTable({
     checkReload()
     enrich <- get_reactome()
     
-    geneSets <- extract_geneSets(enrich, input$cnet_reactome_slider, input$reactome_select_pathway)
+    geneSets <- extract_geneSets(enrich,
+                                 input$cnet_reactome_slider,
+                                 input$reactome_select_pathway)
     graphData <- cnetPlotly(enrich, geneSets, inUse_deTab)
     if ("geneName" %in% colnames(inUse_deTab)) {
-      DT::datatable(inUse_deTab[inUse_deTab$geneName %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
+      DT::datatable(inUse_deTab[inUse_deTab$geneName %in% names(V(graphData)),], options = list(pageLength = 15, scrollX = TRUE))
     } else {
-      DT::datatable(inUse_deTab[rownames(inUse_deTab) %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
+      DT::datatable(inUse_deTab[rownames(inUse_deTab) %in% names(V(graphData)),], options = list(pageLength = 15, scrollX = TRUE))
     }
   }, error = function(err) {
-    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
+    return(DT::datatable(data.frame(c(
+      "No data available in table"
+    )), rownames = FALSE, colnames = ""))
   })
 })
 
@@ -139,7 +187,9 @@ output[["heat_reactome_plot"]] <- renderPlotly({
     checkReload()
     enrich <- get_reactome()
     
-    geneSets <- extract_geneSets(enrich, input$heat_reactome_slider, input$reactome_select_heat)
+    geneSets <- extract_geneSets(enrich,
+                                 input$heat_reactome_slider,
+                                 input$reactome_select_heat)
     heatplotly(geneSets, inUse_deTab)
   }, error = function(err) {
     return(NULL)
@@ -150,10 +200,11 @@ output[["heat_reactome_plot"]] <- renderPlotly({
 output[["heat_reactome_select_pathway"]] <- renderUI({
   tryCatch({
     enrich <- as.data.frame(get_reactome())
-    selectInput(inputId = "reactome_select_heat",
-                label = "Add specific pathway:",
-                multiple = TRUE,
-                choices = c("Click to add pathway" = "", enrich$Description)
+    selectInput(
+      inputId = "reactome_select_heat",
+      label = "Add specific pathway:",
+      multiple = TRUE,
+      choices = c("Click to add pathway" = "", enrich$Description)
     )
   }, error = function(err) {
     return(NULL)
@@ -166,15 +217,19 @@ output[["heat_reactome_table"]] <- DT::renderDataTable({
     checkReload()
     enrich <- get_reactome()
     
-    geneSets <- extract_geneSets(enrich, input$heat_reactome_slider, input$reactome_select_heat)
+    geneSets <- extract_geneSets(enrich,
+                                 input$heat_reactome_slider,
+                                 input$reactome_select_heat)
     graphData <- cnetPlotly(enrich, geneSets, inUse_deTab)
     if ("geneName" %in% colnames(inUse_deTab)) {
-      DT::datatable(inUse_deTab[inUse_deTab$geneName %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
+      DT::datatable(inUse_deTab[inUse_deTab$geneName %in% names(V(graphData)),], options = list(pageLength = 15, scrollX = TRUE))
     } else {
-      DT::datatable(inUse_deTab[rownames(inUse_deTab) %in% names(V(graphData)), ], options = list(pageLength = 15, scrollX = TRUE))
+      DT::datatable(inUse_deTab[rownames(inUse_deTab) %in% names(V(graphData)),], options = list(pageLength = 15, scrollX = TRUE))
     }
   }, error = function(err) {
-    return(DT::datatable(data.frame(c("No data available in table")), rownames = FALSE, colnames = ""))
+    return(DT::datatable(data.frame(c(
+      "No data available in table"
+    )), rownames = FALSE, colnames = ""))
   })
 })
 
@@ -184,7 +239,12 @@ output[["gsea_reactome_plot"]] <- renderPlotly({
     checkReload()
     enrich <- get_reactome()
     graphData <- emap_plotly(enrich)
-    plotlyGraph(graphData, "Reactome", "P-Value", 0, input$reactome_network_annoP, FALSE)
+    plotlyGraph(graphData,
+                "Reactome",
+                "P-Value",
+                0,
+                input$reactome_network_annoP,
+                FALSE)
   }, error = function(err) {
     return(NULL)
   })
@@ -196,8 +256,7 @@ output[["select_reactome_pathway"]] <- renderUI({
     checkReload()
     enrich <- as.data.frame(get_reactome())
     selectInput("reactome_select", "Select a pathway:",
-                enrich$Description
-    )
+                enrich$Description)
   }, error = function(err) {
     return(NULL)
   })
@@ -209,8 +268,26 @@ output[["pathway_from_reactome"]] <- renderUI({
     checkReload()
     enrich <- as.data.frame(get_reactome())
     getpathway <- rownames(enrich)[enrich$Description %in% input$reactome_select]
-    getFromReactome <- includeHTML(paste("https://reactome.org/ContentService/exporter/diagram/", getpathway, ".svg?title=false", sep=""))
-    getFromReactome <- HTML(paste('<a href="https://reactome.org/PathwayBrowser/#/', getpathway, '" target="_blank">\n', getFromReactome, '\n</a>', sep=""))
+    getFromReactome <-
+      includeHTML(
+        paste(
+          "https://reactome.org/ContentService/exporter/diagram/",
+          getpathway,
+          ".svg?title=false",
+          sep = ""
+        )
+      )
+    getFromReactome <-
+      HTML(
+        paste(
+          '<a href="https://reactome.org/PathwayBrowser/#/',
+          getpathway,
+          '" target="_blank">\n',
+          getFromReactome,
+          '\n</a>',
+          sep = ""
+        )
+      )
     getFromReactome
   }, error = function(err) {
     return(NULL)
@@ -218,7 +295,8 @@ output[["pathway_from_reactome"]] <- renderUI({
 })
 
 output[["reactome_barplot_info"]] <- renderUI({
-  infoText <- "The bar plot shows a sorted list of the most enriched terms. The bar plot is sorted based on
+  infoText <-
+    "The bar plot shows a sorted list of the most enriched terms. The bar plot is sorted based on
         the selected value (p-value, q-value or adjusted p-value). The colors of the bars are also
         generated based on the earlier selected value. On the X-axis, the amount of genes linked to
         the pathway is shown."
@@ -226,7 +304,8 @@ output[["reactome_barplot_info"]] <- renderUI({
 })
 
 output[["cnet_reactome_plot_info"]] <- renderUI({
-  infoText <- "The concept network can show which genes are involved in the most significant terms. The
+  infoText <-
+    "The concept network can show which genes are involved in the most significant terms. The
         most enriched terms together with all corresponding genes are collected and shown in a
         network plot. Some pathways may contain some matching genes. These genes will also be
         connected. The color given to genes is based on the log fold change determined after the
@@ -236,14 +315,16 @@ output[["cnet_reactome_plot_info"]] <- renderUI({
 })
 
 output[["heat_reactome_plot_info"]] <- renderUI({
-  infoText <- "The heatmap visualizes pathways and the corresponding genes. The genes are sorted based on 
+  infoText <-
+    "The heatmap visualizes pathways and the corresponding genes. The genes are sorted based on
         Log2FC. The pathways are sorted on number of gene mathes between other pathways, listing pathways with
         the most gene matches on the left. With this plot genes present in pathways can be compared on sight."
   informationBox(infoText)
 })
 
 output[["reactome_network_info"]] <- renderUI({
-  infoText <- "The pathway network shows connections between all found pathways. Every dot that the
+  infoText <-
+    "The pathway network shows connections between all found pathways. Every dot that the
         plot shows represents a pathway. The color given to the pathways is based on the adjusted
         p-value."
   informationBox(infoText)

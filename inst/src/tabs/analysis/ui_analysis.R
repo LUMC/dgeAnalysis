@@ -1,7 +1,7 @@
 
 tab_analysis <- tabItem(
   tabName = "analysis",
-  align="center",
+  align = "center",
   br(),
   
   tabsetPanel(
@@ -9,12 +9,12 @@ tab_analysis <- tabItem(
       title = "DE table",
       HTML('<hr style="border-color: #0088cc;">'),
       radioButtons(
-        "setdeTab",
-        "Show selection:",
+        inputId = "setdeTab",
+        label = "Show selection:",
         inline = TRUE,
-        c("All genes" = "all",
-          "DE genes" = "deg")
-      ),
+        choices = c("All genes" = "all",
+                    "DE genes" = "deg")
+      ), 
       DT::dataTableOutput("detab_table") %>% withSpinner(),
       HTML('<hr style="border-color: #0088cc;">')
     ),
@@ -27,8 +27,8 @@ tab_analysis <- tabItem(
         sidebarPanel(
           width = 3,
           uiOutput("de_ratio_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("de_ratio", height = "600px") %>% withSpinner()
@@ -45,8 +45,8 @@ tab_analysis <- tabItem(
         sidebarPanel(
           width = 3,
           uiOutput("ma_plot_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("ma_plot", height = "600px") %>% withSpinner()
@@ -64,12 +64,26 @@ tab_analysis <- tabItem(
         position = "right",
         sidebarPanel(
           width = 3,
-          sliderInput("vulcanoLogCut", "LogFC Cutoff", 1, min = 0, max = 25, step=0.1),
-          sliderInput("vulcanoPCut", "P-Value Cutoff", 0.05, min = 0.01, max = 1, step=0.01),
+          sliderInput(
+            inputId = "vulcanoLogCut",
+            label = "LogFC Cutoff",
+            value = 1,
+            min = 0,
+            max = 25,
+            step = 0.1
+          ),
+          sliderInput(
+            inputId = "vulcanoPCut",
+            label = "P-Value Cutoff",
+            value = 0.05,
+            min = 0.01,
+            max = 1,
+            step = 0.01
+          ), 
           br(),
           uiOutput("volcano_plot_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("volcano_plot", height = "600px") %>% withSpinner()
@@ -88,12 +102,25 @@ tab_analysis <- tabItem(
         sidebarPanel(
           width = 3,
           uiOutput("group_analysis_bar"),
-          uiOutput("analysis_bar_select_gene"),
-          sliderInput("slider_barcode", "Set the number of genes to show:", value = 10, min = 1,  max = 50, step = 1),
+          selectInput(
+            inputId = "selected_analysis_bar",
+            label = "Add specific genes:",
+            multiple = TRUE,
+            choices = c("Click to add gene" = ""),
+            selected = 1
+          ),
+          sliderInput(
+            inputId = "slider_barcode",
+            label = "Set the number of genes to show:",
+            value = 10,
+            min = 1,
+            max = 50,
+            step = 1
+          ),
           br(),
           uiOutput("barcode_plot_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("barcode_plot", height = "600px") %>% withSpinner()
@@ -110,8 +137,8 @@ tab_analysis <- tabItem(
         sidebarPanel(
           width = 3,
           uiOutput("p_val_plot_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("p_val_plot", height = "600px") %>% withSpinner()

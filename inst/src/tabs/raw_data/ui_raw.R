@@ -1,7 +1,7 @@
 
 tab_raw_data <- tabItem(
   tabName = "raw_data",
-  align="center",
+  align = "center",
   br(),
   
   tabsetPanel(
@@ -13,8 +13,8 @@ tab_raw_data <- tabItem(
         sidebarPanel(
           width = 3,
           uiOutput("dist_line_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("dist_line", height = "600px") %>% withSpinner()
@@ -31,8 +31,8 @@ tab_raw_data <- tabItem(
         sidebarPanel(
           width = 3,
           uiOutput("dist_boxplot_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("dist_boxplot", height = "600px") %>% withSpinner()
@@ -48,12 +48,19 @@ tab_raw_data <- tabItem(
         position = "right",
         sidebarPanel(
           width = 3,
-          sliderInput("slider_raw_voom", "Set Log2CPM cutoff:", value = 1, min = 0,  max = 10, step=0.1),
+          sliderInput(
+            inputId = "slider_raw_voom",
+            label = "Set Log2CPM cutoff:",
+            value = 1,
+            min = 0,
+            max = 10,
+            step = 0.1
+          ),
           uiOutput("raw_voom_ngenes"),
           br(),
           uiOutput("raw_voom_plot_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("raw_voom_plot", height = "600px") %>% withSpinner()
@@ -74,8 +81,8 @@ tab_raw_data <- tabItem(
           uiOutput("group_raw_mds2d"),
           br(),
           uiOutput("un_cluster_2d_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("un_cluster_2d", height = "600px") %>% withSpinner()
@@ -96,8 +103,8 @@ tab_raw_data <- tabItem(
           uiOutput("group_raw_mds3d"),
           br(),
           uiOutput("un_cluster_3d_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("un_cluster_3d", height = "600px") %>% withSpinner()

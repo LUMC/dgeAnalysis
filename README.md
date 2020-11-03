@@ -1,6 +1,6 @@
 # dgeAnalysis
 
-This R package contains the R-Shiny application v1.3.1 developed to perform differential gene expression analysis.
+This R package contains the R-Shiny application v1.3.2 developed to perform differential gene expression analysis.
 * dgeAnalysis manual: https://github.com/LUMC/dgeAnalysis/blob/master/MANUAL.pdf
 
 ## Installing

@@ -2,17 +2,17 @@
 ## Start an analysis
 observeEvent(input$run_button, {
   if (!is.null(preMarkdownChecks())) {
-    showNotification(ui = preMarkdownChecks(), duration = 5, type = "error")
+    showNotification(ui = preMarkdownChecks(),
+                     duration = 5,
+                     type = "error")
     return(NULL)
   }
   
-  showModal(
-    modalDialog(
-      h1("Analysis is running..."),
-      img(src="loading.gif", width = "50%"),
-      footer=NULL
-    )
-  )
+  showModal(modalDialog(
+    h1("Analysis is running..."),
+    img(src = "loading.gif", width = "50%"),
+    footer = NULL
+  ))
   
   results <- tryCatch({
     rmarkdown::render(
@@ -28,20 +28,26 @@ observeEvent(input$run_button, {
         design_value = input$design_value,
         matrix_v1 = input$matrix_val1,
         matrix_v2 = input$matrix_val2,
-        alpha = input$alpha_value),
+        alpha = input$alpha_value
+      ),
       output_file = paste0(input$analysis_method, '.html')
     )
-    load("markdown/analysis.RData", envir=.GlobalEnv)
+    load("markdown/analysis.RData", envir = .GlobalEnv)
     inUse_deTab <<- deTab
     inUse_normDge <<- normDge
-    showNotification(ui = "Analysis has been succesful!", duration = 5, type = "message")
+    showNotification(ui = "Analysis has been succesful!",
+                     duration = 5,
+                     type = "message")
   }, error = function(err) {
-    showNotification(ui = "The analysis failed with an error!", duration = 5, type = "error")
-    showNotification(ui = as.character(err), duration = 10, type = "error")
+    showNotification(ui = "The analysis failed with an error!",
+                     duration = 5,
+                     type = "error")
+    showNotification(ui = as.character(err),
+                     duration = 10,
+                     type = "error")
     print(err)
     return(NULL)
-  }
-  )
+  })
   removeModal()
 }, ignoreInit = TRUE)
 
@@ -51,7 +57,7 @@ preMarkdownChecks <- reactive ({
     return("Wrong analysis mode!")
   } else if (is.null(input$matrix_val1) | is.null(input$matrix_val2)) {
     return("One of the contrast is empty!")
-  } else if (paste(input$matrix_val1, collapse="") == paste(input$matrix_val2, collapse="")) {
+  } else if (paste0(input$matrix_val1) == paste0(input$matrix_val2)) {
     return("Contrasts cant be the same!")
   } else if (!is.null(input$setGeneName)) {
     if (input$setGeneName == "symbol" & !("geneName" %in% colnames(data_annotation()))) {
@@ -64,10 +70,14 @@ preMarkdownChecks <- reactive ({
 ## Render base column for design
 output[["design_base"]] <- renderUI({
   tryCatch({
-    if (is.null(input$file_samples)){return(NULL)}
+    if (is.null(input$file_samples)) {
+      return(NULL)
+    }
     
-    selectInput("design_base", "Select base column for comparison:",
-                colnames(data_samples())
+    selectInput(
+      inputId = "design_base",
+      label = "Select base column for comparison:",
+      choices = colnames(data_samples())
     )
   }, error = function(err) {
     return(NULL)
@@ -77,19 +87,25 @@ output[["design_base"]] <- renderUI({
 ## Render nested design values
 output[["design_value"]] <- renderUI({
   tryCatch({
-    if (is.null(input$design_base)){return(NULL)}
-    if (input$design_type == "basic"){
-      checkboxGroupInput("design_value",
-                         "",
-                         choices = character(0),
-                         inline = TRUE
+    if (is.null(input$design_base)) {
+      return(NULL)
+    }
+    if (input$design_type == "basic") {
+      checkboxGroupInput(
+        inputId = "design_value",
+        label = "",
+        choices = character(0),
+        inline = TRUE
       )
     } else {
-      showNotification(ui = "WARNING: This type of analysis is 'more advanced'! Make sure you know what you are doing!", duration = 5, type = "warning")
-      checkboxGroupInput("design_value",
-                         "Select nested columns, relative to base column:",
-                         choices = colnames(data_samples())[!colnames(data_samples()) %in% input$design_base],
-                         inline = TRUE
+      showNotification(ui = "WARNING: This type of analysis is 'more advanced'! Make sure you know what you are doing!",
+                       duration = 5,
+                       type = "warning")
+      checkboxGroupInput(
+        inputId = "design_value",
+        label = "Select nested columns, relative to base column:",
+        choices = colnames(data_samples())[!colnames(data_samples()) %in% input$design_base],
+        inline = TRUE
       )
     }
   }, error = function(err) {
@@ -104,20 +120,12 @@ AllInputs <- reactive({
 
 ## Show matrix selectizes in current mode
 output[["matrix"]] <- renderUI({
-  fluidRow(
-    column(
-      width = 5,
-      uiOutput("matrix_value1")
-    ),
-    column(
-      width = 2,
-      h2("VS")
-    ),
-    column(
-      width = 5,
-      uiOutput("matrix_value2")
-    )
-  )
+  fluidRow(column(width = 5,
+                  uiOutput("matrix_value1")),
+           column(width = 2,
+                  h2("VS")),
+           column(width = 5,
+                  uiOutput("matrix_value2")))
 })
 
 ## Select items for left matrix
@@ -125,11 +133,12 @@ output[["matrix_value1"]] <- renderUI({
   tryCatch({
     columns <- c(input$design_base, input$design_value)
     
-    selectInput(inputId = "matrix_val1",
-                label = "Select values for comparison:",
-                multiple = TRUE,
-                selected = AllInputs()[["matrix_val1"]],
-                choices = c("(Treatment)" = "", unique(data_samples()[columns]))
+    selectInput(
+      inputId = "matrix_val1",
+      label = "Select values for comparison:",
+      multiple = TRUE,
+      selected = AllInputs()[["matrix_val1"]],
+      choices = c("(Treatment)" = "", unique(data_samples()[columns]))
     )
   }, error = function(err) {
     return(NULL)
@@ -141,11 +150,12 @@ output[["matrix_value2"]] <- renderUI({
   tryCatch({
     columns <- c(input$design_base, input$design_value)
     
-    selectInput(inputId = "matrix_val2",
-                label = "Select values for comparison:",
-                multiple = TRUE,
-                selected = AllInputs()[["matrix_val2"]],
-                choices = c("(Control)" = "", unique(data_samples()[columns]))
+    selectInput(
+      inputId = "matrix_val2",
+      label = "Select values for comparison:",
+      multiple = TRUE,
+      selected = AllInputs()[["matrix_val2"]],
+      choices = c("(Control)" = "", unique(data_samples()[columns]))
     )
   }, error = function(err) {
     return(NULL)
@@ -155,7 +165,14 @@ output[["matrix_value2"]] <- renderUI({
 ## Show the current design in use
 output[["show_design"]] <- renderUI({
   tryCatch({
-    design <- createDesign(data_samples(), input$design_base, input$design_value, input$matrix_val1, input$matrix_val2)
+    design <-
+      createDesign(
+        data_samples(),
+        input$design_base,
+        input$design_value,
+        input$matrix_val1,
+        input$matrix_val2
+      )
     design <- gsub("\\+", " + ", design)
     if (design == "~" | design == "~0 + ") {
       design <- "No values selected"
@@ -204,7 +221,8 @@ output[["show_matrix"]] <- renderUI({
       total_matrix2 <- "No values selected"
     }
     
-    total_matrix <- paste(total_matrix1, total_matrix2, sep = " VS ")
+    total_matrix <-
+      paste(total_matrix1, total_matrix2, sep = " VS ")
   }, error = function(err) {
     return("No values selected VS No values selected")
   })
@@ -239,10 +257,12 @@ output[["setGeneName"]] <- renderUI({
       return(NULL)
     }
     
-    radioButtons("setGeneName", "Use gene ID or gene symbols:",
-                 inline = TRUE,
-                 c("Gene ID" = "id",
-                   "Gene Symbol" = "symbol")
+    radioButtons(
+      inputId = "setGeneName",
+      label = "Use gene ID or gene symbols:",
+      inline = TRUE,
+      choices = c("Gene ID" = "id",
+                  "Gene Symbol" = "symbol")
     )
   }, error = function(err) {
     return(NULL)

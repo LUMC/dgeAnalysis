@@ -1,7 +1,7 @@
 
 tab_alignment <- tabItem(
   tabName = "alignment",
-  align="center",
+  align = "center",
   br(),
   
   tabsetPanel(
@@ -21,7 +21,7 @@ tab_alignment <- tabItem(
           uiOutput("group_sum"),
           br(),
           uiOutput("align_sum_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
         ),
         mainPanel(
           width = 9,
@@ -45,10 +45,17 @@ tab_alignment <- tabItem(
               "Percentage" = "percent")
           ),
           uiOutput("group_color"),
-          sliderInput("comp_rank", "Set number of ranks (Genes):", value = 1000,  min = 10,  max = 10000, step=10),
+          sliderInput(
+            "comp_rank",
+            "Set number of ranks (Genes):",
+            value = 1000,
+            min = 10,
+            max = 10000,
+            step = 10
+          ),
           br(),
           uiOutput("complex_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
         ),
         mainPanel(
           width = 9,

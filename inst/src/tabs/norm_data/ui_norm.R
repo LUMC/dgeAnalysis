@@ -1,18 +1,17 @@
 
 tab_norm_data <- tabItem(
   tabName = "norm_data",
-  align="center",
+  align = "center",
   br(),
   
   tabsetPanel(
     tabPanel(
       title = "Normalized Counts",
       HTML('<hr style="border-color: #0088cc;">'),
-      fluidRow(
-        column(
-          12,
-          DT::dataTableOutput("normalized_counts") %>% withSpinner())
-      ),
+      fluidRow(column(
+        12,
+        DT::dataTableOutput("normalized_counts") %>% withSpinner()
+      )),
       HTML('<hr style="border-color: #0088cc;">')
     ),
     
@@ -24,8 +23,8 @@ tab_norm_data <- tabItem(
         sidebarPanel(
           width = 3,
           uiOutput("norm_dist_line_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("norm_dist_line", height = "600px") %>% withSpinner()
@@ -42,8 +41,8 @@ tab_norm_data <- tabItem(
         sidebarPanel(
           width = 3,
           uiOutput("norm_dist_boxplot_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("norm_dist_boxplot", height = "600px") %>% withSpinner()
@@ -62,8 +61,8 @@ tab_norm_data <- tabItem(
           uiOutput("norm_voom_ngenes"),
           br(),
           uiOutput("norm_voom_plot_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("norm_voom_plot", height = "600px") %>% withSpinner()
@@ -84,8 +83,8 @@ tab_norm_data <- tabItem(
           uiOutput("group_norm_mds2d"),
           br(),
           uiOutput("norm_un_cluster_2d_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("norm_un_cluster_2d", height = "600px") %>% withSpinner()
@@ -106,8 +105,8 @@ tab_norm_data <- tabItem(
           uiOutput("group_norm_mds3d"),
           br(),
           uiOutput("norm_un_cluster_3d_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("norm_un_cluster_3d", height = "600px") %>% withSpinner()

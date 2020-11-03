@@ -1,14 +1,18 @@
 
 tab_enrich_kegg <- tabItem(
   tabName = "enrich_kegg",
-  align="center",
+  align = "center",
   br(),
   
-  radioButtons("choose_kegg", "Select enrichment type:",
-               inline = TRUE,
-               c("Gene set enrichment" = "gse",
-                 "Over represented enrichment" = "enrich")
-  ),
+  radioButtons(
+    inputId = "choose_kegg",
+    label = "Select enrichment type:",
+    inline = TRUE,
+    choices = c(
+      "Gene set enrichment" = "gse",
+      "Over represented enrichment" = "enrich"
+    )
+  ), 
   
   tabsetPanel(
     tabPanel(
@@ -30,14 +34,16 @@ tab_enrich_kegg <- tabItem(
             inputId = "bar_kegg_value",
             label = "Color plot with:",
             selected = "pvalue",
-            c("P-Value" = "pvalue",
+            choices = c(
+              "P-Value" = "pvalue",
               "Adjusted P-Value" = "p.adjust",
-              "Q-Value" = "qvalues")
+              "Q-Value" = "qvalues"
+            )
           ),
           br(),
           uiOutput("kegg_barplot_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("kegg_barplot", height = "600px") %>% withSpinner()
@@ -53,15 +59,26 @@ tab_enrich_kegg <- tabItem(
         position = "right",
         sidebarPanel(
           width = 3,
-          sliderInput("cnet_kegg_slider", "Number of shown pathways:", 5, min = 0, max = 15, step=1),
+          sliderInput(
+            "cnet_kegg_slider",
+            "Number of shown pathways:",
+            5,
+            min = 0,
+            max = 15,
+            step = 1
+          ),
           uiOutput("cnet_kegg_select_pathway"),
           tags$b("Labels on/off:"),
-          checkboxInput("cnet_kegg_annoP", "Pathway labels", value = TRUE),
-          checkboxInput("cnet_kegg_annoG", "Gene labels", value = FALSE),
+          checkboxInput(inputId = "cnet_kegg_annoP",
+                        label = "Pathway labels",
+                        value = TRUE),
+          checkboxInput(inputId = "cnet_kegg_annoG",
+                        label = "Gene labels",
+                        value = FALSE), 
           br(),
           uiOutput("cnet_kegg_plot_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("cnet_kegg_plot", height = "600px") %>% withSpinner()
@@ -79,12 +96,19 @@ tab_enrich_kegg <- tabItem(
         position = "right",
         sidebarPanel(
           width = 3,
-          sliderInput("heat_kegg_slider", "Number of shown pathways:", 5, min = 0, max = 15, step=1),
+          sliderInput(
+            inputId = "heat_kegg_slider",
+            label = "Number of shown pathways:",
+            value = 5,
+            min = 0,
+            max = 15,
+            step = 1
+          ),
           uiOutput("heat_kegg_select_pathway"),
           br(),
           uiOutput("heat_kegg_plot_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("heat_kegg_plot", height = "600px") %>% withSpinner()
@@ -103,11 +127,13 @@ tab_enrich_kegg <- tabItem(
         sidebarPanel(
           width = 3,
           tags$b("Labels on/off:"),
-          checkboxInput("kegg_network_annoP", "Pathway labels", value = FALSE),
+          checkboxInput(inputId = "kegg_network_annoP",
+                        label = "Pathway labels",
+                        value = FALSE), 
           br(),
           uiOutput("kegg_network_info"),
-          span(icon("copyright"), "LUMC - SASC", style="color: #e3e3e3;")
-        ), 
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
         mainPanel(
           width = 9,
           plotlyOutput("gsea_kegg_plot", height = "600px") %>% withSpinner()
