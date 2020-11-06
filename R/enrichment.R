@@ -2,51 +2,6 @@
 ## ----- UTIL FUNCTIONS GENE SET ENRICHMENT -----
 
 
-#' Get LogFC from deTab.
-#' Add entrez id to geneList.
-#' Sort geneList based on LogFC (decreasing).
-#' Remove NA and duplicate names.
-#'
-#' @param deTab Dataframe, with all analysis results
-#'
-#' @return geneList, (Vector) Named vector containing gene names and LogFC values
-#'
-#' @export
-
-get_geneList <- function(deTab) {
-  geneList <- deTab$avgLog2FC
-  names(geneList) <- as.character(deTab$entrez)
-  geneList <- sort(geneList, decreasing = TRUE)
-  geneList <- geneList[na.omit(names(geneList))]
-  geneList <- geneList[!duplicated(names(geneList))]
-  geneList
-}
-
-
-#' Sets a new n value.
-#' n stands for the number of pathways to show.
-#'
-#' @param x Enrichment object, containing enrichment results
-#' @param showCategory Integer, number of pathways
-#'
-#' @return n, (Integer) Updated number of pathways to show
-#'
-#' @export
-
-update_n <- function(x, showCategory) {
-  if (!is.numeric(showCategory)) {
-    return(showCategory)
-  }
-  
-  n <- showCategory
-  if (nrow(x) < n) {
-    n <- nrow(x)
-  }
-  
-  return(n)
-}
-
-
 #' Collect genes within a pathway.
 #' Gets genes from enrichment result.
 #' geneSets names are set based on ID and description.
@@ -61,13 +16,11 @@ update_n <- function(x, showCategory) {
 #' @export
 
 extract_geneSets <- function(enrich, slider, selected) {
-  slider <- update_n(enrich, slider)
-  geneSets <- geneInCategory(enrich)
-  y <- as.data.frame(enrich)
-  geneSets <- geneSets[y$ID]
-  names(geneSets) <- y$Description
-  geneSets <- append(head(geneSets, slider), geneSets[selected])
-  geneSets <- geneSets[!duplicated(geneSets)]
+  splitTerms <- split(x = enrich$intersection, f = enrich$term_name)
+  geneSets <- splitTerms[0:slider]
+  geneSets <- append(geneSets, splitTerms[names(splitTerms) %in% selected])
+  geneSets <- lapply(geneSets, function(geneSets) unique(unlist(strsplit(geneSets, ",", perl = T))))
+  geneSets <- geneSets[unique(names(geneSets))]
   geneSets
 }
 
@@ -107,25 +60,6 @@ list2df <- function(inputList) {
   })
   
   do.call('rbind', ldf)
-}
-
-
-#' Overlap is calculated and define between x and y.
-#' The number of overlaps is returned.
-#' Igraph object is created based on a vector/list.
-#'
-#' @param x Vector, genes relative to x axis
-#' @param y Vector, genes relative to y axis
-#'
-#' @return n, (Integer) Number of overlapping values
-#'
-#' @export
-
-overlap_ratio <- function(x, y) {
-  x <- unlist(x)
-  y <- unlist(y)
-  n <- length(intersect(x, y)) / length(unique(c(x, y)))
-  n
 }
 
 
@@ -170,30 +104,31 @@ get_organismID <- function(deTab) {
 #'
 #' @export
 
-enrichBarplot <- function(enrich, amount, value) {
+enrichBarplot <- function(enrich, amount) {
   enrich <- na.omit(enrich[0:amount, ])
-  enrich$Description <- factor(enrich$Description,
-                               levels = unique(enrich$Description)[order(enrich[[value]],
-                                                                         enrich$Description,
-                                                                         decreasing = TRUE)])
+  enrich$term_name <- factor(enrich$term_name,
+                             levels = unique(enrich$term_name)[order(enrich$p_value,
+                                                                     enrich$term_name,
+                                                                     decreasing = TRUE)])
   color <- seq(
-    from = min(enrich[[value]]),
-    to = max(enrich[[value]]),
+    from = min(enrich$p_value),
+    to = max(enrich$p_value),
     length.out = 10
   )[2:9]
+  
   p <- plot_ly(
     data = enrich,
-    x = ~ Count,
-    y = ~ Description,
+    x = ~ intersection_size,
+    y = ~ term_name,
     orientation = 'h',
     type = "bar",
     hoverinfo = 'text',
-    text = paste("# Genes:", enrich$Count),
+    text = paste("Source:", enrich$source, "\n# Genes:", enrich$intersection_size),
     marker = list(
-      color = -enrich[[value]],
+      color = -enrich$p_value,
       colorscale = 'Viridis',
       colorbar = list(
-        title = value,
+        title = "P-value",
         tickmode = "array",
         tickvals = -color,
         ticktext = floor(color) + signif(color %% 1, 4)
@@ -218,56 +153,6 @@ enrichBarplot <- function(enrich, amount, value) {
 }
 
 
-#' Pathways are gathered from enrichment result with pathway description.
-#' A Igraph object is created with links between pathways.
-#' Colors of dots are based on p-value.
-#'
-#' @param enrich Enrich result, A enrichment results
-#'
-#' @return g, (Igraph object) containing links between pathways
-#'
-#' @export
-
-emap_plotly <- function(enrich) {
-  geneSets <- geneInCategory(enrich)
-  if (is.null(dim(enrich)) | nrow(enrich) == 1) {
-    g <- graph.empty(0, directed = FALSE)
-    g <- add_vertices(g, nv = 1)
-    V(g)$name <- as.character(enrich$Description)
-    V(g)$color <- "red"
-  } else {
-    id <- enrich[, "ID"]
-    geneSets <- geneSets[id]
-    n <- nrow(enrich) #
-    w <- matrix(NA, nrow = n, ncol = n)
-    colnames(w) <- rownames(w) <- enrich$Description
-    
-    for (i in seq_len(n - 1)) {
-      for (j in (i + 1):n) {
-        w[i, j] <- overlap_ratio(geneSets[id[i]], geneSets[id[j]])
-      }
-    }
-    
-    wd <- melt(w)
-    wd <- wd[wd[, 1] != wd[, 2], ]
-    wd <- wd[!is.na(wd[, 3]), ]
-    g <- graph.data.frame(wd[, -3], directed = FALSE)
-    E(g)$width = sqrt(wd[, 3] * 5)
-    g <- delete.edges(g, E(g)[wd[, 3] < 0.2])
-    idx <-
-      unlist(sapply(V(g)$name, function(x)
-        which(x == enrich$Description)))
-    
-    cnt <- sapply(geneSets[idx], length)
-    V(g)$size <- cnt
-    
-    colVar <- enrich[idx, "pvalue"]
-    V(g)$color <- colVar
-  }
-  g
-}
-
-
 #' Genes are gathered from enrichment result from specific pathway.
 #' The geneList is prepared with the right LogFC values and links of genes between multiple pathways.
 #' The number of pathways that are shown is defined with cnet_slider.
@@ -285,18 +170,12 @@ emap_plotly <- function(enrich) {
 cnetPlotly <- function(enrich, geneSets, deTab) {
   g <- list2graph(geneSets)
   
-  g_id <- as.data.frame(V(g)$name[V(g)$name %in% deTab$entrez])
-  colnames(g_id) <- "entrez"
+  g_id <- as.data.frame(V(g)$name[V(g)$name %in% rownames(deTab)])
+  colnames(g_id) <- "gene"
   
-  if (!"geneName" %in% colnames(deTab)) {
-    deTab$geneName <- rownames(deTab)
-  }
-  
+  g_id <- merge(g_id, deTab[c("avgLog2FC"), drop=FALSE], by.x = "gene", by.y = 0,  all.x = TRUE)
   g_id <-
-    merge(g_id, deTab[c("entrez", "geneName", "avgLog2FC")], by = "entrez", all.x =
-            TRUE)
-  g_id <-
-    g_id[order(match(g_id$entrez, V(g)$name[!V(g)$name %in% names(geneSets)])),]
+    g_id[order(match(g_id$gene, V(g)$name[!V(g)$name %in% names(geneSets)])),]
   
   V(g)$color <- g_id$avgLog2FC
   V(g)$name[V(g)$name %in% g_id$entrez] <-
@@ -320,28 +199,25 @@ cnetPlotly <- function(enrich, geneSets, deTab) {
 
 heatplotly <- function(geneSets, deTab) {
   genelist <- list2df(geneSets)
-  genelist <-
-    merge(genelist,
-          deTab[c("entrez", "avgLog2FC")],
-          by.x = "Gene",
-          by.y = "entrez",
-          all.x = TRUE)
+  genelist <- merge(
+    genelist,
+    deTab[c("avgLog2FC"), drop=FALSE],
+    by.x = "Gene",
+    by.y = 0,
+    all.x = TRUE
+  )
   genelist <-
     merge(genelist, rev(sort(table(genelist$Gene))), by.x = "Gene", by.y = "Var1")
-  if (length(rev(sort(table(
-    genelist$categoryID
-  )))) == 1) {
-    genelist <-
-      merge(genelist, rev(sort(table(
-        genelist$categoryID
-      ))), by.x = "categoryID", by.y = "row.names")
+  if (length(rev(sort(table(genelist$categoryID)))) == 1) {
+    genelist <- merge(genelist, rev(sort(table(
+      genelist$categoryID
+    ))), by.x = "categoryID", by.y = "row.names")
     colnames(genelist)[colnames(genelist) %in% c("Freq", "y")] <-
       c("Freq.x", "Freq.y")
   } else {
-    genelist <-
-      merge(genelist, rev(sort(table(
-        genelist$categoryID
-      ))), by.x = "categoryID", by.y = "Var1")
+    genelist <- merge(genelist, rev(sort(table(
+      genelist$categoryID
+    ))), by.x = "categoryID", by.y = "Var1")
   }
   
   for (pathway in unique(genelist$categoryID)) {
@@ -350,22 +226,12 @@ heatplotly <- function(geneSets, deTab) {
     genelist$match[genelist$categoryID == pathway] <- entrez_matches
   }
   
-  if (!"geneName" %in% colnames(deTab)) {
-    deTab$geneName <- rownames(deTab)
-  }
-  
-  genelist <-
-    merge(genelist,
-          deTab[c("entrez", "geneName")],
-          by.x = "Gene",
-          by.y = "entrez",
-          all.x = TRUE)
   genelist <-
     genelist[order(-genelist$match,-genelist$Freq.y, genelist$avgLog2FC),]
   
   p <- plot_ly(
     x = ~ genelist$categoryID,
-    y = ~ genelist$geneName,
+    y = ~ genelist$Gene,
     z = ~ genelist$avgLog2FC,
     colorbar = list(title = "Log2FC", len = 1),
     type = "heatmap",
@@ -374,7 +240,7 @@ heatplotly <- function(geneSets, deTab) {
       "Pathway:",
       genelist$categoryID,
       "<br>Gene:",
-      genelist$geneName,
+      genelist$Gene,
       "<br>Log2FC:",
       genelist$avgLog2FC
     )
@@ -389,7 +255,7 @@ heatplotly <- function(geneSets, deTab) {
       yaxis = list(
         title = '',
         categoryorder = "array",
-        categoryarray = genelist$geneName
+        categoryarray = genelist$Gene
       )
     ) %>%
     config(
@@ -531,21 +397,5 @@ plotlyGraph <- function(g, pwName, getColor, cnet, annoP, annoG) {
   }
   p
 }
-
-#add_annotations(
-#  x = L[as.character(es$V2),]$V1,
-#  y = L[as.character(es$V2),]$V2,
-#  xref = "x", yref = "y",
-#  axref = "x", ayref = "y",
-#  text = "",
-#  arrowcolor = "#030303",
-#  captureevents = TRUE,
-#  arrowwidth = 0.1,
-#  arrowsize = 15,
-#  showarrow = T,
-#  ax = L[as.character(es$V1),]$V1,
-#  ay = L[as.character(es$V1),]$V2,
-#  standoff=5
-#)
 
 ## --------------------------------------------------------------------------
