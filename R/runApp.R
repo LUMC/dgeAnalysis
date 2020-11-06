@@ -23,13 +23,22 @@ startApp <- function(launch.browser = TRUE) {
   
   message("Initializing dgeAnalysis...")
   suppressWarnings(rm(
-    list = c("deTab", "normDge", "inUse_deTab", "inUse_normDge"),
+    list = c(
+      "deTab",
+      "normDge",
+      "enrich",
+      "inUse_deTab",
+      "inUse_normDge",
+      "inUse_enrich"
+    ),
     envir = .GlobalEnv
   ))
   suppressMessages(source(system.file("src/lib/libraries.R", package = "dgeAnalysis")))
   
-  shiny::runApp(appDir,
-                host = "0.0.0.0",
-                port = 1402,
-                launch.browser = launch.browser)
+  shiny::runApp(
+    appDir = appDir,
+    host = "0.0.0.0",
+    port = 1402,
+    launch.browser = launch.browser
+  )
 }
