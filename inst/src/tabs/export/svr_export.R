@@ -11,6 +11,12 @@ observe({
     shinyjs::disable("downloadTSV")
     shinyjs::disable("downloadCSV")
   }
+  
+  if (exists("enrich") && !exists("deTab") && input$dataset_select == "enrichment") {
+    shinyjs::enable("downloadTSV")
+    shinyjs::enable("downloadCSV")
+  }
+  
   if (exists("enrich")) {
     shinyjs::enable("downloadENRICH_HTML")
   } else {
