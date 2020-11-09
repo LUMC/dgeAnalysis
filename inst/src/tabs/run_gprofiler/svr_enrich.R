@@ -1,6 +1,6 @@
 
 
-## Start an analysis
+## Start an enrichment analysis
 observeEvent(input$run_enrichment, {
   showModal(modalDialog(
     h1("Enrichment is running..."),
@@ -38,7 +38,7 @@ observeEvent(input$run_enrichment, {
   removeModal()
 }, ignoreInit = TRUE)
 
-## Create table with normalized counts
+## Create table with the filtered deTab
 output[["enrich_detab"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
@@ -52,6 +52,7 @@ output[["enrich_detab"]] <- DT::renderDataTable({
   })
 })
 
+## Get all filters and values to filter deTab
 get_filters <- reactive({
   tryCatch({
     all_filters <- c()
@@ -73,9 +74,9 @@ get_filters <- reactive({
   })
 })
 
+## Perform filtering of deTab
 filter_deTab <- reactive({
   tryCatch({
-    checkReload()
     filters <- get_filters()
     filtered <- inUse_deTab[inUse_deTab$DE %in% filters$exp &
                               inUse_deTab$P.Value < filters$pvalue &
@@ -88,6 +89,7 @@ filter_deTab <- reactive({
   })
 })
 
+## Select input with all available organisms
 output[["enrich_organism"]] <- renderUI({
   tryCatch({
     selectInput(
@@ -109,6 +111,7 @@ output[["enrich_organism"]] <- renderUI({
   })
 })
 
+## Find organism from current dataset
 get_organism <- reactive({
   tryCatch({
     organism <- get_organismID(inUse_deTab)
@@ -127,7 +130,7 @@ get_organism <- reactive({
   })
 })
 
-## Show amount of genes ledt after filtering
+## Show amount of genes left after filtering
 output[["enrich_ngenes"]] <- renderUI({
   tryCatch({
     checkReload()
@@ -137,6 +140,7 @@ output[["enrich_ngenes"]] <- renderUI({
   })
 })
 
+## Text input for genes to analyze
 output[["enrich_input"]] <- renderUI({
   tryCatch({
     textAreaInput(

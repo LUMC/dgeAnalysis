@@ -1,4 +1,5 @@
 
+## Enrichment table from all term data
 output[["enrich_table"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
@@ -22,6 +23,7 @@ output[["enrich_table"]] <- DT::renderDataTable({
   })
 })
 
+## Show the default gprofiler plot
 output[["enrich_gprofiler"]] <- renderPlotly({
   tryCatch({
     checkReload()
@@ -31,6 +33,7 @@ output[["enrich_gprofiler"]] <- renderPlotly({
   })
 })
 
+## Get a dataframe to use in plots from enrich object
 clean_enrich <- reactive({
   tryCatch({
     checkReload()
@@ -44,7 +47,7 @@ clean_enrich <- reactive({
   })
 })
 
-## create barplot with reactome enrichment terms
+## create barplot with gprofilers enrichment terms
 output[["enrich_barplot"]] <- renderPlotly({
   tryCatch({
     checkReload()
@@ -73,7 +76,7 @@ output[["terms_slider"]] <- renderUI({
   })
 })
 
-## create cnet plot with reactome input
+## create cnet plot with gprofiler enrichment terms
 output[["cnet_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
@@ -129,7 +132,7 @@ output[["cnet_table"]] <- DT::renderDataTable({
   })
 })
 
-## create heatmap with reactome input
+## create heatmap with gprofiler input
 output[["heat_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
@@ -144,6 +147,7 @@ output[["heat_plot"]] <- renderPlotly({
   })
 })
 
+## Select a specific pathway to add to heatmap
 output[["heat_select_pathway"]] <- renderUI({
   tryCatch({
     enrich <- clean_enrich()
@@ -158,6 +162,7 @@ output[["heat_select_pathway"]] <- renderUI({
   })
 })
 
+## Table with genes in corresponding heatmap plot
 output[["heat_table"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
