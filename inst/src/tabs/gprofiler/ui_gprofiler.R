@@ -32,24 +32,6 @@ tab_gprofiler <- tabItem(
     ),
     
     tabPanel(
-      title = "Genes in pathway",
-      HTML('<hr style="border-color: #0088cc;">'),
-      sidebarLayout(
-        position = "right",
-        sidebarPanel(
-          width = 3,
-          
-          br(),
-          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
-        ),
-        mainPanel(
-          width = 9
-        )
-      ),
-      HTML('<hr style="border-color: #0088cc;">')
-    ),
-    
-    tabPanel(
       title = "Enriched terms barplot",
       HTML('<hr style="border-color: #0088cc;">'),
       sidebarLayout(
@@ -64,6 +46,24 @@ tab_gprofiler <- tabItem(
         mainPanel(
           width = 9,
           plotlyOutput("enrich_barplot", height = "600px") %>% withSpinner()
+        )
+      ),
+      HTML('<hr style="border-color: #0088cc;">')
+    ),
+    
+    tabPanel(
+      title = "Genes in pathway",
+      HTML('<hr style="border-color: #0088cc;">'),
+      sidebarLayout(
+        position = "right",
+        sidebarPanel(
+          width = 3,
+          
+          br(),
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
+        mainPanel(
+          width = 9
         )
       ),
       HTML('<hr style="border-color: #0088cc;">')
