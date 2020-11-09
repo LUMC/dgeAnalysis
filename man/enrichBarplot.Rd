@@ -6,7 +6,7 @@
 Descriptions of the pathways are added and the color scale is calculated.
 A Barplot is created with a bar per pathway.}
 \usage{
-enrichBarplot(enrich, amount, value)
+enrichBarplot(enrich, amount)
 }
 \arguments{
 \item{enrich}{Enrich result, A enrichment results}

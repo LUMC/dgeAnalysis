@@ -4,7 +4,7 @@
 
 #' Collect genes within a pathway.
 #' Gets genes from enrichment result.
-#' geneSets names are set based on ID and description.
+#' Gene names are retrieved from terms
 #' duplicated pathways are removed from the set.
 #'
 #' @param enrich Enrichment object, containing enrichment results
