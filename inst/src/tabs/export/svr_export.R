@@ -1,4 +1,23 @@
 
+## Check if data is available
+observe({
+  checkReload()
+  if (exists("deTab")) {
+    shinyjs::enable("downloadDGE_HTML")
+    shinyjs::enable("downloadTSV")
+    shinyjs::enable("downloadCSV")
+  } else {
+    shinyjs::disable("downloadDGE_HTML")
+    shinyjs::disable("downloadTSV")
+    shinyjs::disable("downloadCSV")
+  }
+  if (exists("enrich")) {
+    shinyjs::enable("downloadENRICH_HTML")
+  } else {
+    shinyjs::disable("downloadENRICH_HTML")
+  }
+})
+
 ## get the right dataset for download
 datasetInput <- reactive({
   checkReload()
@@ -9,18 +28,7 @@ datasetInput <- reactive({
     "deTab" = inUse_deTab,
     "deg" = inUse_deTab[inUse_deTab$DE != 0, ],
     "pcGene" = pc_gene_table(),
-    "kegg" = as.data.frame(get_kegg())[, !(
-      colnames(as.data.frame(get_kegg())) %in% c("ID", "leading_edge", "core_enrichment", "geneID")
-    )],
-    "reactome" = as.data.frame(get_reactome())[, !(
-      colnames(as.data.frame(get_reactome())) %in% c("ID", "leading_edge", "core_enrichment", "geneID")
-    )],
-    "go" = as.data.frame(get_go())[, !(
-      colnames(as.data.frame(get_go())) %in% c("ID", "leading_edge", "core_enrichment", "geneID")
-    )],
-    "do" = as.data.frame(get_do())[, !(
-      colnames(as.data.frame(get_do())) %in% c("ID", "leading_edge", "core_enrichment", "geneID")
-    )]
+    "enrichment" = clean_enrich()
   )
 })
 
@@ -56,14 +64,25 @@ output$downloadTSV <- downloadHandler(
   }
 )
 
-## Download markdown HTML report
-output[["downloadMHTML"]] <- downloadHandler(filename = paste(
-  input$analysis_method,
-  '_',
-  gsub('-', '', Sys.Date()),
-  '.html',
-  sep = ''
-),
-content <- function(file) {
-  file.copy(paste0("markdown/", input$analysis_method, '.html'), file)
-})
+## Download markdown HTML report DGE
+output[["downloadDGE_HTML"]] <- downloadHandler(
+  filename = paste(input$analysis_method,
+                   '_',
+                   gsub('-', '', Sys.Date()),
+                   '.html',
+                   sep = ''),
+  content <- function(file) {
+    file.copy(paste0('markdown/', input$analysis_method, '.html'), file)
+  }
+)
+
+## Download markdown HTML report Enrichment
+output[["downloadENRICH_HTML"]] <- downloadHandler(
+  filename = paste('gprofiler_',
+                   gsub('-', '', Sys.Date()),
+                   '.html',
+                   sep = ''),
+  content <- function(file) {
+    file.copy(paste0('markdown/enrichmentGProfiler2.html'), file)
+  }
+)
