@@ -314,8 +314,15 @@ table.dataTable tr.selected td{
 
 /*Text area (enrichment)*/
 .shiny-input-container:not(.shiny-input-container-inline) {
-  width: 80%;
+  width: 70%;
+  max-width: 500px;
 }
+
+#matrix_value1 .shiny-input-container:not(.shiny-input-container-inline),
+#matrix_value2 .shiny-input-container:not(.shiny-input-container-inline) {
+  width: 100%;
+}
+
 #geneInput {
   text-align: center;
 }
