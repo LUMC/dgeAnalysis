@@ -42,7 +42,7 @@ output[["norm_voom_plot"]] <- renderPlotly({
   })
 })
 
-## Show amount of genes ledt after filtering
+## Show amount of genes left after filtering
 output[["norm_voom_ngenes"]] <- renderUI({
   tryCatch({
     checkReload()
