@@ -19,7 +19,6 @@ tab_gprofiler <- tabItem(
         position = "right",
         sidebarPanel(
           width = 3,
-          
           br(),
           span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
         ),
@@ -41,29 +40,12 @@ tab_gprofiler <- tabItem(
           uiOutput("terms_slider"),
           ## Filter on source??
           br(),
+          uiOutput("enrich_barplot_info"),
           span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
         ),
         mainPanel(
           width = 9,
           plotlyOutput("enrich_barplot", height = "600px") %>% withSpinner()
-        )
-      ),
-      HTML('<hr style="border-color: #0088cc;">')
-    ),
-    
-    tabPanel(
-      title = "Genes in pathway",
-      HTML('<hr style="border-color: #0088cc;">'),
-      sidebarLayout(
-        position = "right",
-        sidebarPanel(
-          width = 3,
-          
-          br(),
-          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
-        ),
-        mainPanel(
-          width = 9
         )
       ),
       HTML('<hr style="border-color: #0088cc;">')
@@ -89,6 +71,7 @@ tab_gprofiler <- tabItem(
           checkboxInput("cnet_annoP", "Pathway labels", value = TRUE),
           checkboxInput("cnet_annoG", "Gene labels", value = FALSE),
           br(),
+          uiOutput("enrich_cnet_info"),
           span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
         ),
         mainPanel(
@@ -118,6 +101,8 @@ tab_gprofiler <- tabItem(
             step = 1
           ),
           uiOutput("heat_select_pathway"),
+          br(),
+          uiOutput("enrich_heat_info"),
           span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
         ),
         mainPanel(

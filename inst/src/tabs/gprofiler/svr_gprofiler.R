@@ -179,3 +179,31 @@ output[["heat_table"]] <- DT::renderDataTable({
     )), rownames = FALSE, colnames = ""))
   })
 })
+
+output[["enrich_barplot_info"]] <- renderUI({
+  infoText <-
+    "The bar plot shows a sorted list of the most enriched terms. The bar plot is sorted based on
+        the selected value (p-value, q-value or adjusted p-value). The colors of the bars are also
+        generated based on the earlier selected value. On the X-axis, the amount of genes linked to
+        the pathway is shown."
+  informationBox(infoText)
+})
+
+output[["enrich_cnet_info"]] <- renderUI({
+  infoText <-
+    "The concept network can show which genes are involved in the most significant terms. The
+        most enriched terms together with all corresponding genes are collected and shown in a
+        network plot. Some pathways may contain some matching genes. These genes will also be
+        connected. The color given to genes is based on the log fold change determined after the
+        expression analysis. In the end, this plot shows the connection of genes between the most
+        significant pathways."
+  informationBox(infoText)
+})
+
+output[["enrich_heat_info"]] <- renderUI({
+  infoText <-
+    "The heatmap visualizes pathways and the corresponding genes. The genes are sorted based on
+        Log2FC. The pathways are sorted on number of gene mathes between other pathways, listing pathways with
+        the most gene matches on the left. With this plot genes present in pathways can be compared on sight."
+  informationBox(infoText)
+})
