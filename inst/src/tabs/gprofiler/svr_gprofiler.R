@@ -76,6 +76,35 @@ output[["terms_slider"]] <- renderUI({
   })
 })
 
+## create barplot with the number of DE genes in term
+output[["enrich_DEbarplot"]] <- renderPlotly({
+  tryCatch({
+    checkReload()
+    enrich <- clean_enrich()
+    enrichDE(enrich, inUse_deTab, input$DEterms_slider)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## DE barplot slider, set number of values
+output[["DEterms_slider"]] <- renderUI({
+  tryCatch({
+    checkReload()
+    enrich <- clean_enrich()
+    sliderInput(
+      inputId = "DEterms_slider",
+      label = "Amount of shown pathways:",
+      value = nrow(enrich) / 2,
+      min = 1,
+      max = nrow(enrich),
+      step = 1
+    )
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
 ## create cnet plot with gprofiler enrichment terms
 output[["cnet_plot"]] <- renderPlotly({
   tryCatch({
@@ -180,12 +209,27 @@ output[["heat_table"]] <- DT::renderDataTable({
   })
 })
 
+output[["gProfiler2_plot_info"]] <- renderUI({
+  infoText <-
+    "The gProfiler 2 manhattan plot shows the terms colored by source (database).
+        Every term is represented by a circle. The size of a circle represents the term
+        size (number of genes). The y-axis show the adjusted p-value in a (negative)
+        log10 scale."
+  informationBox(infoText)
+})
+
 output[["enrich_barplot_info"]] <- renderUI({
   infoText <-
     "The bar plot shows a sorted list of the most enriched terms. The bar plot is sorted based on
-        the selected value (p-value, q-value or adjusted p-value). The colors of the bars are also
-        generated based on the earlier selected value. On the X-axis, the amount of genes linked to
-        the pathway is shown."
+        p-value. The colors of the bars are also generated based on p-value. On the X-axis,
+        the amount of genes linked to the pathway is shown."
+  informationBox(infoText)
+})
+
+output[["enrich_DEbarplot_info"]] <- renderUI({
+  infoText <-
+    "The bar plot shows a sorted list of the most enriched terms. The bar plot is sorted based on
+        p-value. The plot shows the number of DE genes (up or down) regulated in a enrichment term."
   informationBox(infoText)
 })
 

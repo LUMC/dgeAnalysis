@@ -20,6 +20,7 @@ tab_gprofiler <- tabItem(
         sidebarPanel(
           width = 3,
           br(),
+          uiOutput("gProfiler2_plot_info"),
           span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
         ),
         mainPanel(
@@ -46,6 +47,27 @@ tab_gprofiler <- tabItem(
         mainPanel(
           width = 9,
           plotlyOutput("enrich_barplot", height = "600px") %>% withSpinner()
+        )
+      ),
+      HTML('<hr style="border-color: #0088cc;">')
+    ),
+    
+    tabPanel(
+      title = "DE genes in terms",
+      HTML('<hr style="border-color: #0088cc;">'),
+      sidebarLayout(
+        position = "right",
+        sidebarPanel(
+          width = 3,
+          uiOutput("DEterms_slider"),
+          ## Filter on source??
+          br(),
+          uiOutput("enrich_DEbarplot_info"),
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
+        mainPanel(
+          width = 9,
+          plotlyOutput("enrich_DEbarplot", height = "600px") %>% withSpinner()
         )
       ),
       HTML('<hr style="border-color: #0088cc;">')
