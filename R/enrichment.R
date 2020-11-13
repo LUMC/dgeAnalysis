@@ -98,7 +98,6 @@ get_organismID <- function(deTab) {
 #'
 #' @param enrich Enrich result, A enrichment results
 #' @param amount Integer, Value with the number of pathways to show
-#' @param value String, Value with the column name to be used (p-, q- or adjP value)
 #'
 #' @return p, (Plotly object) plot
 #'
@@ -149,6 +148,75 @@ enrichBarplot <- function(enrich, amount) {
         height = 1000
       )
     )
+  p
+}
+
+
+#' The enrichment results is filtered based on the number shown of pathways.
+#' Number of up/down regulated genes is retrieved and added per term.
+#' A Barplot is created with a bar per pathway.
+#' For each pathway there is bar with up/down regulated genes.
+#'
+#' @param enrich Enrich result, A enrichment results
+#' @param deTab Dataframe, with all analysis results
+#' @param amount Integer, Value with the number of pathways to show
+#'
+#' @return p, (Plotly object) plot
+#'
+#' @export
+
+enrichDE <- function(enrich, deTab, amount) {
+  enrich <- na.omit(enrich[0:amount,])
+  enrich$term_name <- factor(enrich$term_name,
+                             levels = unique(enrich$term_name)[order(enrich$p_value,
+                                                                     enrich$term_name,
+                                                                     decreasing = TRUE)])
+  enrich[c("down", "not_sign", "up")] <- NA
+  for (row in 1:nrow(enrich)) {
+    genes <- unlist(strsplit(enrich[row, ]$intersection, split = ","))
+    de <- table(deTab$DE[rownames(deTab) %in% genes])
+    names(de) <- c("down", "not_sign", "up")[match(names(de), c(-1, 0, 1))]
+    enrich[row, ][names(de)] <- de
+  }
+  
+  p <- plot_ly(
+    data = enrich,
+    x = ~ up,
+    y = ~ term_name,
+    orientation = 'h',
+    base = 0,
+    type = "bar",
+    name = "Up regulated",
+    hoverinfo = 'text',
+    text = paste("Source:", enrich$source, "\n# Genes up:", enrich$up)
+  ) %>%
+    plotly::layout(
+      barmode = 'stack',
+      xaxis = list(title = 'Gene counts'),
+      title = "DE genes in terms",
+      yaxis = list(title = '')
+    ) %>%
+    config(
+      toImageButtonOptions = list(
+        format = "png",
+        filename = "enrichbar",
+        width = 1500,
+        height = 1000
+      )
+    )
+  p <- add_trace(
+    p,
+    x = if (all(is.na(enrich$up))) {
+      ~ down
+    } else {
+      ~ down * -1
+    }, 
+    y = ~ term_name,
+    name = "Down regulated",
+    orientation = 'h',
+    hoverinfo = 'text',
+    text = paste("Source:", enrich$source, "\n# Genes down:", enrich$down)
+  )
   p
 }
 
