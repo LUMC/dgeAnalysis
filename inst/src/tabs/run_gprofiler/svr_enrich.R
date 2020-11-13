@@ -77,6 +77,8 @@ get_filters <- reactive({
 ## Perform filtering of deTab
 filter_deTab <- reactive({
   tryCatch({
+    checkReload()
+    
     filters <- get_filters()
     filtered <- inUse_deTab[inUse_deTab$DE %in% filters$exp &
                               inUse_deTab$P.Value < filters$pvalue &
@@ -114,6 +116,8 @@ output[["enrich_organism"]] <- renderUI({
 ## Find organism from current dataset
 get_organism <- reactive({
   tryCatch({
+    checkReload()
+    
     organism <- get_organismID(inUse_deTab)
     org <- list(
       ENS = "hsapiens",
@@ -134,6 +138,7 @@ get_organism <- reactive({
 output[["enrich_ngenes"]] <- renderUI({
   tryCatch({
     checkReload()
+    
     h2("After filtering:", br(), nrow(filter_deTab()), "Genes")
   }, error = function(err) {
     return(NULL)
