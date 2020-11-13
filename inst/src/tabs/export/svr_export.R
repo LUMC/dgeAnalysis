@@ -34,6 +34,7 @@ datasetInput <- reactive({
     "deTab" = inUse_deTab,
     "deg" = inUse_deTab[inUse_deTab$DE != 0, ],
     "pcGene" = pc_gene_table(),
+    "filtered" = filter_deTab(),
     "enrichment" = clean_enrich()
   )
 })

@@ -15,6 +15,7 @@ tab_export <- tabItem(
       "Full DE table" = "deTab",
       "DE genes only" = "deg",
       "PC values per gene (PCA)" = "pcGene",
+      "Filtered DE table (enrichment)" = "filtered",
       "gProfiler2 pathways" = "enrichment"
     )
   ), 
