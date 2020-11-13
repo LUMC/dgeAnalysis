@@ -55,7 +55,7 @@ database
 
 ```
 
-## Run enrichment
+# Run enrichment
 Enrichment analysis is performed using gProfiler2.
 
 ```{r runEnrichment}
