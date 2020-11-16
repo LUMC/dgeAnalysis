@@ -20,14 +20,8 @@ if (!require("plotly")) install.packages("plotly")
 if (!require("rmarkdown")) install.packages("rmarkdown")
 
 ## Pathway analysis
-if (!require("clusterProfiler")) BiocManager::install("clusterProfiler")
-if (!require("DOSE")) BiocManager::install("DOSE")
-if (!require("graphite")) BiocManager::install("graphite")
-if (!require("ReactomePA")) BiocManager::install("ReactomePA")
+if (!require("gprofiler2")) install.packages("gprofiler2")
 if (!require("igraph")) install.packages("igraph")
-if (!require("org.Hs.eg.db")) BiocManager::install("org.Hs.eg.db")
-if (!require("org.Mm.eg.db")) BiocManager::install("org.Mm.eg.db")
-if (!require("reshape2")) install.packages("reshape2")
 
 ## WGCNA
 if (!require("WGCNA")) install.packages("WGCNA")

@@ -229,7 +229,7 @@ table.dataTable tr.selected td{
   color: #0088cc;
   border: 1px solid #0088cc;
 }
-#run_button {
+#run_button, #run_enrichment {
   font-size: 24px;
   width: 250px;
 }
@@ -312,6 +312,21 @@ table.dataTable tr.selected td{
   padding-right: 20px;
 }
 
+/*Text area (enrichment)*/
+.shiny-input-container:not(.shiny-input-container-inline) {
+  width: 70%;
+  max-width: 500px;
+}
+
+#matrix_value1 .shiny-input-container:not(.shiny-input-container-inline),
+#matrix_value2 .shiny-input-container:not(.shiny-input-container-inline) {
+  width: 100%;
+}
+
+#geneInput {
+  text-align: center;
+}
+
 /* --- widgets */
 
 /* box (infobox) --- */
@@ -335,34 +350,6 @@ table.dataTable tr.selected td{
 }
 
 /* --- box (infobox) */
-
-
-/* switch --- */
-
-.bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-primary {
-  color: white;
-  font-size: 20px;
-  background: #0088cc;
-}
-
-.bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-default {
-  color: white;
-  font-size: 20px;
-  background: #0088cc;
-}
-
-.bootstrap-switch.bootstrap-switch-inverse.bootstrap-switch-off .bootstrap-switch-label,
-.bootstrap-switch.bootstrap-switch-on .bootstrap-switch-label,
-.bootstrap-switch.bootstrap-switch-off .bootstrap-switch-label {
-  height: 50px;
-}
-
-.bootstrap-switch.bootstrap-switch-animate .bootstrap-switch-container>span {
-  height: 50px;
-}
-
-/* --- toggle switch */
-
 
 /* modal popup --- */
 

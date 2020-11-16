@@ -4,7 +4,7 @@
 \alias{extract_geneSets}
 \title{Collect genes within a pathway.
 Gets genes from enrichment result.
-geneSets names are set based on ID and description.
+Gene names are retrieved from terms
 duplicated pathways are removed from the set.}
 \usage{
 extract_geneSets(enrich, slider, selected)
@@ -22,6 +22,6 @@ geneSets, (vector) Genes found in corresponding pathways
 \description{
 Collect genes within a pathway.
 Gets genes from enrichment result.
-geneSets names are set based on ID and description.
+Gene names are retrieved from terms
 duplicated pathways are removed from the set.
 }

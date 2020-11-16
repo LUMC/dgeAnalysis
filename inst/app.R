@@ -1,9 +1,21 @@
 
 ## USE ONLY FOR DEVELOPMENT!!!
 
-options(shiny.maxRequestSize = 50 * 1024 ^ 2)
+options(shiny.maxRequestSize = 100 * 1024 ^ 2)
 options(spinner.color = "#0088cc")
-# suppressWarnings(rm(list=c("deTab", "normDge", "inUse_deTab", "inUse_normDge"), envir=.GlobalEnv))
+
+##suppressWarnings(rm(
+##  list = c(
+##    "deTab",
+##    "normDge",
+##    "enrich",
+##    "inUse_deTab",
+##    "inUse_normDge",
+##    inUse_enrich
+##  ),
+##  envir = .GlobalEnv
+##))
+
 options(warn = -1)
 
 source("inst/src/lib/libraries.R", local = TRUE)

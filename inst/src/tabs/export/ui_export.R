@@ -15,10 +15,8 @@ tab_export <- tabItem(
       "Full DE table" = "deTab",
       "DE genes only" = "deg",
       "PC values per gene (PCA)" = "pcGene",
-      "KEGG pathways" = "kegg",
-      "Reactome pathways" = "reactome",
-      "GO pathways" = "go",
-      "DO pathways" = "do"
+      "Filtered DE table (enrichment)" = "filtered",
+      "gProfiler2 pathways" = "enrichment"
     )
   ), 
   downloadButton("downloadCSV", label = "Download as CSV"),
@@ -31,7 +29,10 @@ tab_export <- tabItem(
   br(),
   br(),
   h2("Download R Markdown analysis"),
-  downloadButton("downloadMHTML", label = "Download as HTML"),
+  downloadButton("downloadDGE_HTML", label = "Download dge report"),
+  br(),
+  br(),
+  downloadButton("downloadENRICH_HTML", label = "Download enrichment report"),
   br(),
   br(),
   br(),

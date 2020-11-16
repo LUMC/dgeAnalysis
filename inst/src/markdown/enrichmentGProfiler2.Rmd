@@ -1,0 +1,108 @@
+---
+title: "dgeAnalysis - gProfiler2 Enrichment"
+author:
+- "Developed by LUMC-SASC team:"
+- "- Tom Kuipers"
+- "- Leon Mei"
+- "- Davy Cats"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    theme: paper
+always_allow_html: true
+params:
+  geneList:     ""
+  organism:     ""
+  significant:  ""
+  alfa:         ""
+  database:     ""
+---
+
+# Reading packages and variables
+Required packages are loaded and the input variables are set. The used input settings are shown.
+
+```{r setup}
+
+if (!require("gprofiler2")) install.packages("gprofiler2")
+
+```
+
+
+```{r variables}
+# IMPORT VARIABLES
+
+geneList <- strsplit(params$geneList, "\n")[[1]]
+organism <- params$organism
+significant <- eval(parse(text = params$significant))
+alfa <- params$alfa
+database <- params$database
+
+```
+
+## Input values
+
+```{r showVariables}
+# SHOW VALUES OF VARIABLES
+
+length(geneList)
+organism
+significant
+alfa
+database
+
+```
+
+# Run enrichment
+Enrichment analysis is performed using gProfiler2.
+
+```{r runEnrichment}
+# SHOW VALUES OF VARIABLES
+
+enrich <- gost(
+  query = geneList,
+  organism = organism,
+  ordered_query = FALSE,
+  significant = significant,
+  user_threshold = alfa,
+  correction_method = "bonferroni",
+  domain_scope = "annotated",
+  sources = database,
+  evcodes = TRUE
+)
+
+```
+
+# Show results
+Show gProfiler enrichment plot
+
+```{r showResult}
+# Show results
+
+enrich$result$query <- ""
+gostplot(enrich, capped = FALSE, interactive = TRUE)
+
+```
+
+
+# Save results
+Results are saved, so they can be retrieved by the application.
+
+```{r save}
+# SAVE ANALYSIS
+
+save(enrich, file = "enrichment.RData")
+
+```
+
+# Session info
+Showing all used packages including version numbers.
+
+```{r session}
+# INFO
+
+sessionInfo()
+
+```

@@ -19,6 +19,7 @@ server <- function(input, output, session) {
     is.null(input$file_detab_view)
     
     is.null(input$run_button)
+    is.null(input$run_enrichment)
   }
   
   ## All page names
@@ -55,7 +56,11 @@ server <- function(input, output, session) {
   output[["sidebar_tabs"]] <- renderMenu({
     sidebarMenu(
       id = "sidebar",
-      menuItem("Home", tabName = "home", icon = icon("home")),
+      menuItem(
+        "Home",
+        tabName = "home",
+        icon = icon("home")
+      ),
       menuItem(
         "Data upload",
         tabName = "upload",
@@ -88,7 +93,11 @@ server <- function(input, output, session) {
           tabName = "norm_data",
           icon = icon("chart-line")
         ),
-        menuItem("PCA", tabName = "pca", icon = icon("chart-line")),
+        menuItem(
+          "PCA",
+          tabName = "pca",
+          icon = icon("chart-line")
+        ), 
         menuItem(
           "Heatmaps",
           tabName = "heatmaps",
@@ -108,25 +117,15 @@ server <- function(input, output, session) {
       menuItem(
         "Enrichment",
         icon = icon("bezier-curve"),
-        menuSubItem(
-          "KEGG",
-          tabName = "enrich_kegg",
-          icon = icon("bezier-curve")
+        menuItem(
+          "Run enrichment",
+          tabName = "run_gprofiler",
+          icon = icon("calculator")
         ),
-        menuSubItem(
-          "Reactome",
-          tabName = "enrich_reactome",
-          icon = icon("bezier-curve")
-        ),
-        menuSubItem(
-          "Gene Ontology",
-          tabName = "enrich_go",
-          icon = icon("bezier-curve")
-        ),
-        menuSubItem(
-          "Disease Ontology",
-          tabName = "enrich_do",
-          icon = icon("bezier-curve")
+        menuItem(
+          "Enrichment",
+          tabName = "gprofiler",
+          icon = icon("chart-line")
         )
       ),
       menuItem(
@@ -159,10 +158,8 @@ server <- function(input, output, session) {
   source("tabs/heatmaps/svr_heatmaps.R", local = TRUE)
   source("tabs/analysis/svr_analysis.R", local = TRUE)
   source("tabs/bias/svr_bias.R", local = TRUE)
-  source("tabs/enrichment/kegg/svr_kegg.R", local = TRUE)
-  source("tabs/enrichment/reactome/svr_reactome.R", local = TRUE)
-  source("tabs/enrichment/go/svr_go.R", local = TRUE)
-  source("tabs/enrichment/do/svr_do.R", local = TRUE)
+  source("tabs/run_gprofiler/svr_enrich.R", local = TRUE)
+  source("tabs/gprofiler/svr_gprofiler.R", local = TRUE)
   source("tabs/wgcna/svr_wgcna.R", local = TRUE)
   source("tabs/export/svr_export.R", local = TRUE)
   source("tabs/about/svr_about.R", local = TRUE)
