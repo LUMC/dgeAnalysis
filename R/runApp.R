@@ -17,7 +17,7 @@ startApp <- function(launch.browser = TRUE) {
   }
   
   library("dgeAnalysis")
-  options(shiny.maxRequestSize = 50 * 1024 ^ 2)
+  options(shiny.maxRequestSize = 100 * 1024 ^ 2)
   options(spinner.color = "#0088cc")
   options(warn = -1)
   

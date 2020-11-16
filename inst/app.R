@@ -1,7 +1,7 @@
 
 ## USE ONLY FOR DEVELOPMENT!!!
 
-options(shiny.maxRequestSize = 50 * 1024 ^ 2)
+options(shiny.maxRequestSize = 100 * 1024 ^ 2)
 options(spinner.color = "#0088cc")
 
 ##suppressWarnings(rm(
