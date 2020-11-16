@@ -34,9 +34,9 @@ if (!require("gprofiler2")) install.packages("gprofiler2")
 ```{r variables}
 # IMPORT VARIABLES
 
-geneList <- strsplit(params$geneList,"\n")[[1]]
+geneList <- strsplit(params$geneList, "\n")[[1]]
 organism <- params$organism
-significant <- eval(parse(text=params$significant))
+significant <- eval(parse(text = params$significant))
 alfa <- params$alfa
 database <- params$database
 
