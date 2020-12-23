@@ -11,7 +11,6 @@ source("tabs/analysis/ui_analysis.R", local = TRUE)
 source("tabs/bias/ui_bias.R", local = TRUE)
 source("tabs/run_gprofiler/ui_enrich.R", local = TRUE)
 source("tabs/gprofiler/ui_gprofiler.R", local = TRUE)
-source("tabs/wgcna/ui_wgcna.R", local = TRUE)
 source("tabs/export/ui_export.R", local = TRUE)
 source("tabs/about/ui_about.R", local = TRUE)
 
@@ -49,7 +48,6 @@ ui <- dashboardPage(
       tab_bias,
       tab_run_gprofiler,
       tab_gprofiler,
-      tab_wgcna,
       tab_export,
       tab_about
     )

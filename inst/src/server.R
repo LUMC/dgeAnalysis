@@ -38,7 +38,6 @@ server <- function(input, output, session) {
     enrich_reactome = "Reactome Enrichment",
     enrich_go = "Gene Ontology",
     enrich_do = "Disease Ontology",
-    wgcna = "WGCNA",
     export = "Export",
     about = "About"
   )
@@ -129,11 +128,6 @@ server <- function(input, output, session) {
         )
       ),
       menuItem(
-        "WGCNA",
-        tabName = "wgcna",
-        icon = icon("code-branch")
-      ),
-      menuItem(
         "Export",
         tabName = "export",
         icon = icon("download")
@@ -160,7 +154,6 @@ server <- function(input, output, session) {
   source("tabs/bias/svr_bias.R", local = TRUE)
   source("tabs/run_gprofiler/svr_enrich.R", local = TRUE)
   source("tabs/gprofiler/svr_gprofiler.R", local = TRUE)
-  source("tabs/wgcna/svr_wgcna.R", local = TRUE)
   source("tabs/export/svr_export.R", local = TRUE)
   source("tabs/about/svr_about.R", local = TRUE)
   

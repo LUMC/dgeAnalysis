@@ -167,7 +167,7 @@ normDge$counts <- log2(normDge$counts)
 normDge$counts[is.infinite(normDge$counts)] <- 0
 
 countDistributionLinePlot(normDge)
-variancePcaPlot(normDge)
+samplePca2dPlot(normDge, design_base, "PC1", "PC2")
 
 ```
 
@@ -224,6 +224,7 @@ normDge$counts <- normDge$counts[intersect(rownames(deTab), rownames(normDge$cou
 #ORDER deTab TABLE
 deTab <- rename(deTab, "FDR" = "adj.P.Val")
 deOrder <- c("avgLog2CPM", "avgLog2FC", "P.Value", "FDR", "DE")
+deTab <- deTab[order(deTab$FDR),]
 if (!is.null(data_annotation)) {
   deTab <- deTab[colnames(deTab)
                  [c(1, match(deOrder, names(deTab)), 2:(ncol(deTab) - 5))]]

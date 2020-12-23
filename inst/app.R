@@ -23,7 +23,6 @@ source("R/de.R", local = TRUE)
 source("R/enrichment.R", local = TRUE)
 source("R/markdown.R", local = TRUE)
 source("R/de_plots.R", local = TRUE)
-source("R/wcgna.R", local = TRUE)
 
 shiny::runApp(
   appDir = "inst/src/",

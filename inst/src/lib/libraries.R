@@ -1,5 +1,5 @@
 
-## Install or import required packages ##
+## Shiny environment
 if (!require("shiny")) install.packages("shiny")
 if (!require("shinydashboard")) install.packages("shinydashboard")
 if (!require("shinyWidgets")) install.packages("shinyWidgets")
@@ -22,6 +22,3 @@ if (!require("rmarkdown")) install.packages("rmarkdown")
 ## Pathway analysis
 if (!require("gprofiler2")) install.packages("gprofiler2")
 if (!require("igraph")) install.packages("igraph")
-
-## WGCNA
-if (!require("WGCNA")) install.packages("WGCNA")

@@ -2,19 +2,23 @@
 ## Check if data is available
 observe({
   checkReload()
-  if (exists("deTab")) {
-    shinyjs::enable("downloadDGE_HTML")
+  if (exists("inUse_deTab")) {
     shinyjs::enable("downloadTSV")
     shinyjs::enable("downloadCSV")
   } else {
-    shinyjs::disable("downloadDGE_HTML")
     shinyjs::disable("downloadTSV")
     shinyjs::disable("downloadCSV")
   }
   
-  if (exists("enrich") && !exists("deTab") && input$dataset_select == "enrichment") {
+  if (exists("enrich") && !exists("inUse_deTab") && input$dataset_select == "enrichment") {
     shinyjs::enable("downloadTSV")
     shinyjs::enable("downloadCSV")
+  }
+  
+  if (exists("deTab")) {
+    shinyjs::enable("downloadDGE_HTML")
+  } else {
+    shinyjs::disable("downloadDGE_HTML")
   }
   
   if (exists("enrich")) {
