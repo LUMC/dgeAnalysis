@@ -35,7 +35,7 @@ Note: In the folder "exampleData" there is a .zip file, containing three data fi
 ## Requirements
 R version: 3.6+
 
-Linux libraries:
+Linux install libraries:
 ````
 sudo apt-get update && apt-get install \
    build-essential \
@@ -52,15 +52,14 @@ sudo apt-get update && apt-get install \
    -y
 ````
 
-Windows RTools:\
+Windows install RTools and pandoc:\
 R 3.6.x:\
 &nbsp; https://cran.r-project.org/bin/windows/Rtools/Rtools35.exe \
 R 4.0 and up:\
 &nbsp; https://cran.r-project.org/bin/windows/Rtools/rtools40-i686.exe \
-&nbsp; https://cran.r-project.org/bin/windows/Rtools/rtools40-x86_64.exe
-
-Windows pandoc:\
-&nbsp; https://pandoc.org/installing.html \
+&nbsp; https://cran.r-project.org/bin/windows/Rtools/rtools40-x86_64.exe \
+Pandoc:\
+&nbsp; https://pandoc.org/installing.html
 
 ## Fix install problems
 If there are problems installing the application, it might be worth to try installing specific packages manually:
