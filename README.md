@@ -1,6 +1,6 @@
 # dgeAnalysis
 
-This R package contains the R-Shiny application v1.4.1 developed to perform differential gene expression analysis.
+This R package contains the R-Shiny application v1.4.2 developed to perform differential gene expression analysis.
 * dgeAnalysis manual: https://github.com/LUMC/dgeAnalysis/blob/master/MANUAL.pdf
 
 ## Installing
@@ -59,11 +59,13 @@ R 4.0 and up:\
 &nbsp; https://cran.r-project.org/bin/windows/Rtools/rtools40-i686.exe \
 &nbsp; https://cran.r-project.org/bin/windows/Rtools/rtools40-x86_64.exe
 
+Windows pandoc:\
+&nbsp; https://pandoc.org/installing.html \
 
 ## Fix install problems
 If there are problems installing the application, it might be worth to try installing specific packages manually:
 ```
-## Install or import required packages
+## Shiny environment
 if (!require("shiny")) install.packages("shiny")
 if (!require("shinydashboard")) install.packages("shinydashboard")
 if (!require("shinyWidgets")) install.packages("shinyWidgets")
@@ -81,11 +83,9 @@ if (!require("tidyr")) install.packages("tidyr")
 if (!require("scales")) install.packages("scales")
 if (!require("broom")) install.packages("broom")
 if (!require("plotly")) install.packages("plotly")
+if (!require("rmarkdown")) install.packages("rmarkdown")
 
 ## Pathway analysis
 if (!require("gprofiler2")) install.packages("gprofiler2")
 if (!require("igraph")) install.packages("igraph")
-
-## WGCNA
-if (!require("WGCNA")) install.packages("WGCNA")
 ```
