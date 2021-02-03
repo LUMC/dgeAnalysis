@@ -217,7 +217,7 @@ deTab <- rename(deTab, "avgLog2CPM" = "AveExpr")
 deTab <- rename(deTab, "avgLog2FC" = "logFC")
 deTab <- rename(deTab, "FDR" = "adj.P.Val")
 deOrder <- c("avgLog2CPM", "avgLog2FC", "P.Value", "FDR", "DE")
-deTab <- deTab[order(deTab$FDR),]
+
 if (!is.null(data_annotation)) {
   deTab <- deTab[colnames(deTab)
                  [c(1, match(deOrder, names(deTab)), 2:(ncol(deTab) - 5))]]
