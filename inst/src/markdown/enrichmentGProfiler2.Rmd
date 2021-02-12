@@ -67,7 +67,7 @@ enrich <- gost(
   ordered_query = FALSE,
   significant = significant,
   user_threshold = alfa,
-  correction_method = "bonferroni",
+  correction_method = "gSCS",
   domain_scope = "annotated",
   sources = database,
   evcodes = TRUE
