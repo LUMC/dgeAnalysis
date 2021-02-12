@@ -1,7 +1,7 @@
 Package: dgeAnalysis
 Type: Package
 Title: dgeAnalysis
-Version: 1.4.2
+Version: 1.4.3
 Author@R:
   person("Tom", "Kuipers", email = "t.b.kuipers@outlook.com", role = c("aut", "cre"))
 Description:
