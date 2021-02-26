@@ -114,7 +114,7 @@ dge <- DGEList(counts = assay(se),
 dge <- dge[rowSums(abs(dge$counts)) > 1,]
 
 tempDge <- dge
-tempDge$counts <- cpm(dge, log = TRUE)
+tempDge$counts <- cpm(dge, log = TRUE, prior.count = 1)
 countDistributionLinePlot(tempDge)
 
 dge <- DGEList(counts = assay(se), samples = colData(se))
@@ -137,7 +137,7 @@ analysis <- DESeqDataSet(se, design = design)
 analysis <- analysis[rowSums(abs(assay(analysis))) > 1,]
 
 # FILTER IF NESSECARY
-counts <- cpm(counts(analysis), log = TRUE)
+counts <- cpm(counts(analysis), log = TRUE, prior.count = 1)
 selectedFeatures <- rownames(analysis)[apply(counts, 1, function(v)
   sum(v >= cpm_value)) >= 1 / 4 * ncol(counts)]
 analysis <- analysis[selectedFeatures, ]
@@ -161,10 +161,8 @@ Extract the normalized data from the analysis results.
 # GET NORMALIZED COUNTS
 
 getSize <- estimateSizeFactors(analysis)
-normCounts <- cpm(data.frame(counts(getSize, normalized = TRUE)))
-normDge <- DGEList(counts = normCounts, samples = dge$samples)
-normDge$counts <- log2(normDge$counts)
-normDge$counts[is.infinite(normDge$counts)] <- 0
+normDge <- DGEList(counts = data.frame(counts(getSize, normalized = TRUE)), samples = dge$samples)
+normDge$counts <- cpm(normDge, log = TRUE, prior.count = 1)
 
 countDistributionLinePlot(normDge)
 samplePca2dPlot(normDge, design_base, "PC1", "PC2")
@@ -217,10 +215,6 @@ if (!is.null(data_annotation)) {
   deTab$Row.names <- NULL
 }
 
-# MAKE BOTH TABLES EQUAL
-deTab <- deTab[intersect(rownames(deTab), rownames(normDge$counts)), ]
-normDge$counts <- normDge$counts[intersect(rownames(deTab), rownames(normDge$counts)), ]
-
 #ORDER deTab TABLE
 deTab <- rename(deTab, "FDR" = "adj.P.Val")
 deOrder <- c("avgLog2CPM", "avgLog2FC", "P.Value", "FDR", "DE")
@@ -264,6 +258,7 @@ Results are saved, so they can be retrieved by the application.
 ```{r save}
 # SAVE ANALYSIS
 
+deTab <- deTab[order(deTab$FDR),]
 save(deTab, normDge, file = "analysis.RData")
 
 ```
