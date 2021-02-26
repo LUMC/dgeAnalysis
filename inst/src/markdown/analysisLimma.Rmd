@@ -122,7 +122,7 @@ row.names(dge$genes) <- row.names(dge$counts)
 dge <- dge[rowSums(abs(dge$counts)) > 1,]
 
 tempDge <- dge
-tempDge$counts <- cpm(dge, log = TRUE)
+tempDge$counts <- cpm(dge, log = TRUE, prior.count = 1)
 countDistributionLinePlot(tempDge)
 
 ```
@@ -134,7 +134,7 @@ The raw data is filtered based on the input values provided.
 # GET SELECTED FEATURES
 
 limmaV <- calcNormFactors(dge, method = "TMM")
-counts <- cpm(limmaV, log = TRUE)
+counts <- cpm(limmaV, log = TRUE, prior.count = 1)
 selectedFeatures <- rownames(limmaV)[apply(counts, 1, function(v)
   sum(v >= cpm_value)) >= 1 / 4 * ncol(counts)]
 
@@ -157,7 +157,7 @@ The filtered data is normalized using TMM.
 normDge <- calcNormFactors(highExprDge, method = "TMM")
 
 tempDge <- normDge
-tempDge$counts <- cpm(normDge, log = TRUE)
+tempDge$counts <- cpm(normDge, log = TRUE, prior.count = 1)
 countDistributionLinePlot(tempDge)
 samplePca2dPlot(tempDge, design_base, "PC1", "PC2")
 
@@ -257,7 +257,8 @@ Results are saved, so they can be retrieved by the application.
 ```{r save}
 # SAVE ANALYSIS
 
-normDge$counts <- cpm(normDge, log = TRUE)
+deTab <- deTab[order(deTab$FDR),]
+normDge$counts <- cpm(normDge, log = TRUE, prior.count = 1)
 save(deTab, normDge, file = "analysis.RData")
 
 ```

@@ -46,7 +46,7 @@ datasetInput <- reactive({
 ## create filename and save data as CSV
 output$downloadCSV <- downloadHandler(
   filename = function() {
-    paste("shiny_analysis_", gsub(" ", "_", tolower(input$dataset_select)), ".csv", sep = "")
+    paste0("shiny_analysis_", gsub(" ", "_", tolower(input$dataset_select)), ".csv")
   },
   content = function(file) {
     write.table(
@@ -62,7 +62,7 @@ output$downloadCSV <- downloadHandler(
 ## create filename and save data as TSV
 output$downloadTSV <- downloadHandler(
   filename = function() {
-    paste("shiny_analysis_", gsub(" ", "_", tolower(input$dataset_select)), ".tsv", sep = "")
+    paste0("shiny_analysis_", gsub(" ", "_", tolower(input$dataset_select)), ".tsv")
   },
   content = function(file) {
     write.table(
@@ -77,11 +77,9 @@ output$downloadTSV <- downloadHandler(
 
 ## Download markdown HTML report DGE
 output[["downloadDGE_HTML"]] <- downloadHandler(
-  filename = paste(input$analysis_method,
-                   '_',
-                   gsub('-', '', Sys.Date()),
-                   '.html',
-                   sep = ''),
+  filename = function() {
+    paste0(input$analysis_method, '_', gsub('-', '', Sys.Date()),'.html')
+  },
   content <- function(file) {
     file.copy(paste0('markdown/', input$analysis_method, '.html'), file)
   }
@@ -89,10 +87,9 @@ output[["downloadDGE_HTML"]] <- downloadHandler(
 
 ## Download markdown HTML report Enrichment
 output[["downloadENRICH_HTML"]] <- downloadHandler(
-  filename = paste('gprofiler_',
-                   gsub('-', '', Sys.Date()),
-                   '.html',
-                   sep = ''),
+  filename = function() {
+    paste0('gprofiler_', gsub('-', '', Sys.Date()), '.html')
+  },
   content <- function(file) {
     file.copy(paste0('markdown/enrichmentGProfiler2.html'), file)
   }
