@@ -246,7 +246,7 @@ get_raw_dge <- reactive({
                  samples = colData(se),
                  genes = rowData(se))
   dge <- dge[rowSums(abs(dge$counts)) > 1,]
-  dge$counts <- cpm(dge, log = TRUE)
+  dge$counts <- cpm(dge, log = TRUE, prior.count = 1)
   dge
 })
 
