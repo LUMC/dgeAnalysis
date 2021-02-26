@@ -6,6 +6,7 @@ Newest changes should be on top.
 -->
 version 1.4.3
 ---------------------------
++ Add check reload to barcodeplot to update add genes list
 + Change gProfiler correction to gSCS
 
 version 1.4.2

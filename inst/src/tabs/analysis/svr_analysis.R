@@ -109,6 +109,7 @@ output[["group_analysis_bar"]] <- renderUI({
 ## Add specific gene to barplot
 observe({
   tryCatch({
+    checkReload()
     updateSelectizeInput(
       session = session,
       inputId = 'selected_analysis_bar',
