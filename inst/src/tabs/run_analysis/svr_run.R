@@ -57,7 +57,7 @@ preMarkdownChecks <- reactive ({
     return("Wrong analysis mode!")
   } else if (is.null(input$matrix_val1) | is.null(input$matrix_val2)) {
     return("One of the contrast is empty!")
-  } else if (paste0(input$matrix_val1) == paste0(input$matrix_val2)) {
+  } else if (all(sort(input$matrix_val1) == sort(input$matrix_val2))) {
     return("Contrasts cant be the same!")
   } else if (!is.null(input$setGeneName)) {
     if (input$setGeneName == "symbol" & !("geneName" %in% colnames(data_annotation()))) {

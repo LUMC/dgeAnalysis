@@ -4,6 +4,10 @@ Changelog
 <!--
 Newest changes should be on top.
 -->
+version 1.4.4
+---------------------------
++ Fix false warning: Contrast are the same error
+
 version 1.4.3
 ---------------------------
 + Add prior count to CPM calculation
