@@ -6,6 +6,9 @@ Newest changes should be on top.
 -->
 version 1.4.4
 ---------------------------
++ Move normalized MDS to Dimension reduction
++ Change PCA tab to Dimension reduction
++ Remove MDS 3D and PCA 3D
 + Fix false warning: Contrast are the same error
 
 version 1.4.3
