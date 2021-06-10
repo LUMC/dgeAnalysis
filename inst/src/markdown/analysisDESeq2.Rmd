@@ -165,7 +165,7 @@ normDge <- DGEList(counts = data.frame(counts(getSize, normalized = TRUE)), samp
 normDge$counts <- cpm(normDge, log = TRUE, prior.count = 1)
 
 countDistributionLinePlot(normDge)
-samplePca2dPlot(normDge, design_base, "PC1", "PC2")
+pcaPlot(normDge, design_base, "PC1", "PC2")
 
 ```
 

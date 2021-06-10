@@ -159,7 +159,7 @@ normDge <- calcNormFactors(highExprDge, method = "TMM")
 tempDge <- normDge
 tempDge$counts <- cpm(normDge, log = TRUE, prior.count = 1)
 countDistributionLinePlot(tempDge)
-samplePca2dPlot(tempDge, design_base, "PC1", "PC2")
+pcaPlot(tempDge, design_base, "PC1", "PC2")
 
 ```
 
