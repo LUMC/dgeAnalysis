@@ -22,6 +22,7 @@ tab_norm_data <- tabItem(
         position = "right",
         sidebarPanel(
           width = 3,
+          uiOutput("norm_line_color"),
           uiOutput("norm_dist_line_info"),
           span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
         ),

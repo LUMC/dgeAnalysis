@@ -3,7 +3,21 @@
 output[["dist_line"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    countDistributionLinePlot(get_raw_dge())
+    countDistributionLinePlot(get_raw_dge(), input$raw_line_color)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Select a group to color line plot
+output[["raw_line_color"]] <- renderUI({
+  tryCatch({
+    checkReload()
+    selectInput(
+      inputId = "raw_line_color",
+      label = "Group by:",
+      choices = c("None" = "None", colnames(data_samples()))
+    )
   }, error = function(err) {
     return(NULL)
   })

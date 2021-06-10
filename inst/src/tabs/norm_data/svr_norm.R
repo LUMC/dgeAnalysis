@@ -16,7 +16,21 @@ output[["normalized_counts"]] <- DT::renderDataTable({
 output[["norm_dist_line"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    countDistributionLinePlot(inUse_normDge)
+    countDistributionLinePlot(inUse_normDge, input$norm_line_color)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Select a group to color line plot
+output[["norm_line_color"]] <- renderUI({
+  tryCatch({
+    checkReload()
+    selectInput(
+      inputId = "norm_line_color",
+      label = "Group by:",
+      choices = c("None" = "None", colnames(data_samples()))
+    )
   }, error = function(err) {
     return(NULL)
   })

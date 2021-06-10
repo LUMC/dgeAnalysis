@@ -12,6 +12,7 @@ tab_raw_data <- tabItem(
         position = "right",
         sidebarPanel(
           width = 3,
+          uiOutput("raw_line_color"),
           uiOutput("dist_line_info"),
           span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
         ),

@@ -118,7 +118,7 @@ alignmentSummaryPlot <- function(se, sort_value = "None", perc = T) {
 #' A dot line plot is created based on the number of reads at rank.
 #'
 #' @param se SummerizedExperiment object, containing samples and counts
-#' @param group_color String, Sort samples based on a group
+#' @param color String, Sort samples based on a group
 #' @param perc Boolean, Data in percentages
 #' @param rank Integer, The number of genes/rank (min=10)
 #'
@@ -126,117 +126,90 @@ alignmentSummaryPlot <- function(se, sort_value = "None", perc = T) {
 #'
 #' @export
 
-complexityPlot <- function(se, group_color = "None", perc = T, rank = 1000) {
-    compData <- complexityData(se, rank)
-    
-    p <- plot_ly(type = 'scattergl',
-                 mode = "lines+markers") %>%
-      plotly::layout(
-        title = "Gene complexity %",
-        xaxis = list(title = 'Rank', type = "log"),
-        yaxis = if (perc) {
-          list(tickformat = "%", title = 'Cumulative fraction of total reads till rank')
-        }
-        else {
-          list(title = 'Cumulative reads till rank')
-        },
-        legend = list(tracegroupgap = 0)
-      ) %>%
-      config(
-        toImageButtonOptions = list(
-          format = "png",
-          filename = "countdistline",
-          width = 1500,
-          height = 1000
-        )
-      )
-    
-    legend_duplic <- c()
-    for (var in colnames(se)) {
-      temp <- compData[compData$sample == var,]
-      if (group_color != "None") {
-        p <- add_trace(
-          p,
-          x = temp$rank,
-          y = if (perc) {
-            temp$fraction
-          } else {
-            temp$value
-          },
-          showlegend = if (!se[[group_color]][colnames(se) == var] %in% legend_duplic) {
-            TRUE
-          } else{
-            FALSE
-          },
-          legendgroup = se[[group_color]][colnames(se) == var],
-          color = rep(se[[group_color]][colnames(se) == var], rank),
-          text = if (perc) {
-            paste(
-              temp$sample,
-              "\n",
-              temp$rank,
-              "Genes\n",
-              round(temp$fraction * 100, 2),
-              '% Reads\n'
-            )
-          } else {
-            paste(
-              temp$sample,
-              "\n",
-              temp$rank,
-              "Genes\n",
-              formatC(
-                temp$value,
-                format = "f",
-                big.mark = ".",
-                digits = 0
-              ),
-              'Reads\n'
-            )
-          },
-          hoverinfo = 'text'
-        )
-        legend_duplic <- c(legend_duplic, se[[group_color]][colnames(se) == var])
-      } else {
-        p <- add_trace(
-          p,
-          x = temp$rank,
-          y = if (perc) {
-            temp$fraction
-          } else {
-            temp$value
-          },
-          color = var,
-          text = if (perc) {
-            paste(
-              temp$sample,
-              "\n",
-              temp$rank,
-              "Genes\n",
-              round(temp$fraction * 100, 2),
-              '% Reads\n'
-            )
-          } else {
-            paste(
-              temp$sample,
-              "\n",
-              temp$rank,
-              "Genes\n",
-              formatC(
-                temp$value,
-                format = "f",
-                big.mark = ".",
-                digits = 0
-              ),
-              'Reads\n'
-            )
-          },
-          hoverinfo = 'text'
-        )
+complexityPlot <- function(se, color = "None", perc = T, rank = 1000) {
+  if (color == "None") {color <- NA}
+  
+  compData <- complexityData(se, rank)
+  compData <- merge(
+    x = compData,
+    y = as.data.frame(colData(se)),
+    by.x = "sample",
+    by.y = "row.names",
+    all.x = TRUE
+  )
+  
+  p <- plot_ly(type = 'scattergl',
+               mode = "lines+markers") %>%
+    plotly::layout(
+      title = "Gene complexity %",
+      xaxis = list(title = 'Rank', type = "log"),
+      yaxis = if (perc) {
+        list(tickformat = "%", title = 'Cumulative fraction of total reads till rank')
       }
+      else {
+        list(title = 'Cumulative reads till rank')
+      },
+      legend = list(tracegroupgap = 0)
+    ) %>%
+    config(
+      toImageButtonOptions = list(
+        format = "png",
+        filename = "countdistline",
+        width = 1500,
+        height = 1000
+      )
+    )
+  
+  header_col <- c()
+  group_color <- NA
+  for (var in colnames(se)) {
+    temp <- compData[compData$sample == var, ]
+    if (!is.na(color)) {
+      group_color <- temp[[color]][1]
     }
-    p
+    p <- add_trace(
+      p,
+      x = temp$rank,
+      y = if (perc) {
+        temp$fraction
+      } else {
+        temp$value
+      },
+      showlegend = if (!is.na(color) & group_color %in% header_col) {FALSE} else{TRUE},
+      legendgroup = if (is.na(color)) {var} else {group_color},
+      color = if (is.na(color)) {var} else {group_color},
+      text = if (perc) {
+        paste(
+          temp$sample,
+          "\n",
+          temp$rank,
+          "Genes\n",
+          round(temp$fraction * 100, 2),
+          '% Reads\n'
+        )
+      } else {
+        paste(
+          temp$sample,
+          "\n",
+          temp$rank,
+          "Genes\n",
+          formatC(
+            temp$value,
+            format = "f",
+            big.mark = ".",
+            digits = 0
+          ),
+          'Reads\n'
+        )
+      },
+      hoverinfo = 'text'
+    )
+    if (!is.na(color)) {
+      header_col <- c(header_col, as.character(group_color))
+    }
   }
+  p
+}
 
 ## --------------------------------------------------------------------------
 
@@ -248,13 +221,23 @@ complexityPlot <- function(se, group_color = "None", perc = T, rank = 1000) {
 #' A dot line plot is created based on the number of reads at rank.
 #'
 #' @param dge DGE list object, containing samples and counts
+#' @param color String, Sort samples based on a group
 #'
 #' @return p, (Plotly object) plot
 #'
 #' @export
 
-countDistributionLinePlot <- function(dge) {
+countDistributionLinePlot <- function(dge, color = "None") {
+  if (color == "None") {color <- NA}
+  
   stackCounts <- data.frame(stackDge(dge))
+  stackCounts <- merge(
+    x = stackCounts,
+    y = dge$samples,
+    by.x = "sample",
+    by.y = "row.names",
+    all.x = TRUE
+  )
   
   p <- plot_ly(type = 'scattergl',
                mode = 'lines',
@@ -262,7 +245,8 @@ countDistributionLinePlot <- function(dge) {
     plotly::layout(
       title = "Gene count distribution",
       xaxis = list(title = 'Log2CPM'),
-      yaxis = list(title = 'Density')
+      yaxis = list(title = 'Density'),
+      legend = list(tracegroupgap = 0)
     ) %>%
     config(
       toImageButtonOptions = list(
@@ -272,19 +256,31 @@ countDistributionLinePlot <- function(dge) {
         height = 1000
       )
     )
+  
+  header_col <- c()
+  group_color <- NA
   for (var in unique(stackCounts$sample)) {
     temp <- stackCounts[stackCounts$sample == var,]
     density <- density(temp$logCPM)
+    if (!is.na(color)) {
+      group_color <- temp[[color]][1]
+    }
     p <- add_trace(
       p,
       x = density$x,
       y = density$y,
-      name = var,
+      name = if (is.na(color)) {var} else {group_color},
       text = var,
+      legendgroup = if (is.na(color)) {NULL} else {group_color},
+      showlegend = if (!is.na(color) & group_color %in% header_col) {FALSE} else{TRUE},
+      color = if (is.na(color)) {NULL} else {group_color},
       hoverinfo = 'text',
       fill = 'tozeroy',
       alpha = 0.05
     )
+    if (!is.na(color)) {
+      header_col <- c(header_col, as.character(group_color))
+    }
   }
   p
 }

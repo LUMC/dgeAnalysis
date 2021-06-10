@@ -24,12 +24,28 @@ output[["align_sum"]] <- renderPlotly({
   tryCatch({
     checkReload()
     if (input$setSummary == "actual") {
-      perc = F
+      perc = FALSE
     } else {
-      perc = T
+      perc = TRUE
     }
     alignmentSummaryPlot(get_se(), input$group_sum, perc)
   }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Create complexity plot
+output[["complex"]] <- renderPlotly({
+  tryCatch({
+    checkReload()
+    if (input$setComplexity == "actual") {
+      perc = FALSE
+    } else {
+      perc = TRUE
+    }
+    complexityPlot(get_se(), input$group_color, perc, input$comp_rank)
+  }, error = function(err) {
+    print(err)
     return(NULL)
   })
 })
@@ -43,21 +59,6 @@ output[["group_color"]] <- renderUI({
       label = "Group by:",
       choices = c("None" = "None", colnames(data_samples()))
     )
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
-## Create complexity plot
-output[["complex"]] <- renderPlotly({
-  tryCatch({
-    checkReload()
-    if (input$setComplexity == "actual") {
-      perc = F
-    } else {
-      perc = T
-    }
-    complexityPlot(get_se(), input$group_color, perc, input$comp_rank)
   }, error = function(err) {
     return(NULL)
   })
