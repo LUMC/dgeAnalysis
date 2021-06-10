@@ -6,10 +6,12 @@
 A line plot is created based on Log2CPM and the density of the counts.
 A dot line plot is created based on the number of reads at rank.}
 \usage{
-countDistributionLinePlot(dge)
+countDistributionLinePlot(dge, color = "None")
 }
 \arguments{
 \item{dge}{DGE list object, containing samples and counts}
+
+\item{color}{String, Sort samples based on a group}
 }
 \value{
 p, (Plotly object) plot
