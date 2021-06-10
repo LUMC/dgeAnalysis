@@ -12,7 +12,7 @@ pcaPlot(dge, color, getPC1, getPC2)
 \arguments{
 \item{dge}{DGE list object, containing samples and counts}
 
-\item{color}{String, Column on wich colors should be based}
+\item{color}{String, Column on which colors should be based}
 
 \item{getPC1}{String, Selected PC to be plotted on x-axis}
 
