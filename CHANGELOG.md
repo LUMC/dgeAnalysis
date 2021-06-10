@@ -6,6 +6,7 @@ Newest changes should be on top.
 -->
 version 1.4.4
 ---------------------------
++ Change export file name and remove quotes from exported dataframe
 + Small infobox update
 + Add tSNE plot to Dimension reduction
 + Move normalized MDS to Dimension reduction
