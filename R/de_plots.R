@@ -428,7 +428,7 @@ multidimensionalScalingPlot <- function(dge, color, sourceId) {
 
 ## --------------------------------------------------------------------------
 
-## ----- PCA PLOTS -----
+## ----- DIMENSION REDUCTION PLOTS -----
 
 
 #' Columns and rows from DGE list are turned.
@@ -478,7 +478,7 @@ variancePcaPlot <- function(dge) {
 #' Scatter plot is created based on selected PCs.
 #'
 #' @param dge DGE list object, containing samples and counts
-#' @param color String, Column on wich colors should be based
+#' @param color String, Column on which colors should be based
 #' @param getPC1 String, Selected PC to be plotted on x-axis
 #' @param getPC2 String, Selected PC to be plotted on y-axis
 #'
@@ -487,7 +487,6 @@ variancePcaPlot <- function(dge) {
 #' @export
 
 pcaPlot <- function(dge, color, getPC1, getPC2) {
-  save(dge, color, getPC1, getPC2, file="test.RData")
   tdge <- t(dge$counts)
   tdge[!is.finite(tdge)] <- 0
   pca <- prcomp(tdge, center = TRUE)
@@ -529,6 +528,70 @@ pcaPlot <- function(dge, color, getPC1, getPC2) {
       width = 1500,
       height = 1000
     ))
+  p
+}
+
+
+#' Perplexity is set (max 30 & min 1), this depends on the number of samples
+#' tsne model is calculated.
+#' Scatter plot is created based on selected PCs.
+#'
+#' @param dge DGE list object, containing samples and counts
+#' @param color String, Column on which colors should be based
+#'
+#' @return p, (Plotly object) plot
+#'
+#' @export
+
+tsnePlot <- function(dge, color) {
+  set.seed(1234)
+  
+  perplexity <- 30
+  while (perplexity > 0) {
+    try({
+      tsne_model <- Rtsne(
+        t(dge$counts),
+        perplexity = perplexity,
+        check_duplicates = FALSE,
+        normalize = FALSE
+      )
+    }, silent = TRUE
+    )
+    perplexity <- perplexity - 1
+  }
+  
+  tsne_data <- as.data.frame(tsne_model$Y)
+  rownames(tsne_data) <- colnames(dge$counts)
+  tsne_data$color <- dge$samples[[color]]
+  
+  p <- plot_ly(
+    data = tsne_data,
+    x = ~V1,
+    y = ~V2,
+    type = "scattergl",
+    mode = "markers",
+    source = "tsne",
+    key = ~ rownames(tsne_data),
+    marker = list(size=15,
+                  line = list(color = '#999999',
+                              width = 1)),
+    color = ~color,
+    text = rownames(tsne_data),
+    hoverinfo = 'text') %>%
+    plotly::layout(
+      title = "t-SNE",
+      xaxis = list(title = "tSNE 1"),
+      yaxis = list(title = "tSNE 2"),
+      clickmode = "event+select",
+      dragmode = "select") %>%
+    config(
+      toImageButtonOptions = list(
+        format = "png",
+        filename = "t-SNE",
+        width = 1500,
+        height = 1000
+      )
+    )
   p
 }
 

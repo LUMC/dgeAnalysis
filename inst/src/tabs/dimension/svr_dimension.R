@@ -73,6 +73,40 @@ output[["selected_pca"]] <- DT::renderDataTable({
   })
 })
 
+## tSNE
+output[["dim_tsne"]] <- renderPlotly({
+  tryCatch({
+    checkReload()
+    tsnePlot(inUse_normDge, input$group_dim_tsne)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Set color of tSNE
+output[["group_dim_tsne"]] <- renderUI({
+  tryCatch({
+    selectInput(
+      inputId = "group_dim_tsne",
+      label = "Color by:",
+      choices = colnames(data_samples())
+    )
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Selected data points tSNE
+output[["selected_dim_tsne"]] <- DT::renderDataTable({
+  tryCatch({
+    checkReload()
+    s <- event_data(event = "plotly_selected", source = "tsne")
+    DT::datatable(data_samples()[unlist(s$key), , drop = FALSE], options = list(pageLength = 15, scrollX = TRUE))
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
 ## Normalized mds
 output[["norm_un_cluster"]] <- renderPlotly({
   tryCatch({
@@ -142,5 +176,13 @@ output[["norm_un_cluster_info"]] <- renderUI({
     "This MDS plot (multidimensional scaling plot) can be viewed as a 2D plot with
   calculations of two dimensions. With the MDS plot distances between samples is
   shown, based on similarities and differences."
+  informationBox(infoText)
+})
+
+output[["dim_tsne_info"]] <- renderUI({
+  infoText <-
+    "t-distributed stochastic neighbor embedding (t-SNE) is a statistical method
+  for visualizing high-dimensional data by giving each datapoint a location in a 
+  multi-dimensional map."
   informationBox(infoText)
 })

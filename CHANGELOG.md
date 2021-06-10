@@ -6,6 +6,7 @@ Newest changes should be on top.
 -->
 version 1.4.4
 ---------------------------
++ Add tSNE plot to Dimension reduction
 + Move normalized MDS to Dimension reduction
 + Change PCA tab to Dimension reduction
 + Remove MDS 3D and PCA 3D

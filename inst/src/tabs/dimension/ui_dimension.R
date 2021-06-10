@@ -46,6 +46,29 @@ tab_dimension <- tabItem(
       HTML('<hr style="border-color: #0088cc;">')
     ),
     
+    
+    tabPanel(
+      title = "t-SNE",
+      HTML('<hr style="border-color: #0088cc;">'),
+      sidebarLayout(
+        position = "right",
+        sidebarPanel(
+          width = 3,
+          uiOutput("group_dim_tsne"),
+          br(),
+          uiOutput("dim_tsne_info"),
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
+        mainPanel(
+          width = 9,
+          plotlyOutput("dim_tsne", height = "600px") %>% withSpinner()
+        )
+      ),
+      HTML('<hr style="border-color: #0088cc;">'),
+      DT::dataTableOutput("selected_dim_tsne") %>% withSpinner(),
+      HTML('<hr style="border-color: #0088cc;">')
+    ),
+    
     tabPanel(
       title = "MDS",
       HTML('<hr style="border-color: #0088cc;">'),
@@ -69,3 +92,4 @@ tab_dimension <- tabItem(
     )
   )
 )
+
