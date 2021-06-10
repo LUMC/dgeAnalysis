@@ -1,6 +1,6 @@
 
-tab_pca <- tabItem(
-  tabName = "pca",
+tab_dimension <- tabItem(
+  tabName = "dimension",
   align = "center",
   br(),
   
@@ -24,21 +24,21 @@ tab_pca <- tabItem(
     ),
     
     tabPanel(
-      title = "Sample PCA 2D",
+      title = "PCA",
       HTML('<hr style="border-color: #0088cc;">'),
       sidebarLayout(
         position = "right",
         sidebarPanel(
           width = 3,
-          uiOutput("group_pca2d"),
-          uiOutput("setpc_pca2d"),
+          uiOutput("group_pca"),
+          uiOutput("setpc_pca"),
           br(),
-          uiOutput("samples_pca_2d_info"),
+          uiOutput("pca_info"),
           span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
         ),
         mainPanel(
           width = 9,
-          plotlyOutput("samples_pca_2d", height = "600px") %>% withSpinner()
+          plotlyOutput("pca", height = "600px") %>% withSpinner()
         )
       ),
       HTML('<hr style="border-color: #0088cc;">'),
@@ -47,23 +47,24 @@ tab_pca <- tabItem(
     ),
     
     tabPanel(
-      title = "Sample PCA 3D",
+      title = "MDS",
       HTML('<hr style="border-color: #0088cc;">'),
       sidebarLayout(
         position = "right",
         sidebarPanel(
           width = 3,
-          uiOutput("group_pca3d"),
-          uiOutput("setpc_pca3d"),
+          uiOutput("group_norm_mds"),
           br(),
-          uiOutput("samples_pca_3d_info"),
+          uiOutput("norm_un_cluster_info"),
           span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
         ),
         mainPanel(
           width = 9,
-          plotlyOutput("samples_pca_3d", height = "600px") %>% withSpinner()
+          plotlyOutput("norm_un_cluster", height = "600px") %>% withSpinner()
         )
       ),
+      HTML('<hr style="border-color: #0088cc;">'),
+      DT::dataTableOutput("selected_norm_mds") %>% withSpinner(),
       HTML('<hr style="border-color: #0088cc;">')
     )
   )

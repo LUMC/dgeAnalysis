@@ -73,21 +73,21 @@ output[["selected_raw_voom"]] <- DT::renderDataTable({
   })
 })
 
-## Multidimensional scaling 2D
-output[["un_cluster_2d"]] <- renderPlotly({
+## Multidimensional scaling
+output[["un_cluster"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    multidimensionalScaling2dPlot(get_raw_dge(), input$group_raw_mds2d, "raw_mds2d")
+    multidimensionalScalingPlot(get_raw_dge(), input$group_raw_mds, "raw_mds")
   }, error = function(err) {
     return(NULL)
   })
 })
 
-## Set color of mds 2d
-output[["group_raw_mds2d"]] <- renderUI({
+## Set color of mds
+output[["group_raw_mds"]] <- renderUI({
   tryCatch({
     selectInput(
-      inputId = "group_raw_mds2d",
+      inputId = "group_raw_mds",
       label = "Color by:",
       choices = colnames(data_samples())
     )
@@ -96,11 +96,11 @@ output[["group_raw_mds2d"]] <- renderUI({
   })
 })
 
-## Selected data points un_cluster_2d
-output[["selected_raw_mds2d"]] <- DT::renderDataTable({
+## Selected data points un_cluster
+output[["selected_raw_mds"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
-    s <- event_data(event = "plotly_selected", source = "raw_mds2d")
+    s <- event_data(event = "plotly_selected", source = "raw_mds")
     if (is.null(s)) {
       s <- ""
     }
@@ -112,25 +112,6 @@ output[["selected_raw_mds2d"]] <- DT::renderDataTable({
   })
 })
 
-## Multidimensional scaling 3D
-output[["un_cluster_3d"]] <- renderPlotly({
-  tryCatch({
-    checkReload()
-    multidimensionalScaling3dPlot(get_raw_dge(), input$group_raw_mds3d)
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
-## Set color of mds 2d
-output[["group_raw_mds3d"]] <- renderUI({
-  tryCatch({
-    selectInput("group_raw_mds3d", "Color by:",
-                colnames(data_samples()))
-  }, error = function(err) {
-    return(NULL)
-  })
-})
 
 ## INFORMATION BOXES
 
@@ -160,18 +141,10 @@ output[["raw_voom_plot_info"]] <- renderUI({
   informationBox(infoText)
 })
 
-output[["un_cluster_2d_info"]] <- renderUI({
+output[["un_cluster_info"]] <- renderUI({
   infoText <-
     "This MDS plot (multidimensional scaling plot) can be viewed as a 2D plot with
         calculations of two dimensions. With the MDS plot distances between samples is
-        shown, based on similarities and differences."
-  informationBox(infoText)
-})
-
-output[["un_cluster_3d_info"]] <- renderUI({
-  infoText <-
-    "This MDS plot (multidimensional scaling plot) can be viewed as a 3D plot with
-        calculations of three dimensions. With the MDS plot distances between samples is
         shown, based on similarities and differences."
   informationBox(infoText)
 })

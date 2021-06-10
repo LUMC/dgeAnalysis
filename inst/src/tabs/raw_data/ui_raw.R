@@ -72,44 +72,24 @@ tab_raw_data <- tabItem(
     ),
     
     tabPanel(
-      title = "Multidimensional scaling 2D",
+      title = "MDS",
       HTML('<hr style="border-color: #0088cc;">'),
       sidebarLayout(
         position = "right",
         sidebarPanel(
           width = 3,
-          uiOutput("group_raw_mds2d"),
+          uiOutput("group_raw_mds"),
           br(),
-          uiOutput("un_cluster_2d_info"),
+          uiOutput("un_cluster_info"),
           span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
         ),
         mainPanel(
           width = 9,
-          plotlyOutput("un_cluster_2d", height = "600px") %>% withSpinner()
+          plotlyOutput("un_cluster", height = "600px") %>% withSpinner()
         )
       ),
       HTML('<hr style="border-color: #0088cc;">'),
-      DT::dataTableOutput("selected_raw_mds2d") %>% withSpinner(),
-      HTML('<hr style="border-color: #0088cc;">')
-    ),
-    
-    tabPanel(
-      title = "Multidimensional scaling 3D",
-      HTML('<hr style="border-color: #0088cc;">'),
-      sidebarLayout(
-        position = "right",
-        sidebarPanel(
-          width = 3,
-          uiOutput("group_raw_mds3d"),
-          br(),
-          uiOutput("un_cluster_3d_info"),
-          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
-        ),
-        mainPanel(
-          width = 9,
-          plotlyOutput("un_cluster_3d", height = "600px") %>% withSpinner()
-        )
-      ),
+      DT::dataTableOutput("selected_raw_mds") %>% withSpinner(),
       HTML('<hr style="border-color: #0088cc;">')
     )
   )

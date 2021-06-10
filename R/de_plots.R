@@ -390,7 +390,7 @@ voomPlot <- function(dge, sourceId) {
 #'
 #' @export
 
-multidimensionalScaling2dPlot <- function(dge, color, sourceId) {
+multidimensionalScalingPlot <- function(dge, color, sourceId) {
   logFC <- plotMDS(dge$counts, ndim = ncol(dge) - 1)
   for_plots <- data.frame(logFC$cmdscale.out)
   for_plots$group <- dge$samples[, color]
@@ -411,7 +411,7 @@ multidimensionalScaling2dPlot <- function(dge, color, sourceId) {
     source = sourceId
   ) %>%
     plotly::layout(
-      title = paste("MDS Plot 2D"),
+      title = paste("MDS Plot"),
       xaxis = list(title = 'MDS1'),
       yaxis = list(title = 'MDS2'),
       clickmode = "event+select",
@@ -420,50 +420,6 @@ multidimensionalScaling2dPlot <- function(dge, color, sourceId) {
     config(toImageButtonOptions = list(
       format = "png",
       filename = sourceId,
-      width = 1500,
-      height = 1000
-    ))
-  p
-}
-
-
-#' Calculates required values with 'plotMDS' method.
-#' The plot is created with plotly with values retrieved from the mds object.
-#' Plot is colored based on the selected column.
-#'
-#' @param dge DGE list object, containing samples and counts
-#' @param color String, Column on wich colors should be based
-#'
-#' @return p, (Plotly object) plot
-#'
-#' @export
-
-multidimensionalScaling3dPlot <- function(dge, color) {
-  logFC <- plotMDS(dge$counts, ndim = ncol(dge) - 1)
-  for_plots <- data.frame(logFC$cmdscale.out)
-  for_plots$group <- dge$samples[, color]
-  
-  p <- plot_ly(
-    data = for_plots,
-    x = ~ X1,
-    y = ~ X2,
-    z = ~ X3,
-    color = ~ for_plots$group,
-    text = rownames(for_plots),
-    hoverinfo = 'text'
-  ) %>%
-    add_markers(marker = list(size = 5, opacity = 0.75)) %>%
-    plotly::layout(
-      title = paste("MDS Plot 3D"),
-      scene = list(
-        xaxis = list(title = 'MDS1'),
-        yaxis = list(title = 'MDS2'),
-        zaxis = list(title = 'MDS3')
-      )
-    ) %>%
-    config(toImageButtonOptions = list(
-      format = "png",
-      filename = "mds3d",
       width = 1500,
       height = 1000
     ))
@@ -530,7 +486,8 @@ variancePcaPlot <- function(dge) {
 #'
 #' @export
 
-samplePca2dPlot <- function(dge, color, getPC1, getPC2) {
+pcaPlot <- function(dge, color, getPC1, getPC2) {
+  save(dge, color, getPC1, getPC2, file="test.RData")
   tdge <- t(dge$counts)
   tdge[!is.finite(tdge)] <- 0
   pca <- prcomp(tdge, center = TRUE)
@@ -553,10 +510,10 @@ samplePca2dPlot <- function(dge, color, getPC1, getPC2) {
                   line = list(color = '#999999',
                               width = 1)),
     key = ~ rownames(pca),
-    source = "pca_pca2d"
+    source = "pca"
   ) %>%
     plotly::layout(
-      title = 'PCA 2D',
+      title = 'PCA',
       xaxis = list(title = paste0(
         getPC1, " (", round(percent[getPC1, ] * 100, 2), "%)"
       )),
@@ -568,64 +525,7 @@ samplePca2dPlot <- function(dge, color, getPC1, getPC2) {
     ) %>%
     config(toImageButtonOptions = list(
       format = "png",
-      filename = "pca2d",
-      width = 1500,
-      height = 1000
-    ))
-  p
-}
-
-
-#' Columns and rows from DGE list are turned.
-#' PCA is calculated with prcomp.
-#' PC percentages are calculated.
-#' Scatter plot is created based on selected PCs.
-#'
-#' @param dge DGE list object, containing samples and counts
-#' @param color String, Column on wich colors should be based
-#' @param getPC1 String, Selected PC to be plotted on x-axis
-#' @param getPC2 String, Selected PC to be plotted on y-axis
-#' @param getPC3 String, Selected PC to be plotted on z-axis
-#'
-#' @return p, (Plotly object) plot
-#'
-#' @export
-
-samplePca3dPlot <- function(dge, color, getPC1, getPC2, getPC3) {
-  tdge <- t(dge$counts)
-  tdge[!is.finite(tdge)] <- 0
-  pca <- prcomp(tdge, center = TRUE)
-  percent <- data.frame(summary(pca)$importance[2, ])
-  colnames(percent) <- "percent"
-  
-  pca <- data.frame(scale(tdge, center = T, scale = F) %*% pca$rotation)
-  pca$group <- dge$samples[, color]
-  
-  p <- plot_ly(
-    data = pca,
-    x = pca[[getPC1]],
-    y = pca[[getPC2]],
-    z = pca[[getPC3]],
-    color = ~ pca$group,
-    text = rownames(pca),
-    hoverinfo = 'text'
-  ) %>%
-    add_markers(marker = list(size = 5, opacity = 0.75)) %>%
-    plotly::layout(title = 'PCA 3D',
-                   scene = list(
-                     xaxis = list(title = paste0(
-                       getPC1, " (", round(percent[getPC1, ] * 100, 2), "%)"
-                     )),
-                     yaxis = list(title = paste0(
-                       getPC2, " (", round(percent[getPC2, ] * 100, 2), "%)"
-                     )),
-                     zaxis = list(title = paste0(
-                       getPC3, " (", round(percent[getPC3, ] * 100, 2), "%)"
-                     ))
-                   )) %>%
-    config(toImageButtonOptions = list(
-      format = "png",
-      filename = "pca3d",
+      filename = "pca",
       width = 1500,
       height = 1000
     ))
