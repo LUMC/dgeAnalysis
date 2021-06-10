@@ -67,20 +67,19 @@ output[["complex"]] <- renderPlotly({
 
 output[["align_sum_info"]] <- renderUI({
   infoText <-
-    "In the summary plots, a general overview can be seen of the count data. These plots show a
-        bar plot with the alignment results and a complexity plot. The alignment plot is a stacked bar
-        plot, where every 'row' stands for a sample and the stacked bars per row are the different
-        tags. These tags indicate the distribution of the read counts, given by a read counter (e.g.
+    "The summary plots provide a general overview of the counting data. These plots show a
+        bar chart showing the alignment results and a complexity plot. The alignment plot is a stacked bar
+        plot, where each 'row' represents a sample and the stacked bars per row are different
+        tags. These tags indicate the distribution of read counts given by a read counter (eg.
         HTSeq)."
   informationBox(infoText)
 })
 
 output[["complex_info"]] <- renderUI({
   infoText <-
-    "The complexity plots show how many reads cover a certain amount of genes. On the X-axis,
-        there is a ranking from zero to one thousand. This ranking stands for the number of genes.
-        On the Y-axis the proportion of the reads relative to the total amount of counts is shown.
-        Normally the expectation is a growing curve. Big deviations between samples of the number
-        of reads for a gene, will be visible."
+    "The complexity graphs show how many reads cover a given number of genes. On the X-axis,
+        there is a ranking from zero to a thousand. This arrangement represents the number of genes.
+        The Y-axis shows the proportion of reads in relation to the total number of gene counts.
+        Large variances between samples of the number or reads for a gene, will be visible."
   informationBox(infoText)
 })

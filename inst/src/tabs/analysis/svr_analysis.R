@@ -135,49 +135,49 @@ output[["p_val_plot"]] <- renderPlotly({
 
 output[["de_ratio_info"]] <- renderUI({
   infoText <-
-    "The DE ratio plot gives a quick overview of the amount of differentially expressed genes.
-        (down, not and up-regulated) The exact amount of genes are shown inside the plot. The dispersion
-        of the Y-axis is based on the percentages. This is calculated based on the total amount of genes
+    "The DE ratio plot provides a quick overview of the amount of differentially expressed genes.
+        (down, unregulated and up regulated) The exact number of genes is shown in the plot. the spread
+        of the Y-axis is based on the percentages. This is calculated based on the total number of genes
         after filtering."
   informationBox(infoText)
 })
 
 output[["ma_plot_info"]] <- renderUI({
   infoText <-
-    "The MA plot (Mean average), plots all genes after filtering. This plot creates a figure with
-        log-intensity ratios (M-values) and log-intensity averages (A-values). The MA plot can give a
-        view of all genes and their amount of expression in a comparison of two groups. On the
-        X-axis the Log2CPM values (A) are plotted against the Log2FC values on the Y-axis (M). In
-        this plot, the genes are colored based on the DE results (down, not and up-regulated). Also,
+    "The MA plot, plots all genes after filtering. This plot creates a figure with
+        log intensity ratios (M values) and log intensity means (A values). The MA plot can give a
+        overview of all genes and their amount of expression in a comparison of two groups. on the
+        X-axis plots the Log2CPM values (A) against the Log2FC values on the Y-axis (M). In
+        in this plot the genes are stained based on the DE results (down, unregulated and upregulated). so,
         the trend of expression is shown. This trend shows the average expression flow."
   informationBox(infoText)
 })
 
 output[["volcano_plot_info"]] <- renderUI({
   infoText <-
-    "The volcano plot also shows the most expressed genes and can give a good view of the
+    "The volcano plot also shows the most expressed genes and can give a good idea of the
         expression results. The X-axis contains the Log2FC (magnitude of change) and the Y-axis
-        shows -Log10 p-value (statistical significance). A great benefit of the volcano plot is that it
-        makes genes with a high fold-change, who are statistically significant, well visible. If genes
-        are down-regulated, they will be visible towards the left of the plot and up-regulated genes
-        more towards the right. The most statistically significant genes are placed towards the top."
+        shows -Log10 p-value (statistical significance). A major advantage of the volcano plot is that it
+        makes genes with a high fold-change (which are statistically significant) clearly visible. As genes
+        are down-regulated, they will be visible on the left side of the plot and up-regulated genes
+        more to the right. The most statistically significant genes are placed at the top."
   informationBox(infoText)
 })
 
 output[["barcode_plot_info"]] <- renderUI({
   infoText <-
     "The barcode plot shows the most expressed genes. The X-axis shows the Log2CPM
-        for every sample per gene. The Y-axis shows most expressed genes (from top to
-        bottom). Every bar stands for a sample. With this plot differences between samples for a
+        for each sample per gene. The Y-axis shows the most expressed genes (from top to
+        bottom). Each bar represents a sample. With this plot, differences between samples for a
         specific gene is visible."
   informationBox(infoText)
 })
 
 output[["p_val_plot_info"]] <- renderUI({
   infoText <-
-    "The p-value plot is used as a quality control plot. When all bars, for example, are all the
-        same height, then the analysis can be described as “noisy”. The ideal pattern would be that
-        bars around a p-value of zero are high. Next, the bars should get lower in a nice (steep)
+    "The p-value plot is used as a quality control plot. For example, if all bars are all
+        same height, the analysis can be described as “noisy”. The ideal pattern would be that
+        bars around a p-value of zero are high. Then the bars have to be in a nice (steep)
         curve and should be (almost) zero at the p-value of one."
   informationBox(infoText)
 })

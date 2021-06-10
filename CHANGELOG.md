@@ -6,6 +6,7 @@ Newest changes should be on top.
 -->
 version 1.4.4
 ---------------------------
++ Small infobox update
 + Add tSNE plot to Dimension reduction
 + Move normalized MDS to Dimension reduction
 + Change PCA tab to Dimension reduction

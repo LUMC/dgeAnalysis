@@ -158,8 +158,8 @@ pc_gene_table <- reactive({
 
 output[["variance_pca_info"]] <- renderUI({
   infoText <-
-    "This plot shows the variances of the PCA (Principal Components Analysis) components.
-        A scree plot shows the 'eigenvalues' from the PCA and can be used to decide how many components
+    "This chart shows the variances of the PCA (Principal Components Analysis) components.
+        A scree plot shows the 'eigenvalues' from the PCA and can be used to determine how many components
         can be kept for the PCA analysis."
   informationBox(infoText)
 })
@@ -167,22 +167,22 @@ output[["variance_pca_info"]] <- renderUI({
 output[["pca_info"]] <- renderUI({
   infoText <-
     "The 2D PCA plot shows the samples based on the two components. A PCA plot shows important
-        information from a multivariate data table and shows the result as new variables (Principal Components)."
+        information from a multivariate data table and displays the result as new variables (main components)."
   informationBox(infoText)
 })
 
 output[["norm_un_cluster_info"]] <- renderUI({
   infoText <-
     "This MDS plot (multidimensional scaling plot) can be viewed as a 2D plot with
-  calculations of two dimensions. With the MDS plot distances between samples is
-  shown, based on similarities and differences."
+        calculations of two dimensions. With the MDS plotting distances between samples, samples
+        shown, based on similarities and differences."
   informationBox(infoText)
 })
 
 output[["dim_tsne_info"]] <- renderUI({
   infoText <-
     "t-distributed stochastic neighbor embedding (t-SNE) is a statistical method
-  for visualizing high-dimensional data by giving each datapoint a location in a 
-  multi-dimensional map."
+        for visualizing high-dimensional data by giving each datapoint a location in a
+        multi-dimensional map."
   informationBox(infoText)
 })
