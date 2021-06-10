@@ -72,25 +72,25 @@ output[["selected_norm_voom"]] <- DT::renderDataTable({
 output[["norm_dist_line_info"]] <- renderUI({
   infoText <-
     "The line plot shows the density of the log2CPM values per sample. The density shows the
-  distribution of count values per sample and is used to determine big differences between
-  samples."
+        distribution of counts per sample and is used to detect large differences between
+        samples."
   informationBox(infoText)
 })
 
 output[["norm_dist_boxplot_info"]] <- renderUI({
   infoText <-
-    "The box plot has a similar purpose, but the data can be viewed in a different
-  format. The distribution can be seen between the Log2CPM at the corresponding
-  samples."
+    "The box plot serves a similar purpose to the line plot, but the data can be viewed in a different way
+        format. The distribution can be seen between the Log2CPM at the corresponding
+        samples."
   informationBox(infoText)
 })
 
 output[["norm_voom_plot_info"]] <- renderUI({
   infoText <-
     "The voom plot provides a check on the filtering, which is performed at the beginning of the
-  analysis. The method used to calculate this is 'voom'. Voom is an acronym for
-  mean-variance modeling at the observational level. This means that the mean-variance in
-  the data is calculated and gives each observation a certain weight. Problems during the
-  filtering of low expressed genes will be visible in this plot."
+        analysis. The method to calculate this is 'voom'. Voom is an acronym for
+        mean variance modeling at the observational level. This means that the mean variance in
+        the data is calculated and gives each observation a certain weight. Problems during the
+        filtering of low expressed genes will be visible in this plot."
   informationBox(infoText)
 })

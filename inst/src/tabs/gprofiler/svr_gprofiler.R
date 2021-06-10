@@ -212,42 +212,42 @@ output[["heat_table"]] <- DT::renderDataTable({
 output[["gProfiler2_plot_info"]] <- renderUI({
   infoText <-
     "The gProfiler 2 manhattan plot shows the terms colored by source (database).
-        Every term is represented by a circle. The size of a circle represents the term
-        size (number of genes). The y-axis show the adjusted p-value in a (negative)
+        Each term is represented by a circle. The size of a circle represents the term
+        size (number of genes). The y-axis shows the adjusted p-value in a (negative)
         log10 scale."
   informationBox(infoText)
 })
 
 output[["enrich_barplot_info"]] <- renderUI({
   infoText <-
-    "The bar plot shows a sorted list of the most enriched terms. The bar plot is sorted based on
-        p-value. The colors of the bars are also generated based on p-value. On the X-axis,
-        the amount of genes linked to the pathway is shown."
+    "The bar graph shows a sorted list of the most enriched terms. The bar chart is sorted based on
+        p-value. The colors of the bars are also generated based on p-value. on the X-axis,
+        the amount of genes linked to the pathway is displayed."
   informationBox(infoText)
 })
 
 output[["enrich_DEbarplot_info"]] <- renderUI({
   infoText <-
-    "The bar plot shows a sorted list of the most enriched terms. The bar plot is sorted based on
-        p-value. The plot shows the number of DE genes (up or down) regulated in a enrichment term."
+    "The bar graph shows a sorted list of the most enriched terms. The bar chart is sorted based on
+        p-value. The plot shows the number of DE genes (up or down) regulated in an enrichment term."
   informationBox(infoText)
 })
 
 output[["enrich_cnet_info"]] <- renderUI({
   infoText <-
-    "The concept network can show which genes are involved in the most significant terms. The
-        most enriched terms together with all corresponding genes are collected and shown in a
-        network plot. Some pathways may contain some matching genes. These genes will also be
-        connected. The color given to genes is based on the log fold change determined after the
-        expression analysis. In the end, this plot shows the connection of genes between the most
-        significant pathways."
+    "The concept network can show which genes are involved in the most significant terms. The 
+        most enriched terms along with all associated genes are collected and displayed in a
+        network plot. Some pathways may contain some matching genes. These genes will also
+        connected. The color given to genes is based on the log-fold change determined after the
+        expression analysis. Ultimately, this plot shows the connection of genes between the most
+        important road."
   informationBox(infoText)
 })
 
 output[["enrich_heat_info"]] <- renderUI({
   infoText <-
-    "The heatmap visualizes pathways and the corresponding genes. The genes are sorted based on
-        Log2FC. The pathways are sorted on number of gene mathes between other pathways, listing pathways with
-        the most gene matches on the left. With this plot genes present in pathways can be compared on sight."
+    "The heatmap visualizes pathways and the associated genes. The genes are sorted based on:
+        Log2FC. The paths are sorted by the number of gene maths among other paths, with paths listed with
+        most gene matches on the left. This allows genes present in pathways to be compared on sight."
   informationBox(infoText)
 })
