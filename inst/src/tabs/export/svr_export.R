@@ -46,7 +46,7 @@ datasetInput <- reactive({
 ## create filename and save data as CSV
 output$downloadCSV <- downloadHandler(
   filename = function() {
-    paste0("shiny_analysis_", gsub(" ", "_", tolower(input$dataset_select)), ".csv")
+    paste0("dgeAnalysis_", gsub(" ", "_", tolower(input$dataset_select)), ".csv")
   },
   content = function(file) {
     write.table(
@@ -54,7 +54,8 @@ output$downloadCSV <- downloadHandler(
       file,
       row.names = TRUE,
       col.names = NA,
-      sep = ","
+      sep = ",",
+      quote = FALSE
     )
   }
 )
@@ -62,7 +63,7 @@ output$downloadCSV <- downloadHandler(
 ## create filename and save data as TSV
 output$downloadTSV <- downloadHandler(
   filename = function() {
-    paste0("shiny_analysis_", gsub(" ", "_", tolower(input$dataset_select)), ".tsv")
+    paste0("dgeAnalysis_", gsub(" ", "_", tolower(input$dataset_select)), ".tsv")
   },
   content = function(file) {
     write.table(
@@ -70,7 +71,8 @@ output$downloadTSV <- downloadHandler(
       file,
       row.names = TRUE,
       col.names = NA,
-      sep = "\t"
+      sep = "\t",
+      quote = FALSE
     )
   }
 )
