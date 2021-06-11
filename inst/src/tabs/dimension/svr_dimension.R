@@ -141,6 +141,31 @@ output[["selected_norm_mds"]] <- DT::renderDataTable({
   })
 })
 
+## Sample dendrogram
+output[["dim_dendro"]] <- renderPlotly({
+  tryCatch({
+    checkReload()
+    
+    sampleTree <- hclust(dist(t(inUse_normDge$counts)), method = "average")
+    plotly_dendrogram(sampleTree, inUse_normDge$samples[[input$color_dendro]], NA)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Set color of sample dendrogram
+output[["color_dendro"]] <- renderUI({
+  tryCatch({
+    selectInput(
+      inputId = "color_dendro",
+      label = "Color by:",
+      choices = colnames(data_samples())
+    )
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
 ## PC values per gene (table)
 pc_gene_table <- reactive({
   tryCatch({
@@ -184,5 +209,11 @@ output[["dim_tsne_info"]] <- renderUI({
     "t-distributed stochastic neighbor embedding (t-SNE) is a statistical method
         for visualizing high-dimensional data by giving each datapoint a location in a
         multi-dimensional map."
+  informationBox(infoText)
+})
+
+output[["dendro_info"]] <- renderUI({
+  infoText <- "Hierarchical clustering of samples using normalized data. Log2CPM
+        values are used to create the dendrogram. "
   informationBox(infoText)
 })

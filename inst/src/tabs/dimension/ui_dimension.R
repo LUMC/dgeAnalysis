@@ -89,6 +89,26 @@ tab_dimension <- tabItem(
       HTML('<hr style="border-color: #0088cc;">'),
       DT::dataTableOutput("selected_norm_mds") %>% withSpinner(),
       HTML('<hr style="border-color: #0088cc;">')
+    ),
+    
+    tabPanel(
+      title = "Dendrogram",
+      HTML('<hr style="border-color: #0088cc;">'),
+      sidebarLayout(
+        position = "right",
+        sidebarPanel(
+          width = 3,
+          uiOutput("color_dendro"),
+          br(),
+          uiOutput("dendro_info"),
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
+        mainPanel(
+          width = 9,
+          plotlyOutput("dim_dendro", height = "600px") %>% withSpinner()
+        )
+      ),
+      HTML('<hr style="border-color: #0088cc;">')
     )
   )
 )

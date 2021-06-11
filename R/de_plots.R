@@ -106,8 +106,8 @@ alignmentSummaryPlot <- function(se, sort_value = "None", perc = T) {
   plotly::subplot(
     plot_list,
     nrows = length(unique(lse$order)),
-    shareY = T,
-    shareX = T,
+    shareY = TRUE,
+    shareX = TRUE,
     margin = 0.005
   )
 }
@@ -588,6 +588,59 @@ tsnePlot <- function(dge, color) {
         height = 1000
       )
     )
+  p
+}
+
+#' Get dendrogram data dendro_data().
+#' Plot a dendrogram.
+#'
+#' @param d Hclust object, tree object
+#' @param color String, color samples
+#' @param color_list Vector, Color genes
+#'
+#' @return p, (Plotly object) plot
+#'
+#' @export
+
+plotly_dendrogram <- function(d, color, color_list) {
+  dendro_data <- get_dendrogram_data(d)
+  
+  p <- plot_ly(
+    data = dendro_data,
+    x = ~ x,
+    y = ~ y,
+    color = I("black"),
+    hoverinfo = "none"
+  )  %>%
+    add_segments(xend = ~ xend,
+                 yend = ~ yend,
+                 showlegend = FALSE) %>%
+    add_markers(
+      data = dendro_data[dendro_data$label != "", ],
+      x = ~ x,
+      y = ~ y,
+      color = color,
+      marker = list(size = 10,
+                    color = color_list),
+      text = ~ label,
+      hoverinfo = 'text'
+    ) %>%
+    plotly::layout(
+      dragmode = "zoom",
+      title = "Dendrogram",
+      xaxis = list(
+        title = "",
+        showticklabels = FALSE,
+        zeroline = FALSE
+      ),
+      yaxis = list(title = "Height")
+    ) %>%
+    config(toImageButtonOptions = list(
+      format = "png",
+      filename = "dendro",
+      width = 1500,
+      height = 1000
+    ))
   p
 }
 
