@@ -6,7 +6,7 @@ tab_raw_data <- tabItem(
   
   tabsetPanel(
     tabPanel(
-      title = "Line distribution",
+      title = "Count distribution",
       HTML('<hr style="border-color: #0088cc;">'),
       sidebarLayout(
         position = "right",
