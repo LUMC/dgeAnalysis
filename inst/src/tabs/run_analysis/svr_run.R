@@ -1,7 +1,6 @@
 
 ## Start an analysis
 observeEvent(input$run_button, {
-  print(input$cpm_perc)
   if (!is.null(preMarkdownChecks())) {
     showNotification(ui = preMarkdownChecks(),
                      duration = 5,
@@ -19,6 +18,7 @@ observeEvent(input$run_button, {
     rmarkdown::render(
       input = paste0("markdown/", input$analysis_method, ".Rmd"),
       params = list(
+        md5sum = getMD5(),
         data_samples = data_samples(),
         data_counts = data_counts(),
         data_annotation = data_annotation(),
@@ -65,8 +65,27 @@ preMarkdownChecks <- reactive ({
     if (input$setGeneName == "symbol" & !("geneName" %in% colnames(data_annotation()))) {
       return("The annotation file is missing a column: 'geneName'!")
     }
+  } else if (is.null(input$file_counts)) {
+    return("No expression data uploaded!")
   }
   return(NULL)
+})
+
+## Get MD5 info from uploaded files
+getMD5 <- reactive({
+  md5 <- tryCatch({
+    c(
+      paste0(input$file_samples$name, ": ", tools::md5sum(files = input$file_samples$datapath)),
+      paste0(input$file_counts$name, ": ", tools::md5sum(files = input$file_counts$datapath)),
+      paste0(input$file_annotation$name, ": ", tools::md5sum(files = input$file_annotation$datapath))
+    )
+  }, error = function(err) {
+    c(
+      paste0(input$file_samples$name, ": ", tools::md5sum(files = input$file_samples$datapath)),
+      paste0(input$file_counts$name, ": ", tools::md5sum(files = input$file_counts$datapath))
+    )
+  })
+  as.matrix(md5)
 })
 
 ## Render base column for design
