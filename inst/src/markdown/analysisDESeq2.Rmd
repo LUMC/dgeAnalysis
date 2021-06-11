@@ -19,6 +19,7 @@ params:
   data_annotation:  ""
   setGeneName:      ""
   cpm_value:        ""
+  cpm_perc:         ""
   excluded_samples: ""
   design_base:      ""
   design_value:     ""
@@ -50,6 +51,7 @@ data_counts <- params$data_counts
 data_annotation <- params$data_annotation
 setGeneName <- params$setGeneName
 cpm_value <- params$cpm_value
+cpm_perc <- params$cpm_perc
 excluded_samples <- params$excluded_samples
 design_base <- params$design_base
 design_value <- params$design_value
@@ -74,6 +76,7 @@ data_counts <- data_counts[,!colnames(data_counts) %in% excluded_samples]
 # SHOW VALUES OF VARIABLES
 
 cpm_value
+cpm_perc
 excluded_samples
 alpha
 design_base
@@ -139,7 +142,7 @@ analysis <- analysis[rowSums(abs(assay(analysis))) > 1,]
 # FILTER IF NESSECARY
 counts <- cpm(counts(analysis), log = TRUE, prior.count = 1)
 selectedFeatures <- rownames(analysis)[apply(counts, 1, function(v)
-  sum(v >= cpm_value)) >= 1 / 4 * ncol(counts)]
+  sum(v >= cpm_value)) >= (cpm_perc / 100) * ncol(counts)]
 analysis <- analysis[selectedFeatures, ]
 
 ```

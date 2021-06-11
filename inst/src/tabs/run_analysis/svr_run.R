@@ -1,6 +1,7 @@
 
 ## Start an analysis
 observeEvent(input$run_button, {
+  print(input$cpm_perc)
   if (!is.null(preMarkdownChecks())) {
     showNotification(ui = preMarkdownChecks(),
                      duration = 5,
@@ -24,6 +25,7 @@ observeEvent(input$run_button, {
         excluded_samples = input$exclude_samples,
         setGeneName = input$setGeneName,
         cpm_value = input$cpm_value,
+        cpm_perc = input$cpm_perc,
         design_base = input$design_base,
         design_value = input$design_value,
         matrix_v1 = input$matrix_val1,
@@ -215,16 +217,15 @@ output[["show_matrix"]] <- renderUI({
     total_matrix2 <- paste(total_matrix2, collapse = " in ")
     
     if (total_matrix1 == "") {
-      total_matrix1 <- "No values selected"
+      total_matrix1 <- "NaN"
     }
     if (total_matrix2 == "") {
-      total_matrix2 <- "No values selected"
+      total_matrix2 <- "NaN"
     }
     
-    total_matrix <-
-      paste(total_matrix1, total_matrix2, sep = " VS ")
+    total_matrix <- paste("Genes are up/down regulated in", total_matrix1, "compared to", total_matrix2)
   }, error = function(err) {
-    return("No values selected VS No values selected")
+    return("No values selected")
   })
 })
 
