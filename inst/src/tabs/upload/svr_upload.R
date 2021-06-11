@@ -51,7 +51,7 @@ observeEvent(input$app_mode, {
 ## Read sample data file
 data_samples <- reactive({
   if (input$app_mode == "new") {
-    if (is.null(input$file_samples$datapath)) {
+    if (is.null(input$file_samples)) {
       return(NULL)
     }
     data_samples <- read.csv(
@@ -71,7 +71,7 @@ data_samples <- reactive({
     }
   }
   if (input$app_mode == "view") {
-    if (is.null(input$file_samples_view$datapath)) {
+    if (is.null(input$file_samples_view)) {
       return(NULL)
     }
     data_samples <- read.csv(
@@ -96,7 +96,7 @@ data_samples <- reactive({
 ## Read count data file
 data_counts <- reactive({
   if (input$app_mode == "new") {
-    if (is.null(input$file_counts$datapath)) {
+    if (is.null(input$file_counts)) {
       return(NULL)
     }
     data_counts <- read.csv(
@@ -116,7 +116,7 @@ data_counts <- reactive({
     }
   }
   if (input$app_mode == "view") {
-    if (is.null(input$file_counts_view$datapath)) {
+    if (is.null(input$file_counts_view)) {
       return(NULL)
     }
     data_counts <- read.csv(
@@ -140,7 +140,7 @@ data_counts <- reactive({
 
 ## Read annotation data file
 data_annotation <- reactive({
-  if (is.null(input$file_annotation$datapath)) {
+  if (is.null(input$file_annotation)) {
     return(NULL)
   }
   data_annotation <- read.csv(
@@ -163,7 +163,7 @@ data_annotation <- reactive({
 
 ## Read normalized data file
 data_norm <- reactive({
-  if (is.null(input$file_norm_view$datapath)) {
+  if (is.null(input$file_norm_view)) {
     return(NULL)
   }
   data_norm <- read.csv(
@@ -186,7 +186,7 @@ data_norm <- reactive({
 
 ## Read detab data file
 data_detab <- reactive({
-  if (is.null(input$file_detab_view$datapath)) {
+  if (is.null(input$file_detab_view)) {
     return(NULL)
   }
   data_detab <- read.csv(

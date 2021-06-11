@@ -39,9 +39,6 @@ output[["ma_plot"]] <- renderPlotly({
 output[["selected_ma"]] <- DT::renderDataTable({
   tryCatch({
     s <- event_data(event = "plotly_selected", source = "analysis_ma")
-    if (is.null(s)) {
-      s <- ""
-    }
     DT::datatable(inUse_deTab[s$key,], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c(
@@ -66,9 +63,6 @@ output[["volcano_plot"]] <- renderPlotly({
 output[["selected_volcano"]] <- DT::renderDataTable({
   tryCatch({
     s <- event_data(event = "plotly_selected", source = "analysis_volcano")
-    if (is.null(s)) {
-      s <- ""
-    }
     DT::datatable(inUse_deTab[s$key,], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c(

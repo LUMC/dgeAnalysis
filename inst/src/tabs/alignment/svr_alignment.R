@@ -45,7 +45,6 @@ output[["complex"]] <- renderPlotly({
     }
     complexityPlot(get_se(), input$group_color, perc, input$comp_rank)
   }, error = function(err) {
-    print(err)
     return(NULL)
   })
 })

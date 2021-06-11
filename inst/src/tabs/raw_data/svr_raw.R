@@ -115,9 +115,6 @@ output[["selected_raw_mds"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
     s <- event_data(event = "plotly_selected", source = "raw_mds")
-    if (is.null(s)) {
-      s <- ""
-    }
     DT::datatable(data_samples()[unlist(s$key), , drop = FALSE], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c(
