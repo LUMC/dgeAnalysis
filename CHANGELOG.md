@@ -6,11 +6,14 @@ Newest changes should be on top.
 -->
 version 1.4.4
 ---------------------------
++ Add file names and md5 to markdown
++ Add new CPM filter for number of samples (percentage)
++ Add dendrogram to dimension reduction
 + Change export file name and remove quotes from exported dataframe
 + Small infobox update
-+ Add tSNE plot to Dimension reduction
++ Add tSNE plot to dimension reduction
 + Move normalized MDS to Dimension reduction
-+ Change PCA tab to Dimension reduction
++ Change PCA tab to dimension reduction
 + Remove MDS 3D and PCA 3D
 + Fix false warning: Contrast are the same error
 
