@@ -48,47 +48,40 @@ observeEvent(input$app_mode, {
 
 ## ----- Read files -----
 
+## Read data files
+readFiles <- function(input) {
+  df <- read.table(
+    file = input,
+    row.names = 1,
+    header = TRUE,
+    sep = "\t",
+    check.names = FALSE
+  )
+  if (ncol(df) < 1) {
+    df <- read.table(
+      file = input,
+      row.names = 1,
+      header = TRUE,
+      sep = ",",
+      check.names = FALSE
+    )
+  }
+  return(df)
+}
+
 ## Read sample data file
 data_samples <- reactive({
   if (input$app_mode == "new") {
     if (is.null(input$file_samples)) {
       return(NULL)
     }
-    data_samples <- read.csv(
-      input$file_samples$datapath,
-      row.names = 1,
-      header = TRUE,
-      sep = "\t",
-      check.names = FALSE
-    )
-    if (ncol(data_samples) < 1) {
-      data_samples <- read.csv(
-        input$file_samples$datapath,
-        row.names = 1,
-        header = TRUE,
-        check.names = FALSE
-      )
-    }
+    data_samples <- readFiles(input = input$file_samples$datapath)
   }
   if (input$app_mode == "view") {
     if (is.null(input$file_samples_view)) {
       return(NULL)
     }
-    data_samples <- read.csv(
-      input$file_samples_view$datapath,
-      row.names = 1,
-      header = TRUE,
-      sep = "\t",
-      check.names = FALSE
-    )
-    if (ncol(data_samples) < 1) {
-      data_samples <- read.csv(
-        input$file_samples_view$datapath,
-        row.names = 1,
-        header = TRUE,
-        check.names = FALSE
-      )
-    }
+    data_samples <- readFiles(input = input$file_samples_view$datapath)
   }
   data_samples
 })
@@ -99,41 +92,13 @@ data_counts <- reactive({
     if (is.null(input$file_counts)) {
       return(NULL)
     }
-    data_counts <- read.csv(
-      input$file_counts$datapath,
-      row.names = 1,
-      header = TRUE,
-      sep = "\t",
-      check.names = FALSE
-    )
-    if (ncol(data_counts) < 1) {
-      data_counts <- read.csv(
-        input$file_counts$datapath,
-        row.names = 1,
-        header = TRUE,
-        check.names = FALSE
-      )
-    }
+    data_counts <- readFiles(input = input$file_counts$datapath)
   }
   if (input$app_mode == "view") {
     if (is.null(input$file_counts_view)) {
       return(NULL)
     }
-    data_counts <- read.csv(
-      input$file_counts_view$datapath,
-      row.names = 1,
-      header = TRUE,
-      sep = "\t",
-      check.names = FALSE
-    )
-    if (ncol(data_counts) < 1) {
-      data_counts <-  read.csv(
-        input$file_counts_view$datapath,
-        row.names = 1,
-        header = TRUE,
-        check.names = FALSE
-      )
-    }
+    data_counts <- readFiles(input = input$file_counts_view$datapath)
   }
   data_counts
 })
@@ -143,21 +108,7 @@ data_annotation <- reactive({
   if (is.null(input$file_annotation)) {
     return(NULL)
   }
-  data_annotation <- read.csv(
-    input$file_annotation$datapath,
-    row.names = 1,
-    header = TRUE,
-    sep = "\t",
-    check.names = FALSE
-  )
-  if (ncol(data_annotation) < 1) {
-    data_annotation <- read.csv(
-      input$file_annotation$datapath,
-      row.names = 1,
-      header = TRUE,
-      check.names = FALSE
-    )
-  }
+  data_annotation <- readFiles(input = input$file_annotation$datapath)
   data_annotation
 })
 
@@ -166,21 +117,7 @@ data_norm <- reactive({
   if (is.null(input$file_norm_view)) {
     return(NULL)
   }
-  data_norm <- read.csv(
-    input$file_norm_view$datapath,
-    row.names = 1,
-    header = TRUE,
-    sep = "\t",
-    check.names = FALSE
-  )
-  if (ncol(data_norm) < 1) {
-    data_norm <- read.csv(
-      input$file_norm_view$datapath,
-      row.names = 1,
-      header = TRUE,
-      check.names = FALSE
-    )
-  }
+  data_norm <- readFiles(input = input$file_norm_view$datapath)
   data_norm
 })
 
@@ -189,21 +126,7 @@ data_detab <- reactive({
   if (is.null(input$file_detab_view)) {
     return(NULL)
   }
-  data_detab <- read.csv(
-    input$file_detab_view$datapath,
-    row.names = 1,
-    header = TRUE,
-    sep = "\t",
-    check.names = FALSE
-  )
-  if (ncol(data_detab) < 1) {
-    data_detab <- read.csv(
-      input$file_detab_view$datapath,
-      row.names = 1,
-      header = TRUE,
-      check.names = FALSE
-    )
-  }
+  data_detab <- readFiles(input = input$file_detab_view$datapath)
   data_detab
 })
 
