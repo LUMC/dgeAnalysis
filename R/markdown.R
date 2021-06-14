@@ -68,8 +68,7 @@ createDesign <- function(dge, dbase, dvalue, matrix_v1, matrix_v2) {
 #'
 #' @export
 
-relevelSamples <-
-  function(dge, dbase, dvalue, matrix_v1, matrix_v2) {
+relevelSamples <- function(dge, dbase, dvalue, matrix_v1, matrix_v2) {
     columns <- c(dbase, dvalue)
     for (value in columns) {
       newRef <-

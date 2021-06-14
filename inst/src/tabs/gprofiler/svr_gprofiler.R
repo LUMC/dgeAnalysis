@@ -209,6 +209,8 @@ output[["heat_table"]] <- DT::renderDataTable({
   })
 })
 
+## INFORMATION BOXES
+
 output[["gProfiler2_plot_info"]] <- renderUI({
   infoText <-
     "The gProfiler 2 manhattan plot shows the terms colored by source (database).

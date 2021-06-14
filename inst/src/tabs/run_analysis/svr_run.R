@@ -186,14 +186,13 @@ output[["matrix_value2"]] <- renderUI({
 ## Show the current design in use
 output[["show_design"]] <- renderUI({
   tryCatch({
-    design <-
-      createDesign(
-        data_samples(),
-        input$design_base,
-        input$design_value,
-        input$matrix_val1,
-        input$matrix_val2
-      )
+    design <- createDesign(
+      dge = data_samples(),
+      dbase = input$design_base,
+      dvalue = input$design_value,
+      matrix_v1 = input$matrix_val1,
+      matrix_v2 = input$matrix_val2
+    )
     design <- gsub("\\+", " + ", design)
     if (design == "~" | design == "~0 + ") {
       design <- "No values selected"

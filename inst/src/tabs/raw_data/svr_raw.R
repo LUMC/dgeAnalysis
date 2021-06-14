@@ -123,7 +123,6 @@ output[["selected_raw_mds"]] <- DT::renderDataTable({
   })
 })
 
-
 ## INFORMATION BOXES
 
 output[["dist_line_info"]] <- renderUI({
