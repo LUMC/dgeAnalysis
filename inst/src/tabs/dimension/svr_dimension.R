@@ -1,14 +1,4 @@
 
-## Variance PCA
-output[["variance_pca"]] <- renderPlotly({
-  tryCatch({
-    checkReload()
-    variancePcaPlot(inUse_normDge)
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
 ## PCA
 output[["pca"]] <- renderPlotly({
   tryCatch({
@@ -67,6 +57,16 @@ output[["selected_pca"]] <- DT::renderDataTable({
     return(DT::datatable(data.frame(c(
       "No data available in table"
     )), rownames = FALSE, colnames = ""))
+  })
+})
+
+## Variance PCA
+output[["variance_pca"]] <- renderPlotly({
+  tryCatch({
+    checkReload()
+    variancePcaPlot(inUse_normDge)
+  }, error = function(err) {
+    return(NULL)
   })
 })
 

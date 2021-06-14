@@ -40,7 +40,7 @@ tab_run_analysis <- tabItem(
       ),
       sliderInput(
         inputId = "cpm_perc",
-        label = "Set how many samples should meet CPM cutoff:",
+        label = "Minimum % of samples that meet Log2CPM cutoff:",
         value = 25,
         min = 0,
         max = 100,
