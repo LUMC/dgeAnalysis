@@ -156,5 +156,4 @@ server <- function(input, output, session) {
   source("tabs/gprofiler/svr_gprofiler.R", local = TRUE)
   source("tabs/export/svr_export.R", local = TRUE)
   source("tabs/about/svr_about.R", local = TRUE)
-  
 }
