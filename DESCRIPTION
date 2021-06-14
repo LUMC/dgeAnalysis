@@ -3,7 +3,7 @@ Type: Package
 Title: dgeAnalysis
 Version: 1.4.4
 Author@R:
-  person("Tom", "Kuipers", email = "t.b.kuipers@outlook.com", role = c("aut", "cre"))
+  person("Tom", "Kuipers", email = "t.b.kuipers@lumc.nl", role = c("aut", "cre"))
 Description:
     R shiny tool to perform differential gene expression and view the results interactively.
 Depends: R (>= 3.6.1)
@@ -27,12 +27,12 @@ Imports:
     scales (>= 1.1.1),
     broom (>= 0.7.1),
     plotly (>= 4.9.2),
+    Rtsne (>= 0.15),
     rmarkdown (>= 2.4),
     gprofiler2 (>= 0.2.0),
-    igraph (>= 1.2.5),
-    WGCNA (>= 1.69)
+    igraph (>= 1.2.5)
 biocViews: Annotation, Clustering, GeneSetEnrichment, GO, KEGG,
     MultipleComparison, Pathways, Reactome, Visualization,
     Sequencing, RNASeq, GeneExpression, Transcription,
     Normalization, DifferentialExpression, Bayesian, Regression,
-    PrincipalComponent, WGCNA
+    PrincipalComponent, gProfiler, DGE, dgeAnalysis
