@@ -20,7 +20,7 @@ tab_run_analysis <- tabItem(
           "EdgeR" = "analysisEdgeR",
           "DESeq2" = "analysisDESeq2"
         )
-      ), 
+      ),
       br(),
       sliderInput(
         inputId = "alpha_value",
@@ -37,10 +37,20 @@ tab_run_analysis <- tabItem(
         min = 0,
         max = 10,
         step = 0.1
+      ),
+      sliderInput(
+        inputId = "cpm_perc",
+        label = "Minimum % of samples that meet Log2CPM cutoff:",
+        value = 25,
+        min = 0,
+        max = 100,
+        step = 1,
+        post = "%"
       )
     ),
     column(
       width = 6,
+      br(), br(), br(),
       uiOutput("design_base"),
       radioButtons(
         inputId = "design_type",
@@ -64,7 +74,7 @@ tab_run_analysis <- tabItem(
   ),
   column(
     width = 6,
-    h4("Find genes that respond to:"),
+    h4("Read this comparison as:"),
     div(br(),
         uiOutput("show_matrix"),
         br(),

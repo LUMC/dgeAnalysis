@@ -16,7 +16,21 @@ output[["normalized_counts"]] <- DT::renderDataTable({
 output[["norm_dist_line"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    countDistributionLinePlot(inUse_normDge)
+    countDistributionLinePlot(inUse_normDge, input$norm_line_color)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Select a group to color line plot
+output[["norm_line_color"]] <- renderUI({
+  tryCatch({
+    checkReload()
+    selectInput(
+      inputId = "norm_line_color",
+      label = "Group by:",
+      choices = c("None" = "None", colnames(data_samples()))
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -66,103 +80,31 @@ output[["selected_norm_voom"]] <- DT::renderDataTable({
   })
 })
 
-## Normalized Multidimensional scaling 2D
-output[["norm_un_cluster_2d"]] <- renderPlotly({
-  tryCatch({
-    checkReload()
-    multidimensionalScaling2dPlot(inUse_normDge, input$group_norm_mds2d, "norm_mds2d")
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
-## Set color of mds 2d
-output[["group_norm_mds2d"]] <- renderUI({
-  tryCatch({
-    selectInput(
-      inputId = "group_norm_mds2d",
-      label = "Color by:",
-      choices = colnames(data_samples())
-    )
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
-## Selected data points norm_un_cluster_2d
-output[["selected_norm_mds2d"]] <- DT::renderDataTable({
-  tryCatch({
-    checkReload()
-    s <- event_data(event = "plotly_selected", source = "norm_mds2d")
-    DT::datatable(data_samples()[unlist(s$key), , drop = FALSE], options = list(pageLength = 15, scrollX = TRUE))
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
-## Normalized Multidimensional scaling 3D
-output[["norm_un_cluster_3d"]] <- renderPlotly({
-  tryCatch({
-    checkReload()
-    multidimensionalScaling3dPlot(inUse_normDge, input$group_norm_mds3d)
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
-## Set color of mds 3d
-output[["group_norm_mds3d"]] <- renderUI({
-  tryCatch({
-    selectInput(
-      inputId = "group_norm_mds3d",
-      label = "Color by:",
-      choices = colnames(data_samples())
-    )
-  }, error = function(err) {
-    return(NULL)
-  })
-})
 
 ## INFORMATION BOXES
 
 output[["norm_dist_line_info"]] <- renderUI({
   infoText <-
     "The line plot shows the density of the log2CPM values per sample. The density shows the
-  distribution of count values per sample and is used to determine big differences between
-  samples."
+        distribution of counts per sample and is used to detect large differences between
+        samples."
   informationBox(infoText)
 })
 
 output[["norm_dist_boxplot_info"]] <- renderUI({
   infoText <-
-    "The box plot has a similar purpose, but the data can be viewed in a different
-  format. The distribution can be seen between the Log2CPM at the corresponding
-  samples."
+    "The box plot serves a similar purpose to the line plot, but the data can be viewed in a different way
+        format. The distribution can be seen between the Log2CPM at the corresponding
+        samples."
   informationBox(infoText)
 })
 
 output[["norm_voom_plot_info"]] <- renderUI({
   infoText <-
     "The voom plot provides a check on the filtering, which is performed at the beginning of the
-  analysis. The method used to calculate this is 'voom'. Voom is an acronym for
-  mean-variance modeling at the observational level. This means that the mean-variance in
-  the data is calculated and gives each observation a certain weight. Problems during the
-  filtering of low expressed genes will be visible in this plot."
-  informationBox(infoText)
-})
-
-output[["norm_un_cluster_2d_info"]] <- renderUI({
-  infoText <-
-    "This MDS plot (multidimensional scaling plot) can be viewed as a 2D plot with
-  calculations of two dimensions. With the MDS plot distances between samples is
-  shown, based on similarities and differences."
-  informationBox(infoText)
-})
-
-output[["norm_un_cluster_3d_info"]] <- renderUI({
-  infoText <-
-    "This MDS plot (multidimensional scaling plot) can be viewed as a 3D plot with
-  calculations of three dimensions. With the MDS plot distances between samples is
-  shown, based on similarities and differences."
+        analysis. The method to calculate this is 'voom'. Voom is an acronym for
+        mean variance modeling at the observational level. This means that the mean variance in
+        the data is calculated and gives each observation a certain weight. Problems during the
+        filtering of low expressed genes will be visible in this plot."
   informationBox(infoText)
 })

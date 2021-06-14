@@ -3,7 +3,21 @@
 output[["dist_line"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    countDistributionLinePlot(get_raw_dge())
+    countDistributionLinePlot(get_raw_dge(), input$raw_line_color)
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
+## Select a group to color line plot
+output[["raw_line_color"]] <- renderUI({
+  tryCatch({
+    checkReload()
+    selectInput(
+      inputId = "raw_line_color",
+      label = "Group by:",
+      choices = c("None" = "None", colnames(data_samples()))
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -73,21 +87,21 @@ output[["selected_raw_voom"]] <- DT::renderDataTable({
   })
 })
 
-## Multidimensional scaling 2D
-output[["un_cluster_2d"]] <- renderPlotly({
+## Multidimensional scaling
+output[["un_cluster"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    multidimensionalScaling2dPlot(get_raw_dge(), input$group_raw_mds2d, "raw_mds2d")
+    multidimensionalScalingPlot(get_raw_dge(), input$group_raw_mds, "raw_mds")
   }, error = function(err) {
     return(NULL)
   })
 })
 
-## Set color of mds 2d
-output[["group_raw_mds2d"]] <- renderUI({
+## Set color of mds
+output[["group_raw_mds"]] <- renderUI({
   tryCatch({
     selectInput(
-      inputId = "group_raw_mds2d",
+      inputId = "group_raw_mds",
       label = "Color by:",
       choices = colnames(data_samples())
     )
@@ -96,14 +110,11 @@ output[["group_raw_mds2d"]] <- renderUI({
   })
 })
 
-## Selected data points un_cluster_2d
-output[["selected_raw_mds2d"]] <- DT::renderDataTable({
+## Selected data points un_cluster
+output[["selected_raw_mds"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
-    s <- event_data(event = "plotly_selected", source = "raw_mds2d")
-    if (is.null(s)) {
-      s <- ""
-    }
+    s <- event_data(event = "plotly_selected", source = "raw_mds")
     DT::datatable(data_samples()[unlist(s$key), , drop = FALSE], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c(
@@ -112,39 +123,19 @@ output[["selected_raw_mds2d"]] <- DT::renderDataTable({
   })
 })
 
-## Multidimensional scaling 3D
-output[["un_cluster_3d"]] <- renderPlotly({
-  tryCatch({
-    checkReload()
-    multidimensionalScaling3dPlot(get_raw_dge(), input$group_raw_mds3d)
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
-## Set color of mds 2d
-output[["group_raw_mds3d"]] <- renderUI({
-  tryCatch({
-    selectInput("group_raw_mds3d", "Color by:",
-                colnames(data_samples()))
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
 ## INFORMATION BOXES
 
 output[["dist_line_info"]] <- renderUI({
   infoText <-
     "The line plot shows the density of the log2CPM values per sample. The density shows the
-        distribution of count values per sample and is used to determine big differences between
+        distribution of counts per sample and is used to detect large differences between
         samples."
   informationBox(infoText)
 })
 
 output[["dist_boxplot_info"]] <- renderUI({
   infoText <-
-    "The box plot has a similar purpose, but the data can be viewed in a different
+    "The box plot serves a similar purpose as the line plot, but the data can be viewed in a different way
         format. The distribution can be seen between the Log2CPM at the corresponding
         samples."
   informationBox(infoText)
@@ -153,25 +144,17 @@ output[["dist_boxplot_info"]] <- renderUI({
 output[["raw_voom_plot_info"]] <- renderUI({
   infoText <-
     "The voom plot provides a check on the filtering, which is performed at the beginning of the
-        analysis. The method used to calculate this is 'voom'. Voom is an acronym for
-        mean-variance modeling at the observational level. This means that the mean-variance in
+        analysis. The method to calculate this is 'voom'. Voom is an acronym for
+        mean variance modeling at the observational level. This means that the mean variance in
         the data is calculated and gives each observation a certain weight. Problems during the
         filtering of low expressed genes will be visible in this plot."
   informationBox(infoText)
 })
 
-output[["un_cluster_2d_info"]] <- renderUI({
+output[["un_cluster_info"]] <- renderUI({
   infoText <-
     "This MDS plot (multidimensional scaling plot) can be viewed as a 2D plot with
-        calculations of two dimensions. With the MDS plot distances between samples is
-        shown, based on similarities and differences."
-  informationBox(infoText)
-})
-
-output[["un_cluster_3d_info"]] <- renderUI({
-  infoText <-
-    "This MDS plot (multidimensional scaling plot) can be viewed as a 3D plot with
-        calculations of three dimensions. With the MDS plot distances between samples is
+        calculations of two dimensions. With the MDS plotting distances between samples, samples
         shown, based on similarities and differences."
   informationBox(infoText)
 })

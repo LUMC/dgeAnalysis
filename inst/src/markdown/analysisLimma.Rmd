@@ -14,11 +14,13 @@ output:
     theme: paper
 always_allow_html: true
 params:
+  md5sum:           ""
   data_samples:     ""
   data_counts:      ""
   data_annotation:  ""
   setGeneName:      ""
   cpm_value:        ""
+  cpm_perc:         ""
   excluded_samples: ""
   design_base:      ""
   design_value:     ""
@@ -45,11 +47,13 @@ if (!require("plotly")) install.packages("plotly")
 ```{r variables}
 # IMPORT VARIABLES
 
+md5sum <- params$md5sum
 data_samples <- params$data_samples
 data_counts <- params$data_counts
 data_annotation <- params$data_annotation
 setGeneName <- params$setGeneName
 cpm_value <- params$cpm_value
+cpm_perc <- params$cpm_perc
 excluded_samples <- params$excluded_samples
 design_base <- params$design_base
 design_value <- params$design_value
@@ -73,7 +77,9 @@ data_counts <- data_counts[, !colnames(data_counts) %in% excluded_samples]
 ```{r showVariables}
 # SHOW VALUES OF VARIABLES
 
+md5sum
 cpm_value
+cpm_perc
 excluded_samples
 alpha
 design_base
@@ -136,7 +142,7 @@ The raw data is filtered based on the input values provided.
 limmaV <- calcNormFactors(dge, method = "TMM")
 counts <- cpm(limmaV, log = TRUE, prior.count = 1)
 selectedFeatures <- rownames(limmaV)[apply(counts, 1, function(v)
-  sum(v >= cpm_value)) >= 1 / 4 * ncol(counts)]
+  sum(v >= cpm_value)) >= (cpm_perc / 100) * ncol(counts)]
 
 ```
 
@@ -159,7 +165,7 @@ normDge <- calcNormFactors(highExprDge, method = "TMM")
 tempDge <- normDge
 tempDge$counts <- cpm(normDge, log = TRUE, prior.count = 1)
 countDistributionLinePlot(tempDge)
-samplePca2dPlot(tempDge, design_base, "PC1", "PC2")
+pcaPlot(tempDge, design_base, "PC1", "PC2")
 
 ```
 

@@ -13,9 +13,6 @@ output[["gc_bias"]] <- renderPlotly({
 output[["selected_biasgc"]] <- DT::renderDataTable({
   tryCatch({
     s <- event_data(event = "plotly_selected", source = "biasGC")
-    if (is.null(s)) {
-      s <- ""
-    }
     DT::datatable(inUse_deTab[s$key, ], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c(
@@ -57,9 +54,6 @@ output[["len_bias"]] <- renderPlotly({
 output[["selected_biaslength"]] <- DT::renderDataTable({
   tryCatch({
     s <- event_data(event = "plotly_selected", source = "biasLength")
-    if (is.null(s)) {
-      s <- ""
-    }
     DT::datatable(inUse_deTab[s$key, ], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c(
@@ -101,28 +95,28 @@ output[["geneStrand_bias"]] <- renderPlotly({
 
 output[["gc_bias_info"]] <- renderUI({
   infoText <-
-    "The GC bias plots are generated based on the average log fold change on the Y-axis. The bias plots
+    "The GC bias plots are generated based on the mean change of the logFC on the Y-axis. The bias plots
         can only be used if an annotation is used to perform the analysis. If annotation values are
-        present, a column can be selected with the use of a drop-down button. The columns should
-        contain the text: 'GC', otherwise they will not be recognized as a column suitable
+        is present, a column can be selected using a drop-down button. The columns must
+        contain the text: 'GC', otherwise they will not be recognized as a suitable column
         for GC bias calculations."
   informationBox(infoText)
 })
 
 output[["len_bias_info"]] <- renderUI({
   infoText <-
-    "The feature-length bias plots are generated based on the average log fold change on the Y-axis. The bias plots
+    "The feature-length bias plots are generated from the mean change of the logFC on the Y-axis. The bias plots
         can only be used if an annotation is used to perform the analysis. If annotation values are
-        present, a column can be selected with the use of a drop-down button. The columns should
-        contain the text: 'length', otherwise they will not be recognized as a column suitable
+        is present, a column can be selected using a drop-down button. The columns must
+        contain the text: 'length', otherwise they will not be recognized as a suitable column
         for length bias calculations."
   informationBox(infoText)
 })
 
 output[["geneStrand_info"]] <- renderUI({
   infoText <-
-    "The gene strand bias plots are generated based on strand info (+ or -) and the number of
-        genes (DE or not). It shows the distribution of genes between strands. The gene strand plot can only
-        be generated when using an annotation file containing strand information about genes."
+    "The gene strand bias plots are generated based on strand info (+ or -) and number
+        genes (DE or not). It shows the distribution of genes between strands. The Gene Strand Plot can only
+        be generated using the gene strand information annotation file."
   informationBox(infoText)
 })

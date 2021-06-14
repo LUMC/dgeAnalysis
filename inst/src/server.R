@@ -30,7 +30,7 @@ server <- function(input, output, session) {
     alignment = "Alignment",
     raw_data = "Raw Data",
     norm_data = "Normalization",
-    pca = "PCA",
+    dimension = "Dimension reduction",
     heatmaps = "Heatmaps",
     analysis = "DE analysis",
     bias = "Bias",
@@ -93,8 +93,8 @@ server <- function(input, output, session) {
           icon = icon("chart-line")
         ),
         menuItem(
-          "PCA",
-          tabName = "pca",
+          "Dimension reduction",
+          tabName = "dimension",
           icon = icon("chart-line")
         ), 
         menuItem(
@@ -148,7 +148,7 @@ server <- function(input, output, session) {
   source("tabs/alignment/svr_alignment.R", local = TRUE)
   source("tabs/raw_data/svr_raw.R", local = TRUE)
   source("tabs/norm_data/svr_norm.R", local = TRUE)
-  source("tabs/pca/svr_pca.R", local = TRUE)
+  source("tabs/dimension/svr_dimension.R", local = TRUE)
   source("tabs/heatmaps/svr_heatmaps.R", local = TRUE)
   source("tabs/analysis/svr_analysis.R", local = TRUE)
   source("tabs/bias/svr_bias.R", local = TRUE)
@@ -156,5 +156,4 @@ server <- function(input, output, session) {
   source("tabs/gprofiler/svr_gprofiler.R", local = TRUE)
   source("tabs/export/svr_export.R", local = TRUE)
   source("tabs/about/svr_about.R", local = TRUE)
-  
 }

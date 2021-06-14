@@ -5,7 +5,7 @@ source("tabs/run_analysis/ui_run.R", local = TRUE)
 source("tabs/alignment/ui_alignment.R", local = TRUE)
 source("tabs/raw_data/ui_raw.R", local = TRUE)
 source("tabs/norm_data/ui_norm.R", local = TRUE)
-source("tabs/pca/ui_pca.R", local = TRUE)
+source("tabs/dimension/ui_dimension.R", local = TRUE)
 source("tabs/heatmaps/ui_heatmaps.R", local = TRUE)
 source("tabs/analysis/ui_analysis.R", local = TRUE)
 source("tabs/bias/ui_bias.R", local = TRUE)
@@ -42,7 +42,7 @@ ui <- dashboardPage(
       tab_alignment,
       tab_raw_data,
       tab_norm_data,
-      tab_pca,
+      tab_dimension,
       tab_heatmaps,
       tab_analysis,
       tab_bias,

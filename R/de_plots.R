@@ -106,8 +106,8 @@ alignmentSummaryPlot <- function(se, sort_value = "None", perc = T) {
   plotly::subplot(
     plot_list,
     nrows = length(unique(lse$order)),
-    shareY = T,
-    shareX = T,
+    shareY = TRUE,
+    shareX = TRUE,
     margin = 0.005
   )
 }
@@ -118,7 +118,7 @@ alignmentSummaryPlot <- function(se, sort_value = "None", perc = T) {
 #' A dot line plot is created based on the number of reads at rank.
 #'
 #' @param se SummerizedExperiment object, containing samples and counts
-#' @param group_color String, Sort samples based on a group
+#' @param color String, Sort samples based on a group
 #' @param perc Boolean, Data in percentages
 #' @param rank Integer, The number of genes/rank (min=10)
 #'
@@ -126,117 +126,90 @@ alignmentSummaryPlot <- function(se, sort_value = "None", perc = T) {
 #'
 #' @export
 
-complexityPlot <- function(se, group_color = "None", perc = T, rank = 1000) {
-    compData <- complexityData(se, rank)
-    
-    p <- plot_ly(type = 'scattergl',
-                 mode = "lines+markers") %>%
-      plotly::layout(
-        title = "Gene complexity %",
-        xaxis = list(title = 'Rank', type = "log"),
-        yaxis = if (perc) {
-          list(tickformat = "%", title = 'Cumulative fraction of total reads till rank')
-        }
-        else {
-          list(title = 'Cumulative reads till rank')
-        },
-        legend = list(tracegroupgap = 0)
-      ) %>%
-      config(
-        toImageButtonOptions = list(
-          format = "png",
-          filename = "countdistline",
-          width = 1500,
-          height = 1000
-        )
-      )
-    
-    legend_duplic <- c()
-    for (var in colnames(se)) {
-      temp <- compData[compData$sample == var,]
-      if (group_color != "None") {
-        p <- add_trace(
-          p,
-          x = temp$rank,
-          y = if (perc) {
-            temp$fraction
-          } else {
-            temp$value
-          },
-          showlegend = if (!se[[group_color]][colnames(se) == var] %in% legend_duplic) {
-            TRUE
-          } else{
-            FALSE
-          },
-          legendgroup = se[[group_color]][colnames(se) == var],
-          color = rep(se[[group_color]][colnames(se) == var], rank),
-          text = if (perc) {
-            paste(
-              temp$sample,
-              "\n",
-              temp$rank,
-              "Genes\n",
-              round(temp$fraction * 100, 2),
-              '% Reads\n'
-            )
-          } else {
-            paste(
-              temp$sample,
-              "\n",
-              temp$rank,
-              "Genes\n",
-              formatC(
-                temp$value,
-                format = "f",
-                big.mark = ".",
-                digits = 0
-              ),
-              'Reads\n'
-            )
-          },
-          hoverinfo = 'text'
-        )
-        legend_duplic <- c(legend_duplic, se[[group_color]][colnames(se) == var])
-      } else {
-        p <- add_trace(
-          p,
-          x = temp$rank,
-          y = if (perc) {
-            temp$fraction
-          } else {
-            temp$value
-          },
-          color = var,
-          text = if (perc) {
-            paste(
-              temp$sample,
-              "\n",
-              temp$rank,
-              "Genes\n",
-              round(temp$fraction * 100, 2),
-              '% Reads\n'
-            )
-          } else {
-            paste(
-              temp$sample,
-              "\n",
-              temp$rank,
-              "Genes\n",
-              formatC(
-                temp$value,
-                format = "f",
-                big.mark = ".",
-                digits = 0
-              ),
-              'Reads\n'
-            )
-          },
-          hoverinfo = 'text'
-        )
+complexityPlot <- function(se, color = "None", perc = T, rank = 1000) {
+  if (color == "None") {color <- NA}
+  
+  compData <- complexityData(se, rank)
+  compData <- merge(
+    x = compData,
+    y = as.data.frame(colData(se)),
+    by.x = "sample",
+    by.y = "row.names",
+    all.x = TRUE
+  )
+  
+  p <- plot_ly(type = 'scattergl',
+               mode = "lines+markers") %>%
+    plotly::layout(
+      title = "Gene complexity %",
+      xaxis = list(title = 'Rank', type = "log"),
+      yaxis = if (perc) {
+        list(tickformat = "%", title = 'Cumulative fraction of total reads till rank')
       }
+      else {
+        list(title = 'Cumulative reads till rank')
+      },
+      legend = list(tracegroupgap = 0)
+    ) %>%
+    config(
+      toImageButtonOptions = list(
+        format = "png",
+        filename = "countdistline",
+        width = 1500,
+        height = 1000
+      )
+    )
+  
+  header_col <- c()
+  group_color <- NA
+  for (var in colnames(se)) {
+    temp <- compData[compData$sample == var, ]
+    if (!is.na(color)) {
+      group_color <- temp[[color]][1]
     }
-    p
+    p <- add_trace(
+      p,
+      x = temp$rank,
+      y = if (perc) {
+        temp$fraction
+      } else {
+        temp$value
+      },
+      showlegend = if (!is.na(color) & group_color %in% header_col) {FALSE} else{TRUE},
+      legendgroup = if (is.na(color)) {var} else {group_color},
+      color = if (is.na(color)) {var} else {group_color},
+      text = if (perc) {
+        paste(
+          temp$sample,
+          "\n",
+          temp$rank,
+          "Genes\n",
+          round(temp$fraction * 100, 2),
+          '% Reads\n'
+        )
+      } else {
+        paste(
+          temp$sample,
+          "\n",
+          temp$rank,
+          "Genes\n",
+          formatC(
+            temp$value,
+            format = "f",
+            big.mark = ".",
+            digits = 0
+          ),
+          'Reads\n'
+        )
+      },
+      hoverinfo = 'text'
+    )
+    if (!is.na(color)) {
+      header_col <- c(header_col, as.character(group_color))
+    }
   }
+  p
+}
 
 ## --------------------------------------------------------------------------
 
@@ -248,13 +221,23 @@ complexityPlot <- function(se, group_color = "None", perc = T, rank = 1000) {
 #' A dot line plot is created based on the number of reads at rank.
 #'
 #' @param dge DGE list object, containing samples and counts
+#' @param color String, Sort samples based on a group
 #'
 #' @return p, (Plotly object) plot
 #'
 #' @export
 
-countDistributionLinePlot <- function(dge) {
+countDistributionLinePlot <- function(dge, color = "None") {
+  if (color == "None") {color <- NA}
+  
   stackCounts <- data.frame(stackDge(dge))
+  stackCounts <- merge(
+    x = stackCounts,
+    y = dge$samples,
+    by.x = "sample",
+    by.y = "row.names",
+    all.x = TRUE
+  )
   
   p <- plot_ly(type = 'scattergl',
                mode = 'lines',
@@ -262,7 +245,8 @@ countDistributionLinePlot <- function(dge) {
     plotly::layout(
       title = "Gene count distribution",
       xaxis = list(title = 'Log2CPM'),
-      yaxis = list(title = 'Density')
+      yaxis = list(title = 'Density'),
+      legend = list(tracegroupgap = 0)
     ) %>%
     config(
       toImageButtonOptions = list(
@@ -272,19 +256,31 @@ countDistributionLinePlot <- function(dge) {
         height = 1000
       )
     )
+  
+  header_col <- c()
+  group_color <- NA
   for (var in unique(stackCounts$sample)) {
     temp <- stackCounts[stackCounts$sample == var,]
     density <- density(temp$logCPM)
+    if (!is.na(color)) {
+      group_color <- temp[[color]][1]
+    }
     p <- add_trace(
       p,
       x = density$x,
       y = density$y,
-      name = var,
+      name = if (is.na(color)) {var} else {group_color},
       text = var,
+      legendgroup = if (is.na(color)) {NULL} else {group_color},
+      showlegend = if (!is.na(color) & group_color %in% header_col) {FALSE} else{TRUE},
+      color = if (is.na(color)) {NULL} else {group_color},
       hoverinfo = 'text',
       fill = 'tozeroy',
       alpha = 0.05
     )
+    if (!is.na(color)) {
+      header_col <- c(header_col, as.character(group_color))
+    }
   }
   p
 }
@@ -390,7 +386,7 @@ voomPlot <- function(dge, sourceId) {
 #'
 #' @export
 
-multidimensionalScaling2dPlot <- function(dge, color, sourceId) {
+multidimensionalScalingPlot <- function(dge, color, sourceId) {
   logFC <- plotMDS(dge$counts, ndim = ncol(dge) - 1)
   for_plots <- data.frame(logFC$cmdscale.out)
   for_plots$group <- dge$samples[, color]
@@ -411,7 +407,7 @@ multidimensionalScaling2dPlot <- function(dge, color, sourceId) {
     source = sourceId
   ) %>%
     plotly::layout(
-      title = paste("MDS Plot 2D"),
+      title = paste("MDS Plot"),
       xaxis = list(title = 'MDS1'),
       yaxis = list(title = 'MDS2'),
       clickmode = "event+select",
@@ -426,53 +422,9 @@ multidimensionalScaling2dPlot <- function(dge, color, sourceId) {
   p
 }
 
-
-#' Calculates required values with 'plotMDS' method.
-#' The plot is created with plotly with values retrieved from the mds object.
-#' Plot is colored based on the selected column.
-#'
-#' @param dge DGE list object, containing samples and counts
-#' @param color String, Column on wich colors should be based
-#'
-#' @return p, (Plotly object) plot
-#'
-#' @export
-
-multidimensionalScaling3dPlot <- function(dge, color) {
-  logFC <- plotMDS(dge$counts, ndim = ncol(dge) - 1)
-  for_plots <- data.frame(logFC$cmdscale.out)
-  for_plots$group <- dge$samples[, color]
-  
-  p <- plot_ly(
-    data = for_plots,
-    x = ~ X1,
-    y = ~ X2,
-    z = ~ X3,
-    color = ~ for_plots$group,
-    text = rownames(for_plots),
-    hoverinfo = 'text'
-  ) %>%
-    add_markers(marker = list(size = 5, opacity = 0.75)) %>%
-    plotly::layout(
-      title = paste("MDS Plot 3D"),
-      scene = list(
-        xaxis = list(title = 'MDS1'),
-        yaxis = list(title = 'MDS2'),
-        zaxis = list(title = 'MDS3')
-      )
-    ) %>%
-    config(toImageButtonOptions = list(
-      format = "png",
-      filename = "mds3d",
-      width = 1500,
-      height = 1000
-    ))
-  p
-}
-
 ## --------------------------------------------------------------------------
 
-## ----- PCA PLOTS -----
+## ----- DIMENSION REDUCTION PLOTS -----
 
 
 #' Columns and rows from DGE list are turned.
@@ -522,7 +474,7 @@ variancePcaPlot <- function(dge) {
 #' Scatter plot is created based on selected PCs.
 #'
 #' @param dge DGE list object, containing samples and counts
-#' @param color String, Column on wich colors should be based
+#' @param color String, Column on which colors should be based
 #' @param getPC1 String, Selected PC to be plotted on x-axis
 #' @param getPC2 String, Selected PC to be plotted on y-axis
 #'
@@ -530,7 +482,7 @@ variancePcaPlot <- function(dge) {
 #'
 #' @export
 
-samplePca2dPlot <- function(dge, color, getPC1, getPC2) {
+pcaPlot <- function(dge, color, getPC1, getPC2) {
   tdge <- t(dge$counts)
   tdge[!is.finite(tdge)] <- 0
   pca <- prcomp(tdge, center = TRUE)
@@ -553,10 +505,10 @@ samplePca2dPlot <- function(dge, color, getPC1, getPC2) {
                   line = list(color = '#999999',
                               width = 1)),
     key = ~ rownames(pca),
-    source = "pca_pca2d"
+    source = "pca"
   ) %>%
     plotly::layout(
-      title = 'PCA 2D',
+      title = 'PCA',
       xaxis = list(title = paste0(
         getPC1, " (", round(percent[getPC1, ] * 100, 2), "%)"
       )),
@@ -568,7 +520,7 @@ samplePca2dPlot <- function(dge, color, getPC1, getPC2) {
     ) %>%
     config(toImageButtonOptions = list(
       format = "png",
-      filename = "pca2d",
+      filename = "pca",
       width = 1500,
       height = 1000
     ))
@@ -576,56 +528,116 @@ samplePca2dPlot <- function(dge, color, getPC1, getPC2) {
 }
 
 
-#' Columns and rows from DGE list are turned.
-#' PCA is calculated with prcomp.
-#' PC percentages are calculated.
+#' Perplexity is set (max 30 & min 1), this depends on the number of samples
+#' tsne model is calculated.
 #' Scatter plot is created based on selected PCs.
 #'
 #' @param dge DGE list object, containing samples and counts
-#' @param color String, Column on wich colors should be based
-#' @param getPC1 String, Selected PC to be plotted on x-axis
-#' @param getPC2 String, Selected PC to be plotted on y-axis
-#' @param getPC3 String, Selected PC to be plotted on z-axis
+#' @param color String, Column on which colors should be based
 #'
 #' @return p, (Plotly object) plot
 #'
 #' @export
 
-samplePca3dPlot <- function(dge, color, getPC1, getPC2, getPC3) {
-  tdge <- t(dge$counts)
-  tdge[!is.finite(tdge)] <- 0
-  pca <- prcomp(tdge, center = TRUE)
-  percent <- data.frame(summary(pca)$importance[2, ])
-  colnames(percent) <- "percent"
+tsnePlot <- function(dge, color) {
+  set.seed(1234)
   
-  pca <- data.frame(scale(tdge, center = T, scale = F) %*% pca$rotation)
-  pca$group <- dge$samples[, color]
+  perplexity <- 30
+  while (perplexity > 0) {
+    try({
+      tsne_model <- Rtsne(
+        t(dge$counts),
+        perplexity = perplexity,
+        check_duplicates = FALSE,
+        normalize = FALSE
+      )
+    }, silent = TRUE
+    )
+    perplexity <- perplexity - 1
+  }
+  
+  tsne_data <- as.data.frame(tsne_model$Y)
+  rownames(tsne_data) <- colnames(dge$counts)
+  tsne_data$color <- dge$samples[[color]]
   
   p <- plot_ly(
-    data = pca,
-    x = pca[[getPC1]],
-    y = pca[[getPC2]],
-    z = pca[[getPC3]],
-    color = ~ pca$group,
-    text = rownames(pca),
-    hoverinfo = 'text'
-  ) %>%
-    add_markers(marker = list(size = 5, opacity = 0.75)) %>%
-    plotly::layout(title = 'PCA 3D',
-                   scene = list(
-                     xaxis = list(title = paste0(
-                       getPC1, " (", round(percent[getPC1, ] * 100, 2), "%)"
-                     )),
-                     yaxis = list(title = paste0(
-                       getPC2, " (", round(percent[getPC2, ] * 100, 2), "%)"
-                     )),
-                     zaxis = list(title = paste0(
-                       getPC3, " (", round(percent[getPC3, ] * 100, 2), "%)"
-                     ))
-                   )) %>%
+    data = tsne_data,
+    x = ~V1,
+    y = ~V2,
+    type = "scattergl",
+    mode = "markers",
+    source = "tsne",
+    key = ~ rownames(tsne_data),
+    marker = list(size=15,
+                  line = list(color = '#999999',
+                              width = 1)),
+    color = ~color,
+    text = rownames(tsne_data),
+    hoverinfo = 'text') %>%
+    plotly::layout(
+      title = "t-SNE",
+      xaxis = list(title = "tSNE 1"),
+      yaxis = list(title = "tSNE 2"),
+      clickmode = "event+select",
+      dragmode = "select") %>%
+    config(
+      toImageButtonOptions = list(
+        format = "png",
+        filename = "t-SNE",
+        width = 1500,
+        height = 1000
+      )
+    )
+  p
+}
+
+#' Get dendrogram data dendro_data().
+#' Plot a dendrogram.
+#'
+#' @param d Hclust object, tree object
+#' @param color String, color samples
+#' @param color_list Vector, Color genes
+#'
+#' @return p, (Plotly object) plot
+#'
+#' @export
+
+plotly_dendrogram <- function(d, color, color_list) {
+  dendro_data <- get_dendrogram_data(d)
+  
+  p <- plot_ly(
+    data = dendro_data,
+    x = ~ x,
+    y = ~ y,
+    color = I("black"),
+    hoverinfo = "none"
+  )  %>%
+    add_segments(xend = ~ xend,
+                 yend = ~ yend,
+                 showlegend = FALSE) %>%
+    add_markers(
+      data = dendro_data[dendro_data$label != "", ],
+      x = ~ x,
+      y = ~ y,
+      color = color,
+      marker = list(size = 10,
+                    color = color_list),
+      text = ~ label,
+      hoverinfo = 'text'
+    ) %>%
+    plotly::layout(
+      dragmode = "zoom",
+      title = "Dendrogram",
+      xaxis = list(
+        title = "",
+        showticklabels = FALSE,
+        zeroline = FALSE
+      ),
+      yaxis = list(title = "Height")
+    ) %>%
     config(toImageButtonOptions = list(
       format = "png",
-      filename = "pca3d",
+      filename = "dendro",
       width = 1500,
       height = 1000
     ))

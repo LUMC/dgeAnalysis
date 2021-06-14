@@ -1,6 +1,6 @@
 # dgeAnalysis
 
-This R package contains the R-Shiny application v1.4.3 developed to perform differential gene expression analysis.
+This R package contains the R-Shiny application v1.4.4 developed to perform differential gene expression analysis.
 * dgeAnalysis manual: https://github.com/LUMC/dgeAnalysis/blob/master/MANUAL.pdf
 
 ## Installing
@@ -63,7 +63,7 @@ Pandoc:\
 
 ## Fix install problems
 If there are problems installing the application, it might be worth to try installing specific packages manually:
-```
+```R
 ## Shiny environment
 if (!require("shiny")) install.packages("shiny")
 if (!require("shinydashboard")) install.packages("shinydashboard")
@@ -82,6 +82,7 @@ if (!require("tidyr")) install.packages("tidyr")
 if (!require("scales")) install.packages("scales")
 if (!require("broom")) install.packages("broom")
 if (!require("plotly")) install.packages("plotly")
+if (!require("Rtsne")) install.packages("Rtsne")
 if (!require("rmarkdown")) install.packages("rmarkdown")
 
 ## Pathway analysis

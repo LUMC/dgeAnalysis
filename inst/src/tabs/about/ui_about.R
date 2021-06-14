@@ -6,7 +6,7 @@ tab_about <- tabItem(
   
   HTML('<hr style="border-color: #0088cc;">'),
   h2("dgeAnalysis"),
-  h4("R shiny tool to perform differential gene expression"),
+  h4("R shiny tool to perform & visualize differential gene expression"),
   HTML('<hr style="border-color: #0088cc;">'),
   br(),
   br(),

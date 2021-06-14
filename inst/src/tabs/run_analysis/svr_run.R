@@ -18,12 +18,14 @@ observeEvent(input$run_button, {
     rmarkdown::render(
       input = paste0("markdown/", input$analysis_method, ".Rmd"),
       params = list(
+        md5sum = getMD5(),
         data_samples = data_samples(),
         data_counts = data_counts(),
         data_annotation = data_annotation(),
         excluded_samples = input$exclude_samples,
         setGeneName = input$setGeneName,
         cpm_value = input$cpm_value,
+        cpm_perc = input$cpm_perc,
         design_base = input$design_base,
         design_value = input$design_value,
         matrix_v1 = input$matrix_val1,
@@ -57,14 +59,33 @@ preMarkdownChecks <- reactive ({
     return("Wrong analysis mode!")
   } else if (is.null(input$matrix_val1) | is.null(input$matrix_val2)) {
     return("One of the contrast is empty!")
-  } else if (paste0(input$matrix_val1) == paste0(input$matrix_val2)) {
+  } else if (all(sort(input$matrix_val1) == sort(input$matrix_val2))) {
     return("Contrasts cant be the same!")
   } else if (!is.null(input$setGeneName)) {
     if (input$setGeneName == "symbol" & !("geneName" %in% colnames(data_annotation()))) {
       return("The annotation file is missing a column: 'geneName'!")
     }
+  } else if (is.null(input$file_counts)) {
+    return("No expression data uploaded!")
   }
   return(NULL)
+})
+
+## Get MD5 info from uploaded files
+getMD5 <- reactive({
+  md5 <- tryCatch({
+    c(
+      paste0(input$file_samples$name, ": ", tools::md5sum(files = input$file_samples$datapath)),
+      paste0(input$file_counts$name, ": ", tools::md5sum(files = input$file_counts$datapath)),
+      paste0(input$file_annotation$name, ": ", tools::md5sum(files = input$file_annotation$datapath))
+    )
+  }, error = function(err) {
+    c(
+      paste0(input$file_samples$name, ": ", tools::md5sum(files = input$file_samples$datapath)),
+      paste0(input$file_counts$name, ": ", tools::md5sum(files = input$file_counts$datapath))
+    )
+  })
+  as.matrix(md5)
 })
 
 ## Render base column for design
@@ -165,14 +186,13 @@ output[["matrix_value2"]] <- renderUI({
 ## Show the current design in use
 output[["show_design"]] <- renderUI({
   tryCatch({
-    design <-
-      createDesign(
-        data_samples(),
-        input$design_base,
-        input$design_value,
-        input$matrix_val1,
-        input$matrix_val2
-      )
+    design <- createDesign(
+      dge = data_samples(),
+      dbase = input$design_base,
+      dvalue = input$design_value,
+      matrix_v1 = input$matrix_val1,
+      matrix_v2 = input$matrix_val2
+    )
     design <- gsub("\\+", " + ", design)
     if (design == "~" | design == "~0 + ") {
       design <- "No values selected"
@@ -215,16 +235,15 @@ output[["show_matrix"]] <- renderUI({
     total_matrix2 <- paste(total_matrix2, collapse = " in ")
     
     if (total_matrix1 == "") {
-      total_matrix1 <- "No values selected"
+      total_matrix1 <- "NaN"
     }
     if (total_matrix2 == "") {
-      total_matrix2 <- "No values selected"
+      total_matrix2 <- "NaN"
     }
     
-    total_matrix <-
-      paste(total_matrix1, total_matrix2, sep = " VS ")
+    total_matrix <- paste("Genes are up/down regulated in", total_matrix1, "compared to", total_matrix2)
   }, error = function(err) {
-    return("No values selected VS No values selected")
+    return("No values selected")
   })
 })
 

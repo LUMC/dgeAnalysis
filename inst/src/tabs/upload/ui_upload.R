@@ -55,7 +55,7 @@ tab_upload <- tabItem(
       ),
       fileInput(
         inputId = "file_annotation",
-        label = "Choose your annotation file:",
+        label = "Choose your annotation file (optional):",
         multiple = FALSE,
         accept = c(
           "CSV",

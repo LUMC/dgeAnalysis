@@ -16,12 +16,13 @@ tab_norm_data <- tabItem(
     ),
     
     tabPanel(
-      title = "Line distribution",
+      title = "Count distribution",
       HTML('<hr style="border-color: #0088cc;">'),
       sidebarLayout(
         position = "right",
         sidebarPanel(
           width = 3,
+          uiOutput("norm_line_color"),
           uiOutput("norm_dist_line_info"),
           span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
         ),
@@ -70,48 +71,6 @@ tab_norm_data <- tabItem(
       ),
       HTML('<hr style="border-color: #0088cc;">'),
       DT::dataTableOutput("selected_norm_voom") %>% withSpinner(),
-      HTML('<hr style="border-color: #0088cc;">')
-    ),
-    
-    tabPanel(
-      title = "Multidimensional scaling 2D",
-      HTML('<hr style="border-color: #0088cc;">'),
-      sidebarLayout(
-        position = "right",
-        sidebarPanel(
-          width = 3,
-          uiOutput("group_norm_mds2d"),
-          br(),
-          uiOutput("norm_un_cluster_2d_info"),
-          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
-        ),
-        mainPanel(
-          width = 9,
-          plotlyOutput("norm_un_cluster_2d", height = "600px") %>% withSpinner()
-        )
-      ),
-      HTML('<hr style="border-color: #0088cc;">'),
-      DT::dataTableOutput("selected_norm_mds2d") %>% withSpinner(),
-      HTML('<hr style="border-color: #0088cc;">')
-    ),
-    
-    tabPanel(
-      title = "Multidimensional scaling 3D",
-      HTML('<hr style="border-color: #0088cc;">'),
-      sidebarLayout(
-        position = "right",
-        sidebarPanel(
-          width = 3,
-          uiOutput("group_norm_mds3d"),
-          br(),
-          uiOutput("norm_un_cluster_3d_info"),
-          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
-        ),
-        mainPanel(
-          width = 9,
-          plotlyOutput("norm_un_cluster_3d", height = "600px") %>% withSpinner()
-        )
-      ),
       HTML('<hr style="border-color: #0088cc;">')
     )
   )

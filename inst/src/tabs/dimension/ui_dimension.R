@@ -1,74 +1,70 @@
 
-tab_raw_data <- tabItem(
-  tabName = "raw_data",
+tab_dimension <- tabItem(
+  tabName = "dimension",
   align = "center",
   br(),
   
   tabsetPanel(
     tabPanel(
-      title = "Count distribution",
+      title = "PCA",
       HTML('<hr style="border-color: #0088cc;">'),
       sidebarLayout(
         position = "right",
         sidebarPanel(
           width = 3,
-          uiOutput("raw_line_color"),
-          uiOutput("dist_line_info"),
-          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
-        ),
-        mainPanel(
-          width = 9,
-          plotlyOutput("dist_line", height = "600px") %>% withSpinner()
-        )
-      ),
-      HTML('<hr style="border-color: #0088cc;">')
-    ),
-    
-    tabPanel(
-      title = "Boxplot distribution",
-      HTML('<hr style="border-color: #0088cc;">'),
-      sidebarLayout(
-        position = "right",
-        sidebarPanel(
-          width = 3,
-          uiOutput("dist_boxplot_info"),
-          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
-        ),
-        mainPanel(
-          width = 9,
-          plotlyOutput("dist_boxplot", height = "600px") %>% withSpinner()
-        )
-      ),
-      HTML('<hr style="border-color: #0088cc;">')
-    ),
-    
-    tabPanel(
-      title = "Voom",
-      HTML('<hr style="border-color: #0088cc;">'),
-      sidebarLayout(
-        position = "right",
-        sidebarPanel(
-          width = 3,
-          sliderInput(
-            inputId = "slider_raw_voom",
-            label = "Set Log2CPM cutoff:",
-            value = 1,
-            min = 0,
-            max = 10,
-            step = 0.1
-          ),
-          uiOutput("raw_voom_ngenes"),
+          uiOutput("group_pca"),
+          uiOutput("setpc_pca"),
           br(),
-          uiOutput("raw_voom_plot_info"),
+          uiOutput("pca_info"),
           span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
         ),
         mainPanel(
           width = 9,
-          plotlyOutput("raw_voom_plot", height = "600px") %>% withSpinner()
+          plotlyOutput("pca", height = "600px") %>% withSpinner()
         )
       ),
       HTML('<hr style="border-color: #0088cc;">'),
-      DT::dataTableOutput("selected_raw_voom") %>% withSpinner(),
+      DT::dataTableOutput("selected_pca") %>% withSpinner(),
+      HTML('<hr style="border-color: #0088cc;">')
+    ),
+    
+    tabPanel(
+      title = "PCA variance",
+      HTML('<hr style="border-color: #0088cc;">'),
+      sidebarLayout(
+        position = "right",
+        sidebarPanel(
+          width = 3,
+          uiOutput("variance_pca_info"),
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
+        mainPanel(
+          width = 9,
+          plotlyOutput("variance_pca", height = "600px") %>% withSpinner()
+        )
+      ),
+      HTML('<hr style="border-color: #0088cc;">')
+    ),
+    
+    tabPanel(
+      title = "t-SNE",
+      HTML('<hr style="border-color: #0088cc;">'),
+      sidebarLayout(
+        position = "right",
+        sidebarPanel(
+          width = 3,
+          uiOutput("group_dim_tsne"),
+          br(),
+          uiOutput("dim_tsne_info"),
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
+        mainPanel(
+          width = 9,
+          plotlyOutput("dim_tsne", height = "600px") %>% withSpinner()
+        )
+      ),
+      HTML('<hr style="border-color: #0088cc;">'),
+      DT::dataTableOutput("selected_dim_tsne") %>% withSpinner(),
       HTML('<hr style="border-color: #0088cc;">')
     ),
     
@@ -79,19 +75,40 @@ tab_raw_data <- tabItem(
         position = "right",
         sidebarPanel(
           width = 3,
-          uiOutput("group_raw_mds"),
+          uiOutput("group_norm_mds"),
           br(),
-          uiOutput("un_cluster_info"),
+          uiOutput("norm_un_cluster_info"),
           span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
         ),
         mainPanel(
           width = 9,
-          plotlyOutput("un_cluster", height = "600px") %>% withSpinner()
+          plotlyOutput("norm_un_cluster", height = "600px") %>% withSpinner()
         )
       ),
       HTML('<hr style="border-color: #0088cc;">'),
-      DT::dataTableOutput("selected_raw_mds") %>% withSpinner(),
+      DT::dataTableOutput("selected_norm_mds") %>% withSpinner(),
+      HTML('<hr style="border-color: #0088cc;">')
+    ),
+    
+    tabPanel(
+      title = "Dendrogram",
+      HTML('<hr style="border-color: #0088cc;">'),
+      sidebarLayout(
+        position = "right",
+        sidebarPanel(
+          width = 3,
+          uiOutput("color_dendro"),
+          br(),
+          uiOutput("dendro_info"),
+          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
+        ),
+        mainPanel(
+          width = 9,
+          plotlyOutput("dim_dendro", height = "600px") %>% withSpinner()
+        )
+      ),
       HTML('<hr style="border-color: #0088cc;">')
     )
   )
 )
+
