@@ -30,7 +30,7 @@ server <- function(input, output, session) {
     alignment = "Alignment",
     raw_data = "Raw Data",
     norm_data = "Normalization",
-    dim = "Dimension reduction",
+    dimension = "Dimension reduction",
     heatmaps = "Heatmaps",
     analysis = "DE analysis",
     bias = "Bias",

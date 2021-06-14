@@ -6,17 +6,18 @@ output[["welcome"]] <- renderUI({
       br(),
       span(
         "With the development of next-generation sequencing techniques, RNA-Seq is becoming a
-        more commonly applied method in various fields, e.g., cancer genomics, cell biology, etc.
-        RNA-Seq gives great insights into a biological species at a specific moment. To find out
-        which genes are playing an important function at a specific moment or under a specific
-        condition, differential gene expression analysis is used. With the use of this type of analysis,
-        research between different conditions can be conducted.",
+        more widely applied method in various fields, e.g. cancer genomics, cell biology, etc.
+        RNA-Seq gives great insights into a biological species at a specific time. Find out
+        which genes play an important function at a certain time or under a certain
+        condition, differential gene expression analysis is used. Using this type of analysis,
+        research between different conditions can be performed.",
         style = "text-align: justify; display: block; width: 90%"
       ),
       span(
-        "Using the application for differential gene analysis can be very helpful in many projects. Next
-        to checking data quality, it also provides a platform to make a quick analysis. This makes it
-        an easy to use platform capable of performing a variety of analysis possibilities.",
+        "Using the dgeAnalysis application for differential gene analysis can be very
+        helpful in many projects. In addition to checking data quality, it also provides a platform
+        to make a quick analysis. This makes it a user-friendly platform capable of performing
+        various analysis options.",
         style = "text-align: justify; display: block; width: 90%"
       ),
       br(),
@@ -35,7 +36,7 @@ output[["get_started"]] <- renderUI({
       span(
         "1. Go to the 'Data upload' page and select 'New analysis'.",
         tags$br(),
-        "2. Upload files (both CSV and TSV is accepted):",
+        "2. Upload files (both CSV and TSV are accepted):",
         tags$br(),
         HTML("&nbsp;&nbsp;"),
         "- Samplesheet (metadata), Contains information about each sample.",
@@ -48,7 +49,7 @@ output[["get_started"]] <- renderUI({
         tags$br(),
         "3. Go to the 'Run analysis' page.",
         tags$br(),
-        "4. Adjust the settings for to the desired analysis.",
+        "4. Adjust the settings for the desired analysis.",
         tags$br(),
         "5. Run the analysis.",
         tags$br(),
@@ -67,7 +68,7 @@ output[["get_started"]] <- renderUI({
       span(
         "1. Go to the 'Data upload' page and select 'View analysis'.",
         tags$br(),
-        "2. Upload files (both CSV and TSV is accepted):",
+        "2. Upload files (both CSV and TSV are accepted):",
         tags$br(),
         HTML("&nbsp;&nbsp;"),
         "- Samplesheet (metadata), Contains information about each sample.",
