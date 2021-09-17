@@ -551,8 +551,8 @@ tsnePlot <- function(dge, color) {
         check_duplicates = FALSE,
         normalize = FALSE
       )
-    }, silent = TRUE
-    )
+      break
+    }, silent = TRUE)
     perplexity <- perplexity - 1
   }
   

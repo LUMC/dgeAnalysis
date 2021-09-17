@@ -4,6 +4,9 @@ Changelog
 <!--
 Newest changes should be on top.
 -->
+version 1.4.5
+---------------------------
++ Bug fix for tSNE: Missing break in loop
 version 1.4.4
 ---------------------------
 + Add file names and md5 to markdown
