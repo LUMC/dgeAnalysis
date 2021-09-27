@@ -14,6 +14,7 @@
 #'
 #' @export
 
+profvis({
 alignmentSummaryPlot <- function(se, sort_value = "None", perc = T) {
   lse <- alignmentSummary(se)
   lse$feature <- gsub("_", " ", gsub("__", "", lse$feature))
@@ -1215,7 +1216,7 @@ geneStrandBar <- function(deTab) {
     )
   p
 }
-
+})
 ## --------------------------------------------------------------------------
 
 ## ----- INFORMATION BOX -----
