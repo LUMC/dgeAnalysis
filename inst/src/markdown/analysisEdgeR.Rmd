@@ -19,6 +19,7 @@ params:
   data_counts:      ""
   data_annotation:  ""
   setGeneName:      ""
+  PlotShowing:      ""
   cpm_value:        ""
   cpm_perc:         ""
   excluded_samples: ""
@@ -52,6 +53,7 @@ data_samples <- params$data_samples
 data_counts <- params$data_counts
 data_annotation <- params$data_annotation
 setGeneName <- params$setGeneName
+PlotShowing<- params$PlotShowing
 cpm_value <- params$cpm_value
 cpm_perc <- params$cpm_perc
 excluded_samples <- params$excluded_samples
@@ -95,11 +97,15 @@ The raw data is processed and pre-filtered, to remove non feature counts. The da
 ```{r showRawData}
 # READ ALL FILES INTO SE
 
+
 se <- readCountsFromTable(data_counts, data_samples)
 se <- addSamplesFromTableToSE(se, data_samples)
 
-alignmentSummaryPlot(se)
-complexityPlot(se)
+if ((PlotShowing) == "Yes") {
+ alignmentSummaryPlot(se)
+ complexityPlot(se)
+}
+
 
 ```
 
@@ -120,6 +126,7 @@ if (!is.null(data_annotation)) {
 ```{r dge}
 # GET AND CREATE DGE
 
+
 dge <- DGEList(counts = assay(se),
                samples = colData(se),
                genes = rowData(se))
@@ -129,7 +136,10 @@ dge <- dge[rowSums(abs(dge$counts)) > 1,]
 
 tempDge <- dge
 tempDge$counts <- cpm(dge, log = TRUE, prior.count = 1)
-countDistributionLinePlot(tempDge)
+if ((PlotShowing) == "Yes") {
+  countDistributionLinePlot(tempDge)
+}
+
 
 ```
 
@@ -164,8 +174,10 @@ normDge <- calcNormFactors(highExprDge, method = "TMM")
 
 tempDge <- normDge
 tempDge$counts <- cpm(normDge, log = TRUE, prior.count = 1)
-countDistributionLinePlot(tempDge)
-pcaPlot(tempDge, design_base, "PC1", "PC2")
+if ((PlotShowing) == "Yes") {
+ countDistributionLinePlot(tempDge)
+ pcaPlot(tempDge, design_base, "PC1", "PC2")
+}
 
 ```
 
@@ -250,8 +262,10 @@ if (setGeneName == "symbol" && !is.null(data_annotation)) {
 ```{r showDGEResult}
 # SHOW DGE RESULTS
 
-ma_plot(deTab)
-pValuePlot(deTab)
+if ((PlotShowing) == "Yes") {
+ ma_plot(deTab)
+ pValuePlot(deTab)
+}
 
 ```
 
