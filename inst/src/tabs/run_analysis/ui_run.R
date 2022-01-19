@@ -21,6 +21,16 @@ tab_run_analysis <- tabItem(
           "DESeq2" = "analysisDESeq2"
         )
       ),
+        br(),
+        uiOutput("PlotShowing"),
+        radioButtons(
+          inputId = "PlotShowing",
+          label = (HTML("Option for plots to be displayed in HTML report file.<br/>WARNING! Analysis might crash when not enough memory is available.<br/>Only recommended for users with 32GB and more")),
+          selected = "No",
+          inline = TRUE,
+          choices = c("Yes" = "Yes",
+                      "No" = "No")
+        ), 
       br(),
       sliderInput(
         inputId = "alpha_value",
@@ -82,6 +92,7 @@ tab_run_analysis <- tabItem(
   )),
   HTML('<hr style="border-color: #0088cc;">'),
   
+
   uiOutput("excludeSamples"),
   uiOutput("setGeneName"),
   

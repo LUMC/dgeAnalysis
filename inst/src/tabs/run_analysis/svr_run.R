@@ -7,7 +7,7 @@ observeEvent(input$run_button, {
                      type = "error")
     return(NULL)
   }
-  
+
   showModal(modalDialog(
     h1("Analysis is running..."),
     img(src = "loading.gif", width = "50%"),
@@ -24,6 +24,7 @@ observeEvent(input$run_button, {
         data_annotation = data_annotation(),
         excluded_samples = input$exclude_samples,
         setGeneName = input$setGeneName,
+        PlotShowing = input$PlotShowing,
         cpm_value = input$cpm_value,
         cpm_perc = input$cpm_perc,
         design_base = input$design_base,
@@ -287,3 +288,7 @@ output[["setGeneName"]] <- renderUI({
     return(NULL)
   })
 })
+
+
+
+
