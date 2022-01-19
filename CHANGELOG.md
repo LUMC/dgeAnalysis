@@ -4,6 +4,15 @@ Changelog
 <!--
 Newest changes should be on top.
 -->
+version 1.5
+---------------------------
++ Add new button to run_analysis
++ Add new statements to markdown
++ Add new variable PlotShowing
++ Add package DT
++ Removed ndim in de_plots.R
++ Change cmdscale.out to eigen.vectors in de_plots.R
+
 version 1.4.4
 ---------------------------
 + Add file names and md5 to markdown
