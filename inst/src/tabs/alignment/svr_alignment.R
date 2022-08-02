@@ -12,7 +12,7 @@ output[["group_sum"]] <- renderUI({
     selectInput(
       inputId = "group_sum",
       label = "Group by:",
-      choices = c("None" = "None", colnames(data_samples()))
+      choices = c("Samples" = "sample", colnames(data_samples()))
     )
   }, error = function(err) {
     return(NULL)
@@ -23,13 +23,26 @@ output[["group_sum"]] <- renderUI({
 output[["align_sum"]] <- renderPlotly({
   tryCatch({
     checkReload()
+    
+    se <<- get_se()
+    lse <- alignmentSummary(se)
+    lse$feature <- gsub("_", " ", gsub("__", "", lse$feature))
     if (input$setSummary == "actual") {
-      perc = FALSE
-    } else {
-      perc = TRUE
+      for (var in unique(lse$sample)) {
+        temp <- lse[lse$sample == var,]
+        lse$count[lse$sample == var] <- (temp$count / (sum(temp$count))) * 100
+      }
     }
-    alignmentSummaryPlot(get_se(), input$group_sum, perc)
+    
+    bar_plot(
+      df = lse,
+      group = input$group_sum,
+      title = "Count assignments",
+      xlab = "Counts",
+      ylab = ""
+    )
   }, error = function(err) {
+    print(err)
     return(NULL)
   })
 })
@@ -43,8 +56,27 @@ output[["complex"]] <- renderPlotly({
     } else {
       perc = TRUE
     }
-    complexityPlot(get_se(), input$group_color, perc, input$comp_rank)
+    
+    se <- get_se()
+    compData <- complexityData(se, input$comp_rank)
+    compData <- merge(
+      x = compData,
+      y = as.data.frame(colData(se)),
+      by.x = "sample",
+      by.y = "row.names",
+      all.x = TRUE
+    )
+    
+    line_plot(
+      df = compData,
+      group = input$group_color,
+      title = "Gene complexity",
+      xlab = "Cumulative reads per number of genes",
+      ylab = "Number of genes",
+      plot = "complexity"
+    )
   }, error = function(err) {
+    print(err)
     return(NULL)
   })
 })
@@ -56,7 +88,7 @@ output[["group_color"]] <- renderUI({
     selectInput(
       inputId = "group_color",
       label = "Group by:",
-      choices = c("None" = "None", colnames(data_samples()))
+      choices = c("Samples" = "sample", colnames(data_samples()))
     )
   }, error = function(err) {
     return(NULL)
