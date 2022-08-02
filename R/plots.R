@@ -18,41 +18,44 @@ line_plot <- function(df, group, title = "", xlab = "", ylab = "", plot = NA) {
   ggplotly(gg)
 }
 
-density_plot <- function(stackCounts) {
-  gg <- ggplot(data = stackCounts, aes(
-    x = logCPM,
-    color = sample,
-    fill = sample
+density_plot <- function(df, group, title = "", xlab = "", ylab = "") {
+  gg <- ggplot(data = df, aes_string(
+    x = "logCPM",
+    color = group,
+    fill = group
   )) +
-    geom_line(stat = "density",
+    geom_line(aes(group = sample),
+              stat = "density",
               size = 1,
               show.legend = TRUE) +
-    geom_density(alpha = 0.05,
+    geom_density(aes(group = sample),
+                 alpha = 0.05,
                  size = 0,
                  show.legend = FALSE) +
-    labs(title = "Gene count distribution",
-         x = "Log2CPM",
-         y = "Density") +
+    labs(title = title,
+         x = xlab,
+         y = ylab) +
     theme_bw()
+  
+  ggplotly(gg)
 }
 
 
-violin_plot <- function(stackCounts) {
-  gg <- ggplot(data = stackCounts, aes(
-    x = sample,
-    y = logCPM,
-    color = sample,
-    fill = sample
+violin_plot <- function(df, group, title = "", xlab = "", ylab = "") {
+  gg <- ggplot(data = df, aes_string(
+    x = group,
+    y = "logCPM",
+    color = group,
+    fill = group
   )) +
-    geom_violin(alpha = 0.75, size = 1) +
-    labs(title = "Gene count distribution",
-         x = "",
-         y = "Log2CPM") +
+    geom_violin(aes(group = sample), alpha = 0.75, size = 1) +
+    labs(title = title,
+         x = xlab,
+         y = ylab) +
     theme_bw()
 }
 
-
-scatter_plot <- function(deTab, size = 1.5, index = NA) {
+temp1 <- function() {
   index <- round(seq(1, nrow(deTab), length.out = 1000))
   deTab <- deTab[order(deTab$avgLog2CPM), ]
   deTab$DE <- factor(
@@ -64,29 +67,33 @@ scatter_plot <- function(deTab, size = 1.5, index = NA) {
       "Down-regulated"
     )
   )
-  
-  gg <- ggplot(data = deTab, aes(
-    x = avgLog2CPM,
-    y = avgLog2FC,
-    color = DE
+}
+
+scatter_plot <- function(df, size = 1.5, source = NA, index = NA, x, y, group, title = "", xlab = "", ylab = "") {
+  gg <- ggplot(data = df, aes_string(
+    x = x,
+    y = y,
+    color = group
   )) +
     geom_point(size = size, alpha = 0.5) +
-    labs(title = "MA",
-         x = "Average Log2CPM",
-         y = "Average Log2FC") +
+    labs(title = title,
+         x = xlab,
+         y = ylab) +
     theme_bw()
   
   ## Add loess trend for MA
   if (!is.na(index)) {
     gg <- gg + geom_smooth(
-      data = deTab[index, ],
-      aes(x = avgLog2CPM, y = avgLog2FC),
+      data = df[index, ],
+      aes_string(x = x, y = y),
       inherit.aes = FALSE,
       method = "loess",
       fill = "#3366ff",
       alpha = 0.2
     )
   }
+  
+  ggplotly(gg, source = source)
 }
 
 

@@ -43,36 +43,6 @@ tab_raw_data <- tabItem(
     ),
     
     tabPanel(
-      title = "Voom",
-      HTML('<hr style="border-color: #0088cc;">'),
-      sidebarLayout(
-        position = "right",
-        sidebarPanel(
-          width = 3,
-          sliderInput(
-            inputId = "slider_raw_voom",
-            label = "Set Log2CPM cutoff:",
-            value = 1,
-            min = 0,
-            max = 10,
-            step = 0.1
-          ),
-          uiOutput("raw_voom_ngenes"),
-          br(),
-          uiOutput("raw_voom_plot_info"),
-          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
-        ),
-        mainPanel(
-          width = 9,
-          plotlyOutput("raw_voom_plot", height = "600px") %>% withSpinner()
-        )
-      ),
-      HTML('<hr style="border-color: #0088cc;">'),
-      DT::dataTableOutput("selected_raw_voom") %>% withSpinner(),
-      HTML('<hr style="border-color: #0088cc;">')
-    ),
-    
-    tabPanel(
       title = "MDS",
       HTML('<hr style="border-color: #0088cc;">'),
       sidebarLayout(
