@@ -24,6 +24,9 @@ source("R/enrichment.R", local = TRUE)
 source("R/markdown.R", local = TRUE)
 source("R/de_plots.R", local = TRUE)
 
+
+source("R/plots.R", local = TRUE)
+
 shiny::runApp(
   appDir = "inst/src/",
   host = "0.0.0.0",
