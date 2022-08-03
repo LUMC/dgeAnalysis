@@ -6,6 +6,8 @@ Newest changes should be on top.
 -->
 version 1.4.5
 ---------------------------
++ Change filtering for enrichment
++ Rewrite plots to be based on ggplot2 -> ggplotly
 + Bug fix for tSNE: Missing break in loop
 version 1.4.4
 ---------------------------
