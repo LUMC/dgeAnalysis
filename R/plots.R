@@ -58,21 +58,8 @@ violin_plot <- function(df, group, title = "", xlab = "", ylab = "") {
   ggplotly(gg)
 }
 
-temp1 <- function() {
-  index <- round(seq(1, nrow(deTab), length.out = 1000))
-  deTab <- deTab[order(deTab$avgLog2CPM), ]
-  deTab$DE <- factor(
-    x = deTab$DE,
-    levels = c(0, 1, -1),
-    labels = c(
-      "Not significant",
-      "Up-regulated",
-      "Down-regulated"
-    )
-  )
-}
 
-scatter_plot <- function(df, size = 1.5, source = NA, key = NA, index = NA, x, y, group, title = "", xlab = "", ylab = "") {
+scatter_plot <- function(df, size = 1.5, source = NA, key = NA, index = NA, x, y, group, title = "", xlab = "", ylab = "", scale = NA) {
   gg <- ggplot(data = df, aes_string(
     x = x,
     y = y,
@@ -97,45 +84,50 @@ scatter_plot <- function(df, size = 1.5, source = NA, key = NA, index = NA, x, y
     )
   }
   
+  if (!is.na(scale)) {
+    gg <- gg + scale_x_continuous(trans = "log10")
+  }
+  
   ggplotly(gg, source = source)
 }
 
 ## x = "count",
 ## y = group,
 ## fill = "feature"
-bar_plot <- function(df, group, x, y, fill = NULL, title = "", xlab = "", ylab = "") {
+bar_plot <- function(df, group, x, y, fill = NULL, title = "", xlab = "", ylab = "", facet = NA) {
   gg <- ggplot(data = df, aes_string(
     x = x,
     y = y,
     fill = fill
   )) +
     geom_bar(stat = "identity") +
+    scale_fill_manual(values = c("#619CFF", "#F8766D", "#00BA38")) +
+    labs(title = title,
+         x = xlab,
+         y = ylab) +
+    theme_bw()
+  
+  if (!is.na(facet)) {
+    gg <- gg + facet_grid(as.formula(paste("~", group)), scales = "free")
+  }
+  
+  ggplotly(gg)
+}
+
+
+barcode_plot <- function(df, x, y, group, title = "", xlab = "", ylab = "") {
+  gg <- ggplot(data = df, aes_string(
+    x = x,
+    y = y,
+    color = group
+  )) +
+    geom_point() +
     labs(title = title,
          x = xlab,
          y = ylab) +
     theme_bw()
   
   ggplotly(gg)
-}
-
-
-barcode_plot <- function(dge) {
-  temp <- dge$counts[1:10, ]
-  temp <- reshape2::melt(temp)
-  
-  gg <- ggplot(data = temp, aes(
-    x = value,
-    y = Var1,
-    color = Var2,
-    text = paste('Sample:', Var2,
-                 '<br>Log2CPM: ', value)
-  )) +
-    geom_point() +
-    labs(title = "Plot",
-         x = "Label X",
-         y = "Label Y") +
-    theme_bw()
-  ggplotly(gg, tooltip = "text")
 }
 
 

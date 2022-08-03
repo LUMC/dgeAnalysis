@@ -3,7 +3,26 @@
 output[["gc_bias"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    biasPlot(inUse_deTab, input$selectGC, NA, "%", "biasGC")
+    
+    index <- round(seq(1, nrow(inUse_deTab), length.out = 1000))
+    plot_data <- inUse_deTab[order(inUse_deTab[[input$selectGC]]), ]
+    plot_data[[input$selectGC]] <- plot_data[[input$selectGC]] * 100
+    plot_data$gene <- rownames(plot_data)
+    
+    toWebGL(
+      scatter_plot(
+        df = plot_data,
+        source = "biasGC",
+        group = "FDR",
+        key = "gene",
+        index = index,
+        x = input$selectGC,
+        y = "avgLog2FC",
+        title = paste("Bias based on", input$selectGC),
+        xlab = paste(input$selectGC, "(%)"),
+        ylab = "Average Log2FC"
+      )
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -21,7 +40,7 @@ output[["selected_biasgc"]] <- DT::renderDataTable({
   })
 })
 
-## dropdown with all gc choices
+## Dropdown with all gc choices
 output[["selectGC"]] <- renderUI({
   tryCatch({
     checkReload()
@@ -44,7 +63,26 @@ output[["selectGC"]] <- renderUI({
 output[["len_bias"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    biasPlot(inUse_deTab, input$selectLength, "log", NA, "biasLength")
+    
+    index <- round(seq(1, nrow(inUse_deTab), length.out = 1000))
+    plot_data <- inUse_deTab[order(inUse_deTab[[input$selectLength]]), ]
+    plot_data$gene <- rownames(plot_data)
+    
+    toWebGL(
+      scatter_plot(
+        df = plot_data,
+        source = "biasLength",
+        group = "FDR",
+        key = "gene",
+        scale = TRUE,
+        index = index,
+        x = input$selectLength,
+        y = "avgLog2FC",
+        title = paste("Bias based on", input$selectLength),
+        xlab = input$selectLength,
+        ylab = "Average Log2FC"
+      )
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -85,7 +123,38 @@ output[["selectLength"]] <- renderUI({
 output[["geneStrand_bias"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    geneStrandBar(inUse_deTab)
+    
+    geneStrand <- as.data.frame(table(inUse_deTab$geneStrand, inUse_deTab$DE, dnn = c("strand", "DE")))
+    geneStrand$DE <- factor(
+      x = geneStrand$DE,
+      levels = c(-1, 0, 1),
+      labels = c(
+        "Down-regulated",
+        "Not significant",
+        "Up-regulated"
+      )
+    )
+    geneStrand$perc <- geneStrand$Freq / sum(geneStrand$Freq) * 100
+    geneStrand$strand <- factor(
+      x = geneStrand$strand,
+      levels = c("+", "-"),
+      labels = c(
+        "Positive strand",
+        "Negative strand"
+      )
+    )
+    
+    bar_plot(
+      df = geneStrand,
+      group = "strand",
+      x = "DE",
+      y = "Freq",
+      fill = "DE",
+      facet = TRUE,
+      title = "Gene strand ratio",
+      xlab = "",
+      ylab = "Number of genes"
+    )
   }, error = function(err) {
     return(NULL)
   })

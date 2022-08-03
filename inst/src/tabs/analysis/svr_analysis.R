@@ -19,7 +19,29 @@ output[["detab_table"]] <- DT::renderDataTable({
 output[["de_ratio"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    deRatioPlot(inUse_deTab)
+    
+    defeatures <- data.frame(table(inUse_deTab$DE))
+    defeatures$perc <- defeatures[, 2] / sum(defeatures[, 2]) * 100
+    defeatures$Var1 <- factor(
+      x = defeatures$Var1,
+      levels = c(-1, 0, 1),
+      labels = c(
+        "Down-regulated",
+        "Not significant",
+        "Up-regulated"
+      )
+    )
+    
+    bar_plot(
+      df = defeatures,
+      group = "Var1",
+      x = "Var1",
+      y = "perc",
+      fill = "Var1",
+      title = "Differential expression ratio",
+      xlab = "",
+      ylab = "Ratio"
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -29,7 +51,34 @@ output[["de_ratio"]] <- renderPlotly({
 output[["ma_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    ma_plot(inUse_deTab)
+    
+    index <- round(seq(1, nrow(inUse_deTab), length.out = 1000))
+    plot_data <- inUse_deTab[order(inUse_deTab$avgLog2CPM), ]
+    plot_data$DE <- factor(
+      x = plot_data$DE,
+      levels = c(0, 1, -1),
+      labels = c(
+        "Not significant",
+        "Up-regulated",
+        "Down-regulated"
+      )
+    )
+    plot_data$gene <- rownames(plot_data)
+    
+    toWebGL(
+      scatter_plot(
+        df = plot_data,
+        source = "analysis_ma",
+        group = "DE",
+        key = "gene",
+        index = index,
+        x = "avgLog2CPM",
+        y = "avgLog2FC",
+        title = "MA Plot",
+        xlab = "Average Log2CPM",
+        ylab = "Average Log2FC"
+      )
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -51,9 +100,33 @@ output[["selected_ma"]] <- DT::renderDataTable({
 output[["volcano_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    volcanoPlot(inUse_deTab,
-                input$vulcanoLogCut,
-                -log10(input$vulcanoPCut))
+    
+    plot_data <- inUse_deTab
+    plot_data$DE <- factor(
+      x = plot_data$DE,
+      levels = c(0, 1, -1),
+      labels = c(
+        "Not significant",
+        "Up-regulated",
+        "Down-regulated"
+      )
+    )
+    plot_data$FDR <- -log10(plot_data$FDR)
+    plot_data$gene <- rownames(plot_data)
+    
+    toWebGL(
+      scatter_plot(
+        df = plot_data,
+        source = "analysis_volcano",
+        group = "DE",
+        key = "gene",
+        x = "avgLog2FC",
+        y = "FDR",
+        title = "Volcano Plot",
+        xlab = "Average Log2FC",
+        ylab = "-Log10 P-value (FDR)"
+      )
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -75,14 +148,26 @@ output[["selected_volcano"]] <- DT::renderDataTable({
 output[["barcode_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    barcodePlot(
-      inUse_deTab,
-      inUse_normDge,
-      input$group_analysis_bar,
-      input$slider_barcode,
-      input$selected_analysis_bar
+
+    sortdeTab <- inUse_deTab[order(rank(inUse_deTab$FDR)), ]
+    sortdeTab <- head(sortdeTab, input$slider_barcode)
+    getnorm <- inUse_normDge[c(rownames(sortdeTab), input$selected_analysis_bar), ]
+    stack1 <- as.data.frame(stack(getnorm$counts))
+    stack1$group <- getnorm$samples[[input$group_analysis_bar]][stack1$col]
+    
+    toWebGL(
+      barcode_plot(
+        df = stack1,
+        group = "group",
+        x = "value",
+        y = "row",
+        title = "Barcode Plot",
+        xlab = "Log2CPM",
+        ylab = ""
+      )
     )
   }, error = function(err) {
+    print(err)
     return(NULL)
   })
 })
@@ -106,7 +191,7 @@ observe({
     checkReload()
     updateSelectizeInput(
       session = session,
-      inputId = 'selected_analysis_bar',
+      inputId = "selected_analysis_bar",
       choices = rownames(inUse_deTab),
       server = TRUE
     )
@@ -119,7 +204,20 @@ observe({
 output[["p_val_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    pValuePlot(inUse_deTab)
+    
+    pvalue <- round(inUse_deTab$P.Value, digits = 2)
+    pvalue <- aggregate(pvalue, by = list(p = pvalue), FUN = length)
+    pvalue$color <- "color"
+    
+    bar_plot(
+      df = pvalue,
+      x = "p",
+      y = "x",
+      fill = "color",
+      title = "P-Value plot",
+      xlab = "P-Value",
+      ylab = "Count"
+    )
   }, error = function(err) {
     return(NULL)
   })
