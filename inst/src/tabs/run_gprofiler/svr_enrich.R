@@ -67,7 +67,8 @@ get_filters <- reactive({
       exp = exp_values[[input$filter_exp]],
       pvalue = input$filter_pvalue,
       fdr = input$filter_fdr,
-      fc = input$filter_fc
+      fcmin = input$filter_minfc,
+      fcmax = input$filter_maxfc
     )
   }, error = function(err) {
     return(NULL)
@@ -83,10 +84,11 @@ filter_deTab <- reactive({
     filtered <- inUse_deTab[inUse_deTab$DE %in% filters$exp &
                               inUse_deTab$P.Value < filters$pvalue &
                               inUse_deTab$FDR < filters$fdr &
-                              (inUse_deTab$avgLog2FC < filters$fc[1] |
-                                 inUse_deTab$avgLog2FC > filters$fc[2]) ,]
+                              (inUse_deTab$avgLog2FC < filters$fcmin |
+                                 inUse_deTab$avgLog2FC > filters$fcmax), ]
     filtered
   }, error = function(err) {
+    print(err)
     return(NULL)
   })
 })
