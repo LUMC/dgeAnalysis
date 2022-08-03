@@ -30,6 +30,6 @@ source("R/plots.R", local = TRUE)
 shiny::runApp(
   appDir = "inst/src/",
   host = "0.0.0.0",
-  port = 1402,
+  port = 1403,
   launch.browser = TRUE
 )

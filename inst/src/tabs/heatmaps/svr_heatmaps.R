@@ -19,6 +19,9 @@ output[["var_heat"]] <- renderPlotly({
     
     heatmap_plot(
       df = high_var_cpm,
+      x = "col",
+      y = "row",
+      fill = "value",
       group = input$group_var,
       title = "Most variable genes",
       xlab = "",
@@ -83,6 +86,9 @@ output[["dge_heat"]] <- renderPlotly({
     
     heatmap_plot(
       df = getnorm,
+      x = "col",
+      y = "row",
+      fill = "value",
       group = input$group_dge,
       title = "Most DE genes",
       xlab = "",

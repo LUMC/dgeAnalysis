@@ -94,18 +94,21 @@ scatter_plot <- function(df, size = 1.5, source = NA, key = NA, index = NA, x, y
 ## x = "count",
 ## y = group,
 ## fill = "feature"
-bar_plot <- function(df, group, x, y, fill = NULL, title = "", xlab = "", ylab = "", facet = NA) {
+bar_plot <- function(df, group, x, y, fill = NULL, title = "", xlab = "", ylab = "", colorbar = NA, facet = NA) {
   gg <- ggplot(data = df, aes_string(
     x = x,
     y = y,
     fill = fill
   )) +
     geom_bar(stat = "identity") +
-    scale_fill_manual(values = c("#619CFF", "#F8766D", "#00BA38")) +
     labs(title = title,
          x = xlab,
          y = ylab) +
     theme_bw()
+  
+  if (is.na(colorbar)) {
+    gg <- gg + scale_fill_manual(values = c("#619CFF", "#F8766D", "#00BA38"))
+  }
   
   if (!is.na(facet)) {
     gg <- gg + facet_grid(as.formula(paste("~", group)), scales = "free")
@@ -149,23 +152,53 @@ dendro_plot <- function(df, group = NULL, title = "", xlab = "", ylab = "") {
 }
 
 
-heatmap_plot <- function(df, group, title = "", xlab = "", ylab = "") {
-  gg <- ggplot(data = df, aes(x = col,
-                              y = row,
-                              fill = value)) +
+heatmap_plot <- function(df, group, x, y, fill, title = "", xlab = "", ylab = "") {
+  gg <- ggplot(data = df, aes_string(x = x,
+                              y = y,
+                              fill = fill)) +
     geom_tile() +
     labs(title = title,
          x = xlab,
          y = ylab) +
     theme_bw()
   
-  if (table(df$col)[1] > 50) {
+  if (table(df[[x]])[1] > 50) {
     gg <- gg + theme(axis.text.y = element_blank())
   }
   
   if (group != "none") {
     gg <- gg + facet_grid(as.formula(paste("~", group)), scales = "free")
   }
+  
+  ggplotly(gg)
+}
+
+
+network_plot <- function(df, group, title = "", xlab = "", ylab = "") {
+  gg <- ggplot() +
+    geom_segment(
+      data = conns,
+      aes(
+        x = from.x,
+        xend = to.x,
+        y = from.y,
+        yend = to.y,
+      ),
+      size = 1,
+      colour = "grey"
+    ) +
+    geom_point(
+      data = term_layout,
+      aes(x = V1, y = V2),
+      size = 8,
+      colour = "red"
+    ) +
+    geom_point(
+      data = gene_layout,
+      aes(x = V1, y = V2, colour = fc),
+      size = 4
+    ) +
+    theme_void()
   
   ggplotly(gg)
 }

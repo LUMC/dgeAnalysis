@@ -24,7 +24,7 @@ output[["align_sum"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
-    se <<- get_se()
+    se <- get_se()
     lse <- alignmentSummary(se)
     lse$feature <- gsub("_", " ", gsub("__", "", lse$feature))
     if (input$setSummary == "actual") {
@@ -36,6 +36,9 @@ output[["align_sum"]] <- renderPlotly({
     
     bar_plot(
       df = lse,
+      x = "count",
+      y = "sample",
+      fill = "feature",
       group = input$group_sum,
       title = "Count assignments",
       xlab = "Counts",
