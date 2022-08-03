@@ -16,8 +16,25 @@ output[["normalized_counts"]] <- DT::renderDataTable({
 output[["norm_dist_line"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    countDistributionLinePlot(inUse_normDge, input$norm_line_color)
+    
+    stackCounts <- data.frame(stackDge(inUse_normDge))
+    stackCounts <- merge(
+      x = stackCounts,
+      y = inUse_normDge$samples,
+      by.x = "sample",
+      by.y = "row.names",
+      all.x = TRUE
+    )
+    
+    density_plot(
+      df = stackCounts,
+      group = input$norm_line_color,
+      title = "Gene count distribution",
+      x = "Log2CPM",
+      y = "Density"
+    )
   }, error = function(err) {
+    print(err)
     return(NULL)
   })
 })
@@ -29,7 +46,7 @@ output[["norm_line_color"]] <- renderUI({
     selectInput(
       inputId = "norm_line_color",
       label = "Group by:",
-      choices = c("None" = "None", colnames(data_samples()))
+      choices = c("Samples" = "sample", colnames(data_samples()))
     )
   }, error = function(err) {
     return(NULL)
@@ -40,7 +57,16 @@ output[["norm_line_color"]] <- renderUI({
 output[["norm_dist_boxplot"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    countDistributionBoxPlot(inUse_normDge)
+    
+    stackCounts <- data.frame(stackDge(inUse_normDge))
+    
+    violin_plot(
+      df = stackCounts,
+      group = "sample",
+      title = "Gene count distribution",
+      x = "Log2CPM",
+      y = ""
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -50,7 +76,31 @@ output[["norm_dist_boxplot"]] <- renderPlotly({
 output[["norm_voom_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    voomPlot(inUse_normDge, "norm_voom")
+    
+    v <- voom(2 ^ (inUse_normDge$counts), save.plot = TRUE)
+    v <- data.frame(
+      x = v$voom.xy$x,
+      y = v$voom.xy$y,
+      gene = names(v$voom.xy$x),
+      Genes = "Genes"
+    )
+    v <- v[order(v$x), ]
+    index <- round(seq(1, nrow(v), length.out = 1000))
+    
+    toWebGL(
+      scatter_plot(
+        df = v,
+        source = "norm_voom",
+        group = "Genes",
+        key = "gene",
+        index = index,
+        x = "x",
+        y = "y",
+        title = "Voom Plot",
+        xlab = "Average Log2 count",
+        ylab = "SQRT (Standart Deviation)"
+      )
+    )
   }, error = function(err) {
     return(NULL)
   })

@@ -3,7 +3,27 @@
 output[["var_heat"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    variableHeatmapPlot(inUse_normDge, input$group_var, input$slider_heatmap_var)
+    
+    lcpm <- inUse_normDge$counts
+    var_genes <- apply(lcpm, 1, var)
+    select_var <- names(sort(var_genes, decreasing = TRUE))[1:input$slider_heatmap_var]
+    high_var_cpm <- lcpm[select_var, ]
+    high_var_cpm <- as.data.frame(stack(high_var_cpm))
+    high_var_cpm <- merge(
+      x = high_var_cpm,
+      y = as.data.frame(inUse_normDge$samples),
+      by.x = "col",
+      by.y = "row.names",
+      all.x = TRUE
+    )
+    
+    heatmap_plot(
+      df = high_var_cpm,
+      group = input$group_var,
+      title = "Most variable genes",
+      xlab = "",
+      ylab = ""
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -32,7 +52,7 @@ output[["group_var"]] <- renderUI({
     selectInput(
       inputId = "group_var",
       label = "Group by:",
-      choices = c("None" = "None", colnames(data_samples()))
+      choices = c("None" = "none", colnames(data_samples()))
     )
   }, error = function(err) {
     return(NULL)
@@ -46,10 +66,28 @@ output[["dge_heat"]] <- renderPlotly({
     if (is.null(inUse_deTab)) {
       return(NULL)
     }
-    topDgeHeatmapPlot(inUse_deTab,
-                      inUse_normDge,
-                      input$group_dge,
-                      input$slider_heatmap_dge)
+    
+    sortdeTab <- inUse_deTab[order(rank(inUse_deTab$FDR)), ]
+    sortdeTab <- head(sortdeTab, input$slider_heatmap_dge)
+    getnorm <- inUse_normDge[rownames(sortdeTab), ]
+    getnorm <- getnorm$counts
+    getnorm <- as.data.frame(stack(getnorm))
+    
+    getnorm <- merge(
+      x = getnorm,
+      y = as.data.frame(inUse_normDge$samples),
+      by.x = "col",
+      by.y = "row.names",
+      all.x = TRUE
+    )
+    
+    heatmap_plot(
+      df = getnorm,
+      group = input$group_dge,
+      title = "Most DE genes",
+      xlab = "",
+      ylab = ""
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -62,7 +100,7 @@ output[["group_dge"]] <- renderUI({
     selectInput(
       inputId = "group_dge",
       label = "Group by:",
-      choices = c("None" = "None", colnames(data_samples()))
+      choices = c("None" = "none", colnames(data_samples()))
     )
   }, error = function(err) {
     return(NULL)

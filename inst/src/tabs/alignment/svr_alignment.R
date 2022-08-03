@@ -42,7 +42,6 @@ output[["align_sum"]] <- renderPlotly({
       ylab = ""
     )
   }, error = function(err) {
-    print(err)
     return(NULL)
   })
 })
@@ -76,7 +75,6 @@ output[["complex"]] <- renderPlotly({
       plot = "complexity"
     )
   }, error = function(err) {
-    print(err)
     return(NULL)
   })
 })

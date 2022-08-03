@@ -3,11 +3,31 @@
 output[["pca"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    pcaPlot(inUse_normDge,
-            input$group_pca,
-            input$set_pca_pc1,
-            input$set_pca_pc2)
+    
+    tdge <- t(inUse_normDge$counts)
+    tdge[!is.finite(tdge)] <- 0
+    pca <- prcomp(tdge, center = TRUE)
+    percent <- data.frame(summary(pca)$importance[2, ])
+    colnames(percent) <- "percent"
+    
+    pca <- data.frame(scale(tdge, center = T, scale = F) %*% pca$rotation)
+    pca$sample <- rownames(pca)
+    pca$group <- inUse_normDge$samples[, input$group_pca]
+    
+    scatter_plot(
+      df = pca,
+      size = 4,
+      source = "pca",
+      key = "sample",
+      x = input$set_pca_pc1,
+      y = input$set_pca_pc2,
+      group = "group",
+      title = "PCA",
+      xlab = paste0(input$set_pca_pc1, " (", round(percent[input$set_pca_pc1,] * 100, 2), "%)"),
+      ylab = paste0(input$set_pca_pc2, " (", round(percent[input$set_pca_pc2,] * 100, 2), "%)")
+    )
   }, error = function(err) {
+    print(err)
     return(NULL)
   })
 })
@@ -64,7 +84,25 @@ output[["selected_pca"]] <- DT::renderDataTable({
 output[["variance_pca"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    variancePcaPlot(inUse_normDge)
+    
+    tdge <- t(inUse_normDge$counts)
+    tdge[!is.finite(tdge)] <- 0
+    pca <- prcomp(tdge, center = TRUE)
+    percent <- data.frame(
+      pc = names(summary(pca)$importance[2, ]),
+      percent = summary(pca)$importance[2, ] * 100,
+      color = "color"
+    )
+    
+    bar_plot(
+      df = percent,
+      x = "pc",
+      y = "percent",
+      fill = "color",
+      title = "PCA Scree plot",
+      xlab = "Principal component",
+      ylab = "Percentage"
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -74,7 +112,40 @@ output[["variance_pca"]] <- renderPlotly({
 output[["dim_tsne"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    tsnePlot(inUse_normDge, input$group_dim_tsne)
+    
+    set.seed(1234)
+    
+    perplexity <- 30
+    while (perplexity > 0) {
+      try({
+        tsne_model <- Rtsne(
+          t(inUse_normDge$counts),
+          perplexity = perplexity,
+          check_duplicates = FALSE,
+          normalize = FALSE
+        )
+        break
+      }, silent = TRUE)
+      perplexity <- perplexity - 1
+    }
+    
+    tsne_data <- as.data.frame(tsne_model$Y)
+    rownames(tsne_data) <- colnames(inUse_normDge$counts)
+    tsne_data$sample <- rownames(tsne_data)
+    tsne_data$group <- inUse_normDge$samples[[input$group_dim_tsne]]
+    
+    scatter_plot(
+      df = tsne_data,
+      size = 4,
+      source = "tsne",
+      key = "sample",
+      x = "V1",
+      y = "V2",
+      group = "group",
+      title = "tSNE",
+      xlab = "tSNE 1",
+      ylab = "tSNE 2"
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -108,7 +179,24 @@ output[["selected_dim_tsne"]] <- DT::renderDataTable({
 output[["norm_un_cluster"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    multidimensionalScalingPlot(inUse_normDge, input$group_norm_mds, "norm_mds")
+    
+    logFC <- plotMDS(inUse_normDge$counts, ndim = ncol(inUse_normDge) - 1)
+    for_plots <- data.frame(logFC[c("x", "y")])
+    for_plots$sample <- rownames(logFC$distance.matrix.squared)
+    for_plots$group <- inUse_normDge$samples[, input$group_norm_mds]
+    
+    scatter_plot(
+      df = for_plots,
+      size = 4,
+      source = "norm_mds",
+      key = "sample",
+      x = "x",
+      y = "y",
+      group = "group",
+      title = "MDS Plot",
+      xlab = "MDS 1",
+      ylab = "MDS 2"
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -144,7 +232,18 @@ output[["dim_dendro"]] <- renderPlotly({
     checkReload()
     
     sampleTree <- hclust(dist(t(inUse_normDge$counts)), method = "average")
-    plotly_dendrogram(sampleTree, inUse_normDge$samples[[input$color_dendro]], NA)
+    dendro_data <- get_dendrogram_data(sampleTree)
+    dendro_data$group <- NA
+    dendro_data$group[dendro_data$label != ""] <- as.character(inUse_normDge$samples[[input$color_dendro]])
+    print(dendro_data)
+    
+    dendro_plot(
+      df = dendro_data,
+      group = "group",
+      title = "Dendrogram",
+      xlab = "",
+      ylab = "Height"
+    )
   }, error = function(err) {
     return(NULL)
   })

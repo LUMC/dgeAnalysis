@@ -6,6 +6,13 @@ output[["dist_line"]] <- renderPlotly({
     
     dge <- get_raw_dge()
     stackCounts <- data.frame(stackDge(dge))
+    stackCounts <- merge(
+      x = stackCounts,
+      y = dge$samples,
+      by.x = "sample",
+      by.y = "row.names",
+      all.x = TRUE
+    )
     
     density_plot(
       df = stackCounts,
@@ -46,8 +53,8 @@ output[["dist_boxplot"]] <- renderPlotly({
       df = stackCounts,
       group = "sample",
       title = "Gene count distribution",
-      x = "",
-      y = "Log2CPM"
+      x = "Log2CPM",
+      y = ""
     )
   }, error = function(err) {
     print(err)
@@ -64,12 +71,14 @@ output[["un_cluster"]] <- renderPlotly({
     dge <- get_raw_dge()
     logFC <- plotMDS(dge$counts, ndim = ncol(dge) - 1)
     for_plots <- data.frame(logFC[c("x", "y")])
+    for_plots$sample <- rownames(logFC$distance.matrix.squared)
     for_plots$group <- dge$samples[, input$group_raw_mds]
     
     scatter_plot(
       df = for_plots,
       size = 4,
       source = "raw_mds",
+      key = "sample",
       x = "x",
       y = "y",
       group = "group",
@@ -100,8 +109,10 @@ output[["selected_raw_mds"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
     s <- event_data(event = "plotly_selected", source = "raw_mds")
+    print(s)
     DT::datatable(data_samples()[unlist(s$key), , drop = FALSE], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
+    print(err)
     return(DT::datatable(data.frame(c(
       "No data available"
     )), rownames = FALSE, colnames = ""))

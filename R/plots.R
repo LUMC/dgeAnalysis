@@ -49,10 +49,13 @@ violin_plot <- function(df, group, title = "", xlab = "", ylab = "") {
     fill = group
   )) +
     geom_violin(aes(group = sample), alpha = 0.75, size = 1) +
+    coord_flip() +
     labs(title = title,
          x = xlab,
          y = ylab) +
     theme_bw()
+  
+  ggplotly(gg)
 }
 
 temp1 <- function() {
@@ -69,10 +72,11 @@ temp1 <- function() {
   )
 }
 
-scatter_plot <- function(df, size = 1.5, source = NA, index = NA, x, y, group, title = "", xlab = "", ylab = "") {
+scatter_plot <- function(df, size = 1.5, source = NA, key = NA, index = NA, x, y, group, title = "", xlab = "", ylab = "") {
   gg <- ggplot(data = df, aes_string(
     x = x,
     y = y,
+    key = key,
     color = group
   )) +
     geom_point(size = size, alpha = 0.5) +
@@ -81,7 +85,7 @@ scatter_plot <- function(df, size = 1.5, source = NA, index = NA, x, y, group, t
          y = ylab) +
     theme_bw()
   
-  ## Add loess trend for MA
+  ## Add loess trend
   if (!is.na(index)) {
     gg <- gg + geom_smooth(
       data = df[index, ],
@@ -96,18 +100,21 @@ scatter_plot <- function(df, size = 1.5, source = NA, index = NA, x, y, group, t
   ggplotly(gg, source = source)
 }
 
-
-bar_plot <- function(df, group, title = "", xlab = "", ylab = "") {
+## x = "count",
+## y = group,
+## fill = "feature"
+bar_plot <- function(df, group, x, y, fill = NULL, title = "", xlab = "", ylab = "") {
   gg <- ggplot(data = df, aes_string(
-    x = "count",
-    y = group,
-    fill = "feature"
+    x = x,
+    y = y,
+    fill = fill
   )) +
     geom_bar(stat = "identity") +
     labs(title = title,
          x = xlab,
          y = ylab) +
     theme_bw()
+  
   ggplotly(gg)
 }
 
@@ -129,4 +136,44 @@ barcode_plot <- function(dge) {
          y = "Label Y") +
     theme_bw()
   ggplotly(gg, tooltip = "text")
+}
+
+
+dendro_plot <- function(df, group = NULL, title = "", xlab = "", ylab = "") {
+  gg <- ggplot(data = df) +
+    geom_segment(aes(
+      x = x,
+      y = y,
+      xend = xend,
+      yend = yend
+    )) +
+    geom_point(data = df[df$label != "", ], aes_string(x = "x", y = "y", color = group)) +
+    labs(title = title,
+         x = xlab,
+         y = ylab) +
+    theme_bw()
+  
+  ggplotly(gg)
+}
+
+
+heatmap_plot <- function(df, group, title = "", xlab = "", ylab = "") {
+  gg <- ggplot(data = df, aes(x = col,
+                              y = row,
+                              fill = value)) +
+    geom_tile() +
+    labs(title = title,
+         x = xlab,
+         y = ylab) +
+    theme_bw()
+  
+  if (table(df$col)[1] > 50) {
+    gg <- gg + theme(axis.text.y = element_blank())
+  }
+  
+  if (group != "none") {
+    gg <- gg + facet_grid(as.formula(paste("~", group)), scales = "free")
+  }
+  
+  ggplotly(gg)
 }
