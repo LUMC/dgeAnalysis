@@ -174,10 +174,10 @@ heatmap_plot <- function(df, group, x, y, fill, title = "", xlab = "", ylab = ""
 }
 
 
-network_plot <- function(df, group, title = "", xlab = "", ylab = "") {
+network_plot <- function(df, title = "", xlab = "", ylab = "") {
   gg <- ggplot() +
     geom_segment(
-      data = conns,
+      data = df[[1]],
       aes(
         x = from.x,
         xend = to.x,
@@ -188,13 +188,13 @@ network_plot <- function(df, group, title = "", xlab = "", ylab = "") {
       colour = "grey"
     ) +
     geom_point(
-      data = term_layout,
+      data = df[[2]],
       aes(x = V1, y = V2),
       size = 8,
       colour = "red"
     ) +
     geom_point(
-      data = gene_layout,
+      data = df[[3]],
       aes(x = V1, y = V2, colour = fc),
       size = 4
     ) +
