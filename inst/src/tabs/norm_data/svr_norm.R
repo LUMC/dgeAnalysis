@@ -102,6 +102,7 @@ output[["norm_voom_plot"]] <- renderPlotly({
       )
     )
   }, error = function(err) {
+    print(err)
     return(NULL)
   })
 })

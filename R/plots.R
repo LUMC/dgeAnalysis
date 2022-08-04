@@ -15,7 +15,7 @@ line_plot <- function(df, group, title = "", xlab = "", ylab = "", plot = NA) {
     gg <- gg + scale_x_continuous(trans = "log10")
   }
   
-  ggplotly(gg)
+  gg
 }
 
 density_plot <- function(df, group, title = "", xlab = "", ylab = "") {
@@ -37,7 +37,7 @@ density_plot <- function(df, group, title = "", xlab = "", ylab = "") {
          y = ylab) +
     theme_bw()
   
-  ggplotly(gg)
+  gg
 }
 
 
@@ -55,7 +55,7 @@ violin_plot <- function(df, group, title = "", xlab = "", ylab = "") {
          y = ylab) +
     theme_bw()
   
-  ggplotly(gg)
+  gg
 }
 
 
@@ -73,7 +73,7 @@ scatter_plot <- function(df, size = 1.5, source = NA, key = NA, index = NA, x, y
     theme_bw()
   
   ## Add loess trend
-  if (!is.na(index)) {
+  if (!is.na(index[1])) {
     gg <- gg + geom_smooth(
       data = df[index, ],
       aes_string(x = x, y = y),
@@ -88,7 +88,7 @@ scatter_plot <- function(df, size = 1.5, source = NA, key = NA, index = NA, x, y
     gg <- gg + scale_x_continuous(trans = "log10")
   }
   
-  ggplotly(gg, source = source)
+  gg
 }
 
 ## x = "count",
@@ -106,7 +106,7 @@ bar_plot <- function(df, group, x, y, fill = NULL, title = "", xlab = "", ylab =
          y = ylab) +
     theme_bw()
   
-  if (is.na(colorbar)) {
+  if (!is.na(colorbar)) {
     gg <- gg + scale_fill_manual(values = c("#619CFF", "#F8766D", "#00BA38"))
   }
   
@@ -114,7 +114,7 @@ bar_plot <- function(df, group, x, y, fill = NULL, title = "", xlab = "", ylab =
     gg <- gg + facet_grid(as.formula(paste("~", group)), scales = "free")
   }
   
-  ggplotly(gg)
+  gg
 }
 
 
@@ -130,7 +130,7 @@ barcode_plot <- function(df, x, y, group, title = "", xlab = "", ylab = "") {
          y = ylab) +
     theme_bw()
   
-  ggplotly(gg)
+  gg
 }
 
 
@@ -148,7 +148,7 @@ dendro_plot <- function(df, group = NULL, title = "", xlab = "", ylab = "") {
          y = ylab) +
     theme_bw()
   
-  ggplotly(gg)
+  gg
 }
 
 
@@ -170,7 +170,7 @@ heatmap_plot <- function(df, group, x, y, fill, title = "", xlab = "", ylab = ""
     gg <- gg + facet_grid(as.formula(paste("~", group)), scales = "free")
   }
   
-  ggplotly(gg)
+  gg
 }
 
 
@@ -200,5 +200,5 @@ network_plot <- function(df, group, title = "", xlab = "", ylab = "") {
     ) +
     theme_void()
   
-  ggplotly(gg)
+  gg
 }

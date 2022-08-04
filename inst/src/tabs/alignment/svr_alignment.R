@@ -39,7 +39,7 @@ output[["align_sum"]] <- renderPlotly({
       x = "count",
       y = "sample",
       fill = "feature",
-      group = input$group_sum,
+      group = "sample",
       title = "Count assignments",
       xlab = "Counts",
       ylab = ""

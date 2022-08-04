@@ -28,6 +28,7 @@ output[["var_heat"]] <- renderPlotly({
       ylab = ""
     )
   }, error = function(err) {
+    print(err)
     return(NULL)
   })
 })
