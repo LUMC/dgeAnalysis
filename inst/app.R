@@ -10,7 +10,7 @@ options(spinner.color = "#0088cc")
 ##    "normDge",
 ##    "enrich",
 ##    "inUse_deTab",
-##    "inUse_normDge",
+##    "inUse_normDge",+
 ##    inUse_enrich
 ##  ),
 ##  envir = .GlobalEnv
@@ -27,9 +27,10 @@ source("R/de_plots.R", local = TRUE)
 
 source("R/plots.R", local = TRUE)
 
+
 shiny::runApp(
   appDir = "inst/src/",
   host = "0.0.0.0",
-  port = 1403,
+  port = 1402,
   launch.browser = TRUE
 )
