@@ -4,21 +4,12 @@ output[["var_heat"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
-    lcpm <- inUse_normDge$counts
-    var_genes <- apply(lcpm, 1, var)
-    select_var <- names(sort(var_genes, decreasing = TRUE))[1:input$slider_heatmap_var]
-    high_var_cpm <- lcpm[select_var, ]
-    high_var_cpm <- as.data.frame(stack(high_var_cpm))
-    high_var_cpm <- merge(
-      x = high_var_cpm,
-      y = as.data.frame(inUse_normDge$samples),
-      by.x = "col",
-      by.y = "row.names",
-      all.x = TRUE
-    )
+    ## Get input data
+    plot_data <- heat_var(inUse_normDge, input$slider_heatmap_var)
     
+    ## Create plot
     heatmap_plot(
-      df = high_var_cpm,
+      df = plot_data,
       x = "col",
       y = "row",
       fill = "value",
@@ -71,22 +62,12 @@ output[["dge_heat"]] <- renderPlotly({
       return(NULL)
     }
     
-    sortdeTab <- inUse_deTab[order(rank(inUse_deTab$FDR)), ]
-    sortdeTab <- head(sortdeTab, input$slider_heatmap_dge)
-    getnorm <- inUse_normDge[rownames(sortdeTab), ]
-    getnorm <- getnorm$counts
-    getnorm <- as.data.frame(stack(getnorm))
+    ## Get input data
+    plot_data <- heat_de(inUse_normDge, inUse_deTab, input$slider_heatmap_dge)
     
-    getnorm <- merge(
-      x = getnorm,
-      y = as.data.frame(inUse_normDge$samples),
-      by.x = "col",
-      by.y = "row.names",
-      all.x = TRUE
-    )
-    
+    ## Create plot
     heatmap_plot(
-      df = getnorm,
+      df = plot_data,
       x = "col",
       y = "row",
       fill = "value",
@@ -96,6 +77,7 @@ output[["dge_heat"]] <- renderPlotly({
       ylab = ""
     )
   }, error = function(err) {
+    print(err)
     return(NULL)
   })
 })

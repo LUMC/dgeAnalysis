@@ -17,17 +17,12 @@ output[["norm_dist_line"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
-    stackCounts <- data.frame(stackDge(inUse_normDge))
-    stackCounts <- merge(
-      x = stackCounts,
-      y = inUse_normDge$samples,
-      by.x = "sample",
-      by.y = "row.names",
-      all.x = TRUE
-    )
+    ## Get input data
+    plot_data <- count_dist(inUse_normDge)
     
+    ## Create plot
     density_plot(
-      df = stackCounts,
+      df = plot_data,
       group = input$norm_line_color,
       title = "Gene count distribution",
       x = "Log2CPM",
@@ -58,14 +53,16 @@ output[["norm_dist_boxplot"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
-    stackCounts <- data.frame(stackDge(inUse_normDge))
+    ## Get input data
+    plot_data <- count_dist(inUse_normDge)
     
+    ## Create plot
     violin_plot(
-      df = stackCounts,
+      df = plot_data,
       group = "sample",
       title = "Gene count distribution",
-      x = "Log2CPM",
-      y = ""
+      x = "",
+      y = "Log2CPM"
     )
   }, error = function(err) {
     return(NULL)
@@ -77,19 +74,14 @@ output[["norm_voom_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
-    v <- voom(2 ^ (inUse_normDge$counts), save.plot = TRUE)
-    v <- data.frame(
-      x = v$voom.xy$x,
-      y = v$voom.xy$y,
-      gene = names(v$voom.xy$x),
-      Genes = "Genes"
-    )
-    v <- v[order(v$x), ]
-    index <- round(seq(1, nrow(v), length.out = 1000))
+    ## Get input data
+    plot_data <- voom_data(inUse_normDge)
+    index <- round(seq(1, nrow(plot_data), length.out = 1000))
     
+    ## Create plot
     toWebGL(
       scatter_plot(
-        df = v,
+        df = plot_data,
         source = "norm_voom",
         group = "Genes",
         key = "gene",

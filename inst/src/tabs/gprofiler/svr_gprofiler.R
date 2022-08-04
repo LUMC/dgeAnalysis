@@ -52,18 +52,15 @@ output[["enrich_barplot"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
+    ## Get input data
     enrich <- clean_enrich()
-    enrich <- na.omit(enrich[0:input$terms_slider, ])
-    enrich$term_name <- factor(enrich$term_name,
-                               levels = unique(enrich$term_name)[order(enrich$p_value,
-                                                                       enrich$term_name,
-                                                                       decreasing = TRUE)])
+    plot_data <- enrich_bar(enrich, input$terms_slider)
     
+    ## Create plot
     bar_plot(
-      df = enrich,
+      df = plot_data,
       x = "intersection_size",
       y = "term_name",
-      colorbar = TRUE,
       fill = "p_value",
       title = "Enrichment barplot",
       xlab = "Number of genes",
@@ -78,26 +75,12 @@ output[["enrich_barplot"]] <- renderPlotly({
 output[["enrich_DEbarplot"]] <- renderPlotly({
   tryCatch({
     checkReload()
+    
+    ## Get input data
     enrich <- clean_enrich()
+    plot_data <- enrich_barDE(enrich, input$DEterms_slider)
     
-    enrich <- na.omit(enrich[0:input$DEterms_slider,])
-    enrich$term_name <- factor(enrich$term_name,
-                               levels = unique(enrich$term_name)[order(enrich$p_value,
-                                                                       enrich$term_name,
-                                                                       decreasing = TRUE)])
-    enrich[c("down", "not_sign", "up")] <- NA
-    for (row in 1:nrow(enrich)) {
-      genes <- unlist(strsplit(enrich[row, ]$intersection, split = ","))
-      de <- table(deTab$DE[rownames(deTab) %in% genes])
-      names(de) <- c("down", "not_sign", "up")[match(names(de), c(-1, 0, 1))]
-      enrich[row, ][names(de)] <- de
-    }
-    
-    plot_data <- enrich[c("term_name", "down", "up")]
-    plot_data$down <- plot_data$down * -1
-    plot_data <- stack(plot_data)
-    plot_data$name <- enrich$term_name
-    
+    ## Create plot
     bar_plot(
       df = plot_data,
       x = "values",
@@ -116,40 +99,19 @@ output[["enrich_DEbarplot"]] <- renderPlotly({
 output[["cnet_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
+    
+    ## Get input data
     enrich <- clean_enrich()
     geneSets <- extract_geneSets(enrich,
-                                 5, #input$cnet_slider,
-                                 NULL) #input$select_pathway)
-    
+                                 input$cnet_slider,
+                                 input$select_pathway)
     graphData <- cnetPlotly(enrich, geneSets, inUse_deTab)
-    set.seed(1234)
-    layout <- as.data.frame(layout.kamada.kawai(graphData))
+    plot_data <- cnet_data(inUse_deTab, graphData)
     
-    ## Fix layout
-    layout <- as.data.frame(layout)
-    layout$genes <- names(V(graphData))
-    
-    ## Expand graph
-    layout[1:2] <- layout[1:2] * 10
-
-    conns <- get.data.frame(graphData)
-    conns$from.x <- layout$V1[match(conns$from, layout$genes)]
-    conns$from.y <- layout$V2[match(conns$from, layout$genes)]
-    conns$to.x <- layout$V1[match(conns$to, layout$genes)]
-    conns$to.y <- layout$V2[match(conns$to, layout$genes)]
-    
-    term_layout <- layout[1:5, ]
-    gene_layout <- layout[6:nrow(layout), ]
-    
-    gene_layout$fc <- inUse_deTab$avgLog2FC[match(gene_layout$genes, rownames(inUse_deTab))]
-    
-    plotlyGraph(
-      graphData,
-      "Gene-Concept Network",
-      "Log2FC",
-      length(geneSets),
-      input$cnet_annoP,
-      input$cnet_annoG
+    ## Create plot
+    network_plot(
+      df = plot_data,
+      title = "Gene-Concept Network"
     )
   }, error = function(err) {
     return(NULL)
@@ -175,6 +137,7 @@ output[["cnet_select_pathway"]] <- renderUI({
 output[["cnet_table"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
+    
     enrich <- clean_enrich()
     geneSets <- extract_geneSets(enrich,
                                  input$cnet_slider,
@@ -193,49 +156,17 @@ output[["cnet_table"]] <- DT::renderDataTable({
 output[["heat_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
+    
+    ## Get input data
     enrich <- clean_enrich()
     geneSets <- extract_geneSets(enrich,
                                  input$heat_slider,
                                  input$select_heat)
+    plot_data <- heat_terms(geneSets)
     
-    genelist <- list2df(geneSets)
-    genelist <- merge(
-      genelist,
-      inUse_deTab[c("avgLog2FC"), drop = FALSE],
-      by.x = "Gene",
-      by.y = 0,
-      all.x = TRUE
-    )
-    genelist <-
-      merge(genelist, rev(sort(table(genelist$Gene))), by.x = "Gene", by.y = "Var1")
-    if (length(rev(sort(table(
-      genelist$categoryID
-    )))) == 1) {
-      genelist <- merge(genelist, rev(sort(table(
-        genelist$categoryID
-      ))), by.x = "categoryID", by.y = "row.names")
-      colnames(genelist)[colnames(genelist) %in% c("Freq", "y")] <-
-        c("Freq.x", "Freq.y")
-    } else {
-      genelist <- merge(genelist, rev(sort(table(
-        genelist$categoryID
-      ))), by.x = "categoryID", by.y = "Var1")
-    }
-    
-    for (pathway in unique(genelist$categoryID)) {
-      entrezID <- genelist$Gene[genelist$categoryID == pathway]
-      entrez_matches <-
-        count(genelist$Gene[genelist$categoryID != pathway] %in% entrezID)
-      genelist$match[genelist$categoryID == pathway] <-
-        entrez_matches
-    }
-    
-    genelist <- genelist[order(-genelist$match, -genelist$Freq.y, genelist$avgLog2FC), ]
-    genelist$Gene <- factor(genelist$Gene, levels = unique(genelist$Gene))
-    genelist$categoryID <- factor(genelist$categoryID, levels = unique(genelist$categoryID))
-    
+    ## Create plot
     heatmap_plot(
-      df = genelist,
+      df = plot_data,
       x = "categoryID",
       y = "Gene",
       group = "none",

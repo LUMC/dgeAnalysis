@@ -4,30 +4,23 @@ output[["pca"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
-    tdge <- t(inUse_normDge$counts)
-    tdge[!is.finite(tdge)] <- 0
-    pca <- prcomp(tdge, center = TRUE)
-    percent <- data.frame(summary(pca)$importance[2, ])
-    colnames(percent) <- "percent"
+    ## Get input data
+    plot_data <- pca_data(inUse_normDge)
     
-    pca <- data.frame(scale(tdge, center = T, scale = F) %*% pca$rotation)
-    pca$sample <- rownames(pca)
-    pca$group <- inUse_normDge$samples[, input$group_pca]
-    
+    ## Create plot
     scatter_plot(
-      df = pca,
+      df = plot_data,
       size = 4,
       source = "pca",
       key = "sample",
       x = input$set_pca_pc1,
       y = input$set_pca_pc2,
-      group = "group",
+      group = input$group_pca,
       title = "PCA",
-      xlab = paste0(input$set_pca_pc1, " (", round(percent[input$set_pca_pc1,] * 100, 2), "%)"),
-      ylab = paste0(input$set_pca_pc2, " (", round(percent[input$set_pca_pc2,] * 100, 2), "%)")
+      xlab = paste0(input$set_pca_pc1, " (", plot_data$percent[as.numeric(gsub("PC", "", input$set_pca_pc1))], "%)"),
+      ylab = paste0(input$set_pca_pc2, " (", plot_data$percent[as.numeric(gsub("PC", "", input$set_pca_pc2))], "%)")
     )
   }, error = function(err) {
-    print(err)
     return(NULL)
   })
 })
@@ -38,7 +31,7 @@ output[["group_pca"]] <- renderUI({
     selectInput(
       inputId = "group_pca",
       label = "Color by:",
-      choices = colnames(data_samples())
+      choices = c("Samples" = "sample", colnames(data_samples()))
     )
   }, error = function(err) {
     return(NULL)
@@ -85,20 +78,14 @@ output[["variance_pca"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
-    tdge <- t(inUse_normDge$counts)
-    tdge[!is.finite(tdge)] <- 0
-    pca <- prcomp(tdge, center = TRUE)
-    percent <- data.frame(
-      pc = names(summary(pca)$importance[2, ]),
-      percent = summary(pca)$importance[2, ] * 100,
-      color = "color"
-    )
+    ## Get input data
+    plot_data <- pca_data(inUse_normDge)
     
+    ## Create plot
     bar_plot(
-      df = percent,
+      df = plot_data,
       x = "pc",
       y = "percent",
-      fill = "color",
       title = "PCA Scree plot",
       xlab = "Principal component",
       ylab = "Percentage"
@@ -113,35 +100,18 @@ output[["dim_tsne"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
-    set.seed(1234)
+    ## Get input data
+    plot_data <- tsne_data(inUse_normDge)
     
-    perplexity <- 30
-    while (perplexity > 0) {
-      try({
-        tsne_model <- Rtsne(
-          t(inUse_normDge$counts),
-          perplexity = perplexity,
-          check_duplicates = FALSE,
-          normalize = FALSE
-        )
-        break
-      }, silent = TRUE)
-      perplexity <- perplexity - 1
-    }
-    
-    tsne_data <- as.data.frame(tsne_model$Y)
-    rownames(tsne_data) <- colnames(inUse_normDge$counts)
-    tsne_data$sample <- rownames(tsne_data)
-    tsne_data$group <- inUse_normDge$samples[[input$group_dim_tsne]]
-    
+    ## Create plot
     scatter_plot(
-      df = tsne_data,
+      df = plot_data,
       size = 4,
       source = "tsne",
       key = "sample",
       x = "V1",
       y = "V2",
-      group = "group",
+      group = input$group_dim_tsne,
       title = "tSNE",
       xlab = "tSNE 1",
       ylab = "tSNE 2"
@@ -157,7 +127,7 @@ output[["group_dim_tsne"]] <- renderUI({
     selectInput(
       inputId = "group_dim_tsne",
       label = "Color by:",
-      choices = colnames(data_samples())
+      choices = c("Samples" = "sample", colnames(data_samples()))
     )
   }, error = function(err) {
     return(NULL)
@@ -180,19 +150,18 @@ output[["norm_un_cluster"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
-    logFC <- plotMDS(inUse_normDge$counts, ndim = ncol(inUse_normDge) - 1)
-    for_plots <- data.frame(logFC[c("x", "y")])
-    for_plots$sample <- rownames(logFC$distance.matrix.squared)
-    for_plots$group <- inUse_normDge$samples[, input$group_norm_mds]
+    ## Get input data
+    plot_data <- mds_clust(inUse_normDge)
     
+    ## Create plot
     scatter_plot(
-      df = for_plots,
+      df = plot_data,
       size = 4,
       source = "norm_mds",
       key = "sample",
       x = "x",
       y = "y",
-      group = "group",
+      group = input$group_norm_mds,
       title = "MDS Plot",
       xlab = "MDS 1",
       ylab = "MDS 2"
@@ -208,7 +177,7 @@ output[["group_norm_mds"]] <- renderUI({
     selectInput(
       inputId = "group_norm_mds",
       label = "Color by:",
-      choices = colnames(data_samples())
+      choices = c("Samples" = "sample", colnames(data_samples()))
     )
   }, error = function(err) {
     return(NULL)
@@ -231,15 +200,13 @@ output[["dim_dendro"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
-    sampleTree <- hclust(dist(t(inUse_normDge$counts)), method = "average")
-    dendro_data <- get_dendrogram_data(sampleTree)
-    dendro_data$group <- NA
-    dendro_data$group[dendro_data$label != ""] <- as.character(inUse_normDge$samples[[input$color_dendro]])
-    print(dendro_data)
+    ## Get input data
+    plot_data <- dendro_data(inUse_normDge)
     
+    ## Create plot
     dendro_plot(
-      df = dendro_data,
-      group = "group",
+      df = plot_data,
+      group = input$color_dendro,
       title = "Dendrogram",
       xlab = "",
       ylab = "Height"
@@ -255,7 +222,7 @@ output[["color_dendro"]] <- renderUI({
     selectInput(
       inputId = "color_dendro",
       label = "Color by:",
-      choices = colnames(data_samples())
+      choices = c("Samples" = "sample", colnames(data_samples()))
     )
   }, error = function(err) {
     return(NULL)

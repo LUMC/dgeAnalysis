@@ -4,11 +4,11 @@ output[["gc_bias"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
+    ## Get input data
     index <- round(seq(1, nrow(inUse_deTab), length.out = 1000))
-    plot_data <- inUse_deTab[order(inUse_deTab[[input$selectGC]]), ]
-    plot_data[[input$selectGC]] <- plot_data[[input$selectGC]] * 100
-    plot_data$gene <- rownames(plot_data)
+    plot_data <- bias_gc(inUse_deTab, input$selectGC)
     
+    ## Create plot
     toWebGL(
       scatter_plot(
         df = plot_data,
@@ -64,10 +64,11 @@ output[["len_bias"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
+    ## Get input data
     index <- round(seq(1, nrow(inUse_deTab), length.out = 1000))
-    plot_data <- inUse_deTab[order(inUse_deTab[[input$selectLength]]), ]
-    plot_data$gene <- rownames(plot_data)
+    plot_data <- bias_gc(inUse_deTab, input$selectLength)
     
+    ## Create plot
     toWebGL(
       scatter_plot(
         df = plot_data,
@@ -124,28 +125,13 @@ output[["geneStrand_bias"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
-    geneStrand <- as.data.frame(table(inUse_deTab$geneStrand, inUse_deTab$DE, dnn = c("strand", "DE")))
-    geneStrand$DE <- factor(
-      x = geneStrand$DE,
-      levels = c(-1, 0, 1),
-      labels = c(
-        "Down-regulated",
-        "Not significant",
-        "Up-regulated"
-      )
-    )
-    geneStrand$perc <- geneStrand$Freq / sum(geneStrand$Freq) * 100
-    geneStrand$strand <- factor(
-      x = geneStrand$strand,
-      levels = c("+", "-"),
-      labels = c(
-        "Positive strand",
-        "Negative strand"
-      )
-    )
+    ## Get input data
+    index <- round(seq(1, nrow(inUse_deTab), length.out = 1000))
+    plot_data <- gene_strand(inUse_deTab)
     
+    ## Create plot
     bar_plot(
-      df = geneStrand,
+      df = plot_data,
       group = "strand",
       x = "DE",
       y = "Freq",

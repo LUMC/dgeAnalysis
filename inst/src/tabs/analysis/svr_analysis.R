@@ -20,20 +20,12 @@ output[["de_ratio"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
-    defeatures <- data.frame(table(inUse_deTab$DE))
-    defeatures$perc <- defeatures[, 2] / sum(defeatures[, 2]) * 100
-    defeatures$Var1 <- factor(
-      x = defeatures$Var1,
-      levels = c(-1, 0, 1),
-      labels = c(
-        "Down-regulated",
-        "Not significant",
-        "Up-regulated"
-      )
-    )
+    ## Get input data
+    plot_data <- de_ratio(inUse_deTab)
     
+    ## Create plot
     bar_plot(
-      df = defeatures,
+      df = plot_data,
       group = "Var1",
       x = "Var1",
       y = "perc",
@@ -52,19 +44,11 @@ output[["ma_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
+    ## Get input data
     index <- round(seq(1, nrow(inUse_deTab), length.out = 1000))
-    plot_data <- inUse_deTab[order(inUse_deTab$avgLog2CPM), ]
-    plot_data$DE <- factor(
-      x = plot_data$DE,
-      levels = c(0, 1, -1),
-      labels = c(
-        "Not significant",
-        "Up-regulated",
-        "Down-regulated"
-      )
-    )
-    plot_data$gene <- rownames(plot_data)
+    plot_data <- ma(inUse_deTab)
     
+    ## Create plot
     toWebGL(
       scatter_plot(
         df = plot_data,
@@ -101,19 +85,10 @@ output[["volcano_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
-    plot_data <- inUse_deTab
-    plot_data$DE <- factor(
-      x = plot_data$DE,
-      levels = c(0, 1, -1),
-      labels = c(
-        "Not significant",
-        "Up-regulated",
-        "Down-regulated"
-      )
-    )
-    plot_data$FDR <- -log10(plot_data$FDR)
-    plot_data$gene <- rownames(plot_data)
+    ## Get input data
+    plot_data <- volcano(inUse_deTab)
     
+    ## Create plot
     toWebGL(
       scatter_plot(
         df = plot_data,
@@ -148,17 +123,15 @@ output[["selected_volcano"]] <- DT::renderDataTable({
 output[["barcode_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
-
-    sortdeTab <- inUse_deTab[order(rank(inUse_deTab$FDR)), ]
-    sortdeTab <- head(sortdeTab, input$slider_barcode)
-    getnorm <- inUse_normDge[c(rownames(sortdeTab), input$selected_analysis_bar), ]
-    stack1 <- as.data.frame(stack(getnorm$counts))
-    stack1$group <- getnorm$samples[[input$group_analysis_bar]][stack1$col]
     
+    ## Get input data
+    plot_data <- barcode(inUse_deTab, input$slider_barcode, input$selected_analysis_bar)
+    
+    ## Create plot
     toWebGL(
       barcode_plot(
-        df = stack1,
-        group = "group",
+        df = plot_data,
+        group = input$group_analysis_bar,
         x = "value",
         y = "row",
         title = "Barcode Plot",
@@ -167,7 +140,6 @@ output[["barcode_plot"]] <- renderPlotly({
       )
     )
   }, error = function(err) {
-    print(err)
     return(NULL)
   })
 })
@@ -178,7 +150,7 @@ output[["group_analysis_bar"]] <- renderUI({
     selectInput(
       inputId = "group_analysis_bar",
       label = "Color by:",
-      choices = colnames(data_samples())
+      choices = c("Samples" = "sample", colnames(data_samples()))
     )
   }, error = function(err) {
     return(NULL)
@@ -205,15 +177,14 @@ output[["p_val_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
-    pvalue <- round(inUse_deTab$P.Value, digits = 2)
-    pvalue <- aggregate(pvalue, by = list(p = pvalue), FUN = length)
-    pvalue$color <- "color"
+    ## Get input data
+    plot_data <- pvalue(inUse_deTab)
     
+    ## Create plot
     bar_plot(
-      df = pvalue,
+      df = plot_data,
       x = "p",
       y = "x",
-      fill = "color",
       title = "P-Value plot",
       xlab = "P-Value",
       ylab = "Count"

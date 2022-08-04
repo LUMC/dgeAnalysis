@@ -24,18 +24,13 @@ output[["align_sum"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
+    ## Get input data
     se <- get_se()
-    lse <- alignmentSummary(se)
-    lse$feature <- gsub("_", " ", gsub("__", "", lse$feature))
-    if (input$setSummary == "actual") {
-      for (var in unique(lse$sample)) {
-        temp <- lse[lse$sample == var,]
-        lse$count[lse$sample == var] <- (temp$count / (sum(temp$count))) * 100
-      }
-    }
+    plot_data <- alignment_summary(se)
     
+    ## Create plot
     bar_plot(
-      df = lse,
+      df = plot_data,
       x = "count",
       y = "sample",
       fill = "feature",
@@ -53,24 +48,14 @@ output[["align_sum"]] <- renderPlotly({
 output[["complex"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    if (input$setComplexity == "actual") {
-      perc = FALSE
-    } else {
-      perc = TRUE
-    }
     
+    ## Get input data
     se <- get_se()
-    compData <- complexityData(se, input$comp_rank)
-    compData <- merge(
-      x = compData,
-      y = as.data.frame(colData(se)),
-      by.x = "sample",
-      by.y = "row.names",
-      all.x = TRUE
-    )
+    plot_data <- complexity(se, rank = input$comp_rank)
     
+    ## Create plot
     line_plot(
-      df = compData,
+      df = plot_data,
       group = input$group_color,
       title = "Gene complexity",
       xlab = "Cumulative reads per number of genes",

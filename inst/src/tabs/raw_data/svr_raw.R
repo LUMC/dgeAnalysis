@@ -4,18 +4,13 @@ output[["dist_line"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
+    ## Get input data
     dge <- get_raw_dge()
-    stackCounts <- data.frame(stackDge(dge))
-    stackCounts <- merge(
-      x = stackCounts,
-      y = dge$samples,
-      by.x = "sample",
-      by.y = "row.names",
-      all.x = TRUE
-    )
+    plot_data <- count_dist(dge)
     
+    ## Create plot
     density_plot(
-      df = stackCounts,
+      df = plot_data,
       group = input$raw_line_color,
       title = "Gene count distribution",
       x = "Log2CPM",
@@ -46,18 +41,19 @@ output[["dist_boxplot"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
+    ## Get input data
     dge <- get_raw_dge()
-    stackCounts <- data.frame(stackDge(dge))
+    plot_data <- count_dist(dge)
     
+    ## Create plot
     violin_plot(
-      df = stackCounts,
+      df = plot_data,
       group = "sample",
       title = "Gene count distribution",
-      x = "Log2CPM",
-      y = ""
+      x = "",
+      y = "Log2CPM"
     )
   }, error = function(err) {
-    print(err)
     return(NULL)
   })
 })
@@ -68,20 +64,19 @@ output[["un_cluster"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
+    ## Get input data
     dge <- get_raw_dge()
-    logFC <- plotMDS(dge$counts, ndim = ncol(dge) - 1)
-    for_plots <- data.frame(logFC[c("x", "y")])
-    for_plots$sample <- rownames(logFC$distance.matrix.squared)
-    for_plots$group <- dge$samples[, input$group_raw_mds]
+    plot_data <- mds_clust(dge)
     
+    ## Create plot
     scatter_plot(
-      df = for_plots,
+      df = plot_data,
       size = 4,
       source = "raw_mds",
       key = "sample",
       x = "x",
       y = "y",
-      group = "group",
+      group = input$group_raw_mds,
       title = "MDS Plot",
       xlab = "MDS 1",
       ylab = "MDS 2"
@@ -97,7 +92,7 @@ output[["group_raw_mds"]] <- renderUI({
     selectInput(
       inputId = "group_raw_mds",
       label = "Color by:",
-      choices = colnames(data_samples())
+      choices =c("Samples" = "sample", colnames(data_samples()))
     )
   }, error = function(err) {
     return(NULL)
@@ -109,7 +104,6 @@ output[["selected_raw_mds"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
     s <- event_data(event = "plotly_selected", source = "raw_mds")
-    print(s)
     DT::datatable(data_samples()[unlist(s$key), , drop = FALSE], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     print(err)
