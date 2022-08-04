@@ -1232,7 +1232,7 @@ geneStrandBar <- function(deTab) {
 informationBox <- function(infoText) {
   tryCatch({
     box(
-      title = icon("info-circle"),
+      title = icon("circle-info"),
       status = "primary",
       solidHeader = TRUE,
       width = 12,
