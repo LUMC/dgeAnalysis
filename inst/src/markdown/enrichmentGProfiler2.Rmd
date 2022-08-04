@@ -21,19 +21,25 @@ params:
   database:     ""
 ---
 
-# Reading packages and variables
-Required packages are loaded and the input variables are set. The used input settings are shown.
+
+# Load packages
 
 ```{r setup}
 
-if (!require("gprofiler2")) install.packages("gprofiler2")
+## Load required packages
+suppressPackageStartupMessages({
+  library(gprofiler2)
+})
 
 ```
 
 
-```{r variables}
-# IMPORT VARIABLES
+# Input
+## Load input variables
 
+```{r variables}
+
+## Import variables
 geneList <- strsplit(params$geneList, "\n")[[1]]
 organism <- params$organism
 significant <- eval(parse(text = params$significant))
@@ -42,11 +48,12 @@ database <- params$database
 
 ```
 
-## Input values
+
+## Show input variables
 
 ```{r showVariables}
-# SHOW VALUES OF VARIABLES
 
+## Values of variables
 length(geneList)
 organism
 significant
@@ -55,12 +62,12 @@ database
 
 ```
 
+
 # Run enrichment
-Enrichment analysis is performed using gProfiler2.
 
 ```{r runEnrichment}
-# SHOW VALUES OF VARIABLES
 
+## Start enrichment with gProfiler
 enrich <- gost(
   query = geneList,
   organism = organism,
@@ -75,12 +82,12 @@ enrich <- gost(
 
 ```
 
+
 # Show results
-Show gProfiler enrichment plot
 
 ```{r showResult}
-# Show results
 
+## Show results
 enrich$result$query <- ""
 gostplot(enrich, capped = FALSE, interactive = TRUE)
 
@@ -88,21 +95,20 @@ gostplot(enrich, capped = FALSE, interactive = TRUE)
 
 
 # Save results
-Results are saved, so they can be retrieved by the application.
 
 ```{r save}
-# SAVE ANALYSIS
 
+## Save data files
 save(enrich, file = "enrichment.RData")
 
 ```
 
+
 # Session info
-Showing all used packages including version numbers.
 
 ```{r session}
-# INFO
 
+## Session info
 sessionInfo()
 
 ```

@@ -29,24 +29,30 @@ params:
   alpha:            ""
 ---
 
-# Reading packages and variables
-Required packages are loaded and the input variables are set. The used input settings are shown.
+
+# Load packages
 
 ```{r setup}
 
-if (!require("knitr")) install.packages("knitr")
-if (!require("SummarizedExperiment")) install.packages("SummarizedExperiment")
-if (!require("edgeR")) install.packages("edgeR")
-if (!require("tidyr")) install.packages("tidyr")
-if (!require("scales")) install.packages("scales")
-if (!require("plotly")) install.packages("plotly")
+## Load required packages
+suppressPackageStartupMessages({
+  library(knitr)
+  library(SummarizedExperiment)
+  library(edgeR)
+  library(tidyr)
+  library(scales)
+  library(plotly)
+})
 
 ```
 
 
-```{r variables}
-# IMPORT VARIABLES
+# Input
+## Load input variables
 
+```{r variables}
+
+## Import variables
 md5sum <- params$md5sum
 data_samples <- params$data_samples
 data_counts <- params$data_counts
@@ -64,19 +70,11 @@ alpha <- params$alpha
 ```
 
 
-```{r filterData}
-# FILTER DATA IF NECESSARY
-
-data_samples <- data_samples[!rownames(data_samples) %in% excluded_samples, , drop = FALSE]
-data_counts <- data_counts[, !colnames(data_counts) %in% excluded_samples]
-
-```
-
-## Input values
+## Show input variables
 
 ```{r showVariables}
-# SHOW VALUES OF VARIABLES
 
+## Values of variables
 md5sum
 cpm_value
 cpm_perc
@@ -89,24 +87,25 @@ matrix_v2
 
 ```
 
-# Process raw data
-The raw data is processed and pre-filtered, to remove non feature counts. The data is placed in a format (DGE list) which can be used for later analsis.
 
-```{r showRawData}
-# READ ALL FILES INTO SE
+# Pre-process data
+## Create Summarized Experiment
 
+```{r preprocess}
+
+## Match sample sheet & count data
+data_samples <- data_samples[!rownames(data_samples) %in% excluded_samples, , drop = FALSE]
+data_counts <- data_counts[, !colnames(data_counts) %in% excluded_samples]
+
+## Read data as Summarized Experiment
 se <- readCountsFromTable(data_counts, data_samples)
 se <- addSamplesFromTableToSE(se, data_samples)
 
+## Show plots
 alignmentSummaryPlot(se)
 complexityPlot(se)
 
-```
-
-
-```{r filesIntoSE}
-# ADD ANNOTATION TO SE IF PRESENT
-
+## Create final Summarized Experiment
 se <- readCountsFromTable(data_counts[!grepl('^__', rownames(data_counts)), ], data_samples)
 se <- addSamplesFromTableToSE(se, data_samples)
 if (!is.null(data_annotation)) {
@@ -115,53 +114,45 @@ if (!is.null(data_annotation)) {
 
 ```
 
+
 ## Create DGE list
 
 ```{r dge}
-# GET AND CREATE DGE
 
+## Create DGE list
 dge <- DGEList(counts = assay(se),
                samples = colData(se),
                genes = rowData(se))
 row.names(dge$genes) <- row.names(dge$counts)
 
-dge <- dge[rowSums(abs(dge$counts)) > 1,]
+## Remove genes with all 0 counts
+dge <- dge[rowSums(abs(dge$counts)) > 1, ]
 
+## Show plots
 tempDge <- dge
 tempDge$counts <- cpm(dge, log = TRUE, prior.count = 1)
 countDistributionLinePlot(tempDge)
 
 ```
 
-# Filter raw data
-The raw data is filtered based on the input values provided.
 
-```{r selectedFeatures}
-# GET SELECTED FEATURES
+## Filter & normalize data
 
+```{r normalize}
+
+## Filter data on low expressed genes
 edger <- calcNormFactors(dge, method = "TMM")
 counts <- cpm(edger, log = TRUE, prior.count = 1)
 selectedFeatures <- rownames(edger)[apply(counts, 1, function(v)
   sum(v >= cpm_value)) >= (cpm_perc / 100) * ncol(counts)]
 
-```
-
-
-```{r highExpressed}
-# GET HIGH EXPRESSED FEATURES
-
+## Get high expressed genes
 highExprDge <- dge[selectedFeatures, , keep.lib.sizes = FALSE]
 
-```
-
-# Normalization
-The filtered data is normalized using TMM.
-
-```{r normalize}
-# NORMALIZE DATA
-
+## Normalize data
 normDge <- calcNormFactors(highExprDge, method = "TMM")
 
+## Show plots
 tempDge <- normDge
 tempDge$counts <- cpm(normDge, log = TRUE, prior.count = 1)
 countDistributionLinePlot(tempDge)
@@ -169,59 +160,64 @@ pcaPlot(tempDge, design_base, "PC1", "PC2")
 
 ```
 
+
 # Create design and contrasts
-The design matrix and contrasts are created, based on input values.
 
 ```{r design}
-# CREATE DESIGN
 
+## Create design
 get_design <- createDesign(normDge$samples, design_base, design_value, matrix_v1, matrix_v2)
 get_design
 normDge <- relevelSamples(normDge, design_base, design_value, matrix_v1, matrix_v2)
 design <- model.matrix(eval(parse(text = get_design)), normDge$samples)
 design
 
+## Get contrast values
 get_matrix1 <- createMatrix(normDge, design_base, design_value, matrix_v1)
 get_matrix2 <- createMatrix(normDge, design_base, design_value, matrix_v2)
 get_matrix1
 get_matrix2
 
+## Create contrast
 contrast <- createContrast(design, get_matrix1, get_matrix2)
 contrast
 
 ```
 
+
 # Perform analysis
-The analysis is performed using edgeR with the normalized counts, design matrix and the provided contrasts.
 
 ```{r analysis}
-# PERFORM ANALYSIS
 
+## Run analysis
 normDge <- estimateDisp(normDge, design)
 edfit <- glmQLFit(normDge, design)
 efit <- glmQLFTest(edfit, contrast = contrast)
 
+## Get DE values
 efit$DE <- decideTests(efit, p.value = alpha)
 summary(efit$DE)
 
 ```
 
+
 ## Format DE output table
 
-```{r create_deTab}
-# CREATE deTab TABLE
+```{r deTab}
 
+## Get DE tables
 deTab <- topTags(efit, n = Inf)$table
 deTab <- deTab[order(rownames(deTab)), ]
 deTab$DE <- c(efit$DE[order(rownames(efit$DE)), ])
 
-#ORDER deTab TABLE
+## Reorder & rename table values
 deTab$F <- NULL
 deTab <- rename(deTab, "avgLog2CPM" = "logCPM")
 deTab <- rename(deTab, "avgLog2FC" = "logFC")
 deTab <- rename(deTab, "P.Value" = "PValue")
 deOrder <- c("avgLog2CPM", "avgLog2FC", "P.Value", "FDR", "DE")
 
+## Reorder annotation (if present)
 if (!is.null(data_annotation)) {
   deTab <- deTab[colnames(deTab)
                  [c(1, match(deOrder, names(deTab)), 2:(ncol(deTab) - 5))]]
@@ -229,12 +225,7 @@ if (!is.null(data_annotation)) {
   deTab <- deTab[deOrder]
 }
 
-```
-
-
-```{r changeToSymbol}
-# CHANGE GENE ID TO SYMBOL IF NECESSARY
-
+## Add gene symbol
 if (setGeneName == "symbol" && !is.null(data_annotation)) {
   tempCol <- rownames(deTab)
   rownames(deTab) <- make.names(deTab$geneName, unique = TRUE)
@@ -245,34 +236,35 @@ if (setGeneName == "symbol" && !is.null(data_annotation)) {
 
 ```
 
+
 ## DE results
 
 ```{r showDGEResult}
-# SHOW DGE RESULTS
 
+## Show plots
 ma_plot(deTab)
 pValuePlot(deTab)
 
 ```
 
+
 # Save results
-Results are saved, so they can be retrieved by the application.
 
 ```{r save}
-# SAVE ANALYSIS
 
+## Save data files
 deTab <- deTab[order(deTab$FDR),]
 normDge$counts <- cpm(normDge, log = TRUE, prior.count = 1)
 save(deTab, normDge, file = "analysis.RData")
 
 ```
 
+
 # Session info
-Showing all used packages including version numbers.
 
 ```{r session}
-# INFO
 
+## Session info
 sessionInfo()
 
 ```
