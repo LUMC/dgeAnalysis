@@ -4,6 +4,11 @@ output[["var_heat"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
+    ## Only plot if UI is loaded
+    if(is.null(input$slider_heatmap_var)) {
+      break
+    }
+    
     ## Get input data
     plot_data <- heat_var(inUse_normDge, input$slider_heatmap_var)
     
@@ -19,7 +24,6 @@ output[["var_heat"]] <- renderPlotly({
       ylab = ""
     )
   }, error = function(err) {
-    print(err)
     return(NULL)
   })
 })
@@ -62,6 +66,11 @@ output[["dge_heat"]] <- renderPlotly({
       return(NULL)
     }
     
+    ## Only plot if UI is loaded
+    if(is.null(input$slider_heatmap_dge)) {
+      break
+    }
+    
     ## Get input data
     plot_data <- heat_de(inUse_normDge, inUse_deTab, input$slider_heatmap_dge)
     
@@ -77,7 +86,6 @@ output[["dge_heat"]] <- renderPlotly({
       ylab = ""
     )
   }, error = function(err) {
-    print(err)
     return(NULL)
   })
 })

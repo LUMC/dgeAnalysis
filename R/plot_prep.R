@@ -1,12 +1,22 @@
 
-alignment_summary <- function(se) {
+alignment_summary <- function(se, percent = "percent") {
   plot_data <- alignmentSummary(se)
   plot_data$feature <- gsub("_", " ", gsub("__", "", plot_data$feature))
   
-  for (var in unique(plot_data$sample)) {
-    temp <- plot_data[plot_data$sample == var, ]
-    plot_data$count[plot_data$sample == var] <- temp$count / (sum(temp$count)) * 100
+  if (percent == "percent") {
+    for (var in unique(plot_data$sample)) {
+      temp <- plot_data[plot_data$sample == var, ]
+      plot_data$count[plot_data$sample == var] <- temp$count / (sum(temp$count)) * 100
+    }
   }
+  
+  plot_data <- merge(
+    x = plot_data,
+    y = as.data.frame(colData(se)),
+    by.x = "sample",
+    by.y = "row.names",
+    all.x = TRUE
+  )
   
   return(plot_data)
 }
@@ -243,7 +253,7 @@ volcano <- function(deTab) {
   return(deTab)
 }
 
-barcode <- function(deTab, amount, select) {
+barcode <- function(deTab, dge, amount, select) {
   sortdeTab <- deTab[order(rank(deTab$FDR)), ]
   sortdeTab <- head(sortdeTab, amount)
   getnorm <- inUse_normDge[c(rownames(sortdeTab), select), ]
@@ -333,7 +343,7 @@ enrich_barDE <- function(enrich, amount) {
   return(plot_data)
 }
 
-cnet_data <- function(deTab, graphData) {
+cnet_data <- function(deTab, graphData, terms) {
   set.seed(1234)
   layout <- as.data.frame(layout.kamada.kawai(graphData))
   
@@ -350,8 +360,8 @@ cnet_data <- function(deTab, graphData) {
   conns$to.x <- layout$V1[match(conns$to, layout$genes)]
   conns$to.y <- layout$V2[match(conns$to, layout$genes)]
   
-  term_layout <- layout[1:5, ]
-  gene_layout <- layout[6:nrow(layout), ]
+  term_layout <- layout[1:terms,]
+  gene_layout <- layout[terms + 1:nrow(layout), ]
   
   gene_layout$fc <- deTab$avgLog2FC[match(gene_layout$genes, rownames(deTab))]
   
@@ -398,6 +408,7 @@ heat_terms <- function(geneSets) {
   
   genelist <- genelist[order(-genelist$match, -genelist$Freq.y, genelist$avgLog2FC), ]
   genelist$Gene <- factor(genelist$Gene, levels = unique(genelist$Gene))
+  genelist$categoryID <- stringr::str_wrap(genelist$categoryID, 15)
   genelist$categoryID <- factor(genelist$categoryID, levels = unique(genelist$categoryID))
   
   return(genelist)

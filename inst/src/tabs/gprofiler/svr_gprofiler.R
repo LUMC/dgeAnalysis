@@ -106,12 +106,14 @@ output[["cnet_plot"]] <- renderPlotly({
                                  input$cnet_slider,
                                  input$select_pathway)
     graphData <- cnetPlotly(enrich, geneSets, inUse_deTab)
-    plot_data <- cnet_data(inUse_deTab, graphData)
+    plot_data <- cnet_data(inUse_deTab, graphData, (input$cnet_slider + length(input$select_pathway)))
     
     ## Create plot
     network_plot(
       df = plot_data,
-      title = "Gene-Concept Network"
+      title = "Gene-Concept Network",
+      label1 = input$cnet_annoP,
+      label2 = input$cnet_annoG
     )
   }, error = function(err) {
     return(NULL)

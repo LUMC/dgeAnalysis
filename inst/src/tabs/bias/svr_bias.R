@@ -4,15 +4,19 @@ output[["gc_bias"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
+    ## Only plot if UI is loaded
+    if(is.null(input$selectGC)) {
+      break
+    }
+    
     ## Get input data
     index <- round(seq(1, nrow(inUse_deTab), length.out = 1000))
     plot_data <- bias_gc(inUse_deTab, input$selectGC)
     
     ## Create plot
-    toWebGL(
+    toWebGL(ggplotly(
       scatter_plot(
         df = plot_data,
-        source = "biasGC",
         group = "FDR",
         key = "gene",
         index = index,
@@ -21,8 +25,9 @@ output[["gc_bias"]] <- renderPlotly({
         title = paste("Bias based on", input$selectGC),
         xlab = paste(input$selectGC, "(%)"),
         ylab = "Average Log2FC"
-      )
-    )
+      ),
+      source = "biasGC"
+    ))
   }, error = function(err) {
     return(NULL)
   })
@@ -64,15 +69,19 @@ output[["len_bias"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
+    ## Only plot if UI is loaded
+    if(is.null(input$selectLength)) {
+      break
+    }
+    
     ## Get input data
     index <- round(seq(1, nrow(inUse_deTab), length.out = 1000))
     plot_data <- bias_gc(inUse_deTab, input$selectLength)
     
     ## Create plot
-    toWebGL(
+    toWebGL(ggplotly(
       scatter_plot(
         df = plot_data,
-        source = "biasLength",
         group = "FDR",
         key = "gene",
         scale = TRUE,
@@ -82,8 +91,9 @@ output[["len_bias"]] <- renderPlotly({
         title = paste("Bias based on", input$selectLength),
         xlab = input$selectLength,
         ylab = "Average Log2FC"
-      )
-    )
+      ),
+      source = "biasLength"
+    ))
   }, error = function(err) {
     return(NULL)
   })
@@ -134,12 +144,12 @@ output[["geneStrand_bias"]] <- renderPlotly({
       df = plot_data,
       group = "strand",
       x = "DE",
-      y = "Freq",
+      y = "perc",
       fill = "DE",
       facet = TRUE,
       title = "Gene strand ratio",
       xlab = "",
-      ylab = "Number of genes"
+      ylab = "Percentage of genes"
     )
   }, error = function(err) {
     return(NULL)

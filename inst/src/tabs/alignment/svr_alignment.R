@@ -12,7 +12,7 @@ output[["group_sum"]] <- renderUI({
     selectInput(
       inputId = "group_sum",
       label = "Group by:",
-      choices = c("Samples" = "sample", colnames(data_samples()))
+      choices = c("Samples" = "none", colnames(data_samples()))
     )
   }, error = function(err) {
     return(NULL)
@@ -24,17 +24,23 @@ output[["align_sum"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
+    ## Only plot if UI is loaded
+    if(is.null(input$group_sum)) {
+      break
+    }
+    
     ## Get input data
     se <- get_se()
-    plot_data <- alignment_summary(se)
+    plot_data <- alignment_summary(se, input$setSummary)
     
     ## Create plot
     bar_plot(
       df = plot_data,
       x = "count",
       y = "sample",
+      facet = input$group_sum,
       fill = "feature",
-      group = "sample",
+      group = input$group_sum,
       title = "Count assignments",
       xlab = "Counts",
       ylab = ""
@@ -49,6 +55,11 @@ output[["complex"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
+    ## Only plot if UI is loaded
+    if(is.null(input$group_color)) {
+      break
+    }
+    
     ## Get input data
     se <- get_se()
     plot_data <- complexity(se, rank = input$comp_rank)
@@ -57,11 +68,11 @@ output[["complex"]] <- renderPlotly({
     line_plot(
       df = plot_data,
       x = "rank",
-      y = "fraction",
+      y = input$setComplexity,
       group = input$group_color,
       title = "Gene complexity",
-      xlab = "Cumulative reads per number of genes",
-      ylab = "Number of genes",
+      xlab = "Number of genes",
+      ylab = "Cumulative reads per number of genes",
       plot = "complexity"
     )
   }, error = function(err) {

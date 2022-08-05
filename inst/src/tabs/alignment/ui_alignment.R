@@ -13,10 +13,11 @@ tab_alignment <- tabItem(
         sidebarPanel(
           width = 3,
           radioButtons(
-            "setSummary",
-            "Set distribution:",
-            c("Actual" = "actual",
-              "Percentage" = "percent")
+            inputId =  "setSummary",
+            label = "Set distribution:",
+            choices = c("Actual" = "actual",
+              "Percentage" = "percent"),
+            selected = "percent"
           ),
           uiOutput("group_sum"),
           br(),
@@ -39,15 +40,16 @@ tab_alignment <- tabItem(
         sidebarPanel(
           width = 3,
           radioButtons(
-            "setComplexity",
-            "Set distribution:",
-            c("Actual" = "actual",
-              "Percentage" = "percent")
+            inputId = "setComplexity",
+            label = "Set distribution:",
+            choices = c("Actual" = "value",
+              "Percentage" = "fraction"),
+            selected = "fraction"
           ),
           uiOutput("group_color"),
           sliderInput(
-            "comp_rank",
-            "Set number of ranks (Genes):",
+            inputId = "comp_rank",
+            label = "Set number of genes:",
             value = 1000,
             min = 10,
             max = 10000,

@@ -21,7 +21,7 @@ line_plot <- function(df, x, y, group, title = "", xlab = "", ylab = "", plot = 
 
 violin_plot <- function(df, group, title = "", xlab = "", ylab = "") {
   gg <- ggplot(data = df, aes_string(
-    x = group,
+    x = "sample",
     y = "logCPM",
     color = group,
     fill = group
@@ -37,7 +37,7 @@ violin_plot <- function(df, group, title = "", xlab = "", ylab = "") {
 }
 
 
-scatter_plot <- function(df, size = 1.5, source = NA, key = NA, index = NA, x, y, group, title = "", xlab = "", ylab = "", scale = NA) {
+scatter_plot <- function(df, size = 1.5, key = NA, index = NA, x, y, group, title = "", xlab = "", ylab = "", scale = NA) {
   gg <- ggplot(data = df, aes_string(
     x = x,
     y = y,
@@ -72,7 +72,7 @@ scatter_plot <- function(df, size = 1.5, source = NA, key = NA, index = NA, x, y
 ## x = "count",
 ## y = group,
 ## fill = "feature"
-bar_plot <- function(df, group, x, y, fill = NULL, title = "", xlab = "", ylab = "", colorbar = NA, facet = NA) {
+bar_plot <- function(df, group, x, y, fill = NULL, title = "", xlab = "", ylab = "", colorbar = NA, facet = "none") {
   gg <- ggplot(data = df, aes_string(
     x = x,
     y = y,
@@ -88,7 +88,7 @@ bar_plot <- function(df, group, x, y, fill = NULL, title = "", xlab = "", ylab =
     gg <- gg + scale_fill_manual(values = c("#619CFF", "#F8766D", "#00BA38"))
   }
   
-  if (!is.na(facet)) {
+  if (facet != "none") {
     gg <- gg + facet_grid(as.formula(paste("~", group)), scales = "free")
   }
   
@@ -102,7 +102,7 @@ barcode_plot <- function(df, x, y, group, title = "", xlab = "", ylab = "") {
     y = y,
     color = group
   )) +
-    geom_point() +
+    geom_point(size = 4, alpha = 0.5) +
     labs(title = title,
          x = xlab,
          y = ylab) +
@@ -120,11 +120,12 @@ dendro_plot <- function(df, group = NULL, title = "", xlab = "", ylab = "") {
       xend = xend,
       yend = yend
     )) +
-    geom_point(data = df[df$label != "", ], aes_string(x = "x", y = "y", color = group)) +
+    geom_point(data = df[df$label != "", ], aes_string(x = "x", y = "y", color = group), size = 4) +
     labs(title = title,
          x = xlab,
          y = ylab) +
-    theme_bw()
+    theme_bw() +
+    theme(axis.text.x = element_blank())
   
   gg
 }
@@ -152,7 +153,7 @@ heatmap_plot <- function(df, group, x, y, fill, title = "", xlab = "", ylab = ""
 }
 
 
-network_plot <- function(df, title = "", xlab = "", ylab = "") {
+network_plot <- function(df, title = "", xlab = "", ylab = "", label1 = TRUE, label2 = FALSE) {
   gg <- ggplot() +
     geom_segment(
       data = df[[1]],
@@ -177,6 +178,32 @@ network_plot <- function(df, title = "", xlab = "", ylab = "") {
       size = 4
     ) +
     theme_void()
+  
+  ## Add label to terms
+  if (label1) {
+    gg <- gg + geom_text(
+      data = df[[2]],
+      aes(x = V1,
+          y = V2,
+          label = stringr::str_wrap(genes, 25)),
+      inherit.aes = FALSE,
+      check_overlap = TRUE,
+      size = 3
+    )
+  }
+  
+  ## Add label to genes
+  if (label2) {
+    gg <- gg + geom_text(
+      data = df[[3]],
+      aes(x = V1,
+          y = V2,
+          label = stringr::str_wrap(genes, 25)),
+      inherit.aes = FALSE,
+      check_overlap = TRUE,
+      size = 3
+    )
+  }
   
   gg
 }

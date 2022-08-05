@@ -32,7 +32,7 @@ output[["de_ratio"]] <- renderPlotly({
       fill = "Var1",
       title = "Differential expression ratio",
       xlab = "",
-      ylab = "Ratio"
+      ylab = "Percentage of genes"
     )
   }, error = function(err) {
     return(NULL)
@@ -49,10 +49,9 @@ output[["ma_plot"]] <- renderPlotly({
     plot_data <- ma(inUse_deTab)
     
     ## Create plot
-    toWebGL(
+    toWebGL(ggplotly(
       scatter_plot(
         df = plot_data,
-        source = "analysis_ma",
         group = "DE",
         key = "gene",
         index = index,
@@ -61,8 +60,9 @@ output[["ma_plot"]] <- renderPlotly({
         title = "MA Plot",
         xlab = "Average Log2CPM",
         ylab = "Average Log2FC"
-      )
-    )
+      ),
+      source = "analysis_ma"
+    ))
   }, error = function(err) {
     return(NULL)
   })
@@ -89,10 +89,9 @@ output[["volcano_plot"]] <- renderPlotly({
     plot_data <- volcano(inUse_deTab)
     
     ## Create plot
-    toWebGL(
+    toWebGL(ggplotly(
       scatter_plot(
         df = plot_data,
-        source = "analysis_volcano",
         group = "DE",
         key = "gene",
         x = "avgLog2FC",
@@ -100,8 +99,9 @@ output[["volcano_plot"]] <- renderPlotly({
         title = "Volcano Plot",
         xlab = "Average Log2FC",
         ylab = "-Log10 P-value (FDR)"
-      )
-    )
+      ),
+      source = "analysis_volcano"
+    ))
   }, error = function(err) {
     return(NULL)
   })
@@ -124,8 +124,13 @@ output[["barcode_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
+    ## Only plot if UI is loaded
+    if(is.null(input$group_analysis_bar)) {
+      break
+    }
+    
     ## Get input data
-    plot_data <- barcode(inUse_deTab, input$slider_barcode, input$selected_analysis_bar)
+    plot_data <- barcode(inUse_deTab, inUse_normDge, input$slider_barcode, input$selected_analysis_bar)
     
     ## Create plot
     toWebGL(

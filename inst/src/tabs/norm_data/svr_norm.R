@@ -17,6 +17,11 @@ output[["norm_dist_line"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
+    ## Only plot if UI is loaded
+    if(is.null(input$norm_line_color)) {
+      break
+    }
+    
     ## Get input data
     plot_data <- count_dist(inUse_normDge)
     
@@ -26,16 +31,6 @@ output[["norm_dist_line"]] <- renderPlotly({
       x = "x",
       y = "y",
       group = input$norm_line_color,
-      title = "Gene count distribution",
-      xlab = "Log2CPM",
-      ylab = "Density"
-    )
-    
-    line_plot(
-      df = plot_data,
-      x = "x",
-      y = "y",
-      group = "sample",
       title = "Gene count distribution",
       xlab = "Log2CPM",
       ylab = "Density"
@@ -59,10 +54,15 @@ output[["norm_line_color"]] <- renderUI({
   })
 })
 
-## Normalized distribution plot boxplot
-output[["norm_dist_boxplot"]] <- renderPlotly({
+## Normalized distribution plot violin
+output[["norm_dist_violin"]] <- renderPlotly({
   tryCatch({
     checkReload()
+    
+    ## Only plot if UI is loaded
+    if(is.null(input$norm_violin_group)) {
+      break
+    }
     
     ## Get input data
     plot_data <- violin_dist(inUse_normDge)
@@ -70,13 +70,26 @@ output[["norm_dist_boxplot"]] <- renderPlotly({
     ## Create plot
     violin_plot(
       df = plot_data,
-      group = "sample",
+      group = input$norm_violin_group,
       title = "Gene count distribution",
       xlab = "",
       ylab = "Log2CPM"
     )
   }, error = function(err) {
-    print(err)
+    return(NULL)
+  })
+})
+
+## Select a group to group violin plot
+output[["norm_violin_group"]] <- renderUI({
+  tryCatch({
+    checkReload()
+    selectInput(
+      inputId = "norm_violin_group",
+      label = "Group by:",
+      choices = c("Samples" = "sample", colnames(data_samples()))
+    )
+  }, error = function(err) {
     return(NULL)
   })
 })
@@ -91,10 +104,9 @@ output[["norm_voom_plot"]] <- renderPlotly({
     index <- round(seq(1, nrow(plot_data), length.out = 1000))
     
     ## Create plot
-    toWebGL(
+    toWebGL(ggplotly(
       scatter_plot(
         df = plot_data,
-        source = "norm_voom",
         group = "Genes",
         key = "gene",
         index = index,
@@ -103,10 +115,10 @@ output[["norm_voom_plot"]] <- renderPlotly({
         title = "Voom Plot",
         xlab = "Average Log2 count",
         ylab = "SQRT (Standart Deviation)"
-      )
-    )
+      ),
+      source = "norm_voom"
+    ))
   }, error = function(err) {
-    print(err)
     return(NULL)
   })
 })
@@ -146,9 +158,9 @@ output[["norm_dist_line_info"]] <- renderUI({
   informationBox(infoText)
 })
 
-output[["norm_dist_boxplot_info"]] <- renderUI({
+output[["norm_dist_violin_info"]] <- renderUI({
   infoText <-
-    "The box plot serves a similar purpose to the line plot, but the data can be viewed in a different way
+    "The violin plot serves a similar purpose to the line plot, but the data can be viewed in a different way
         format. The distribution can be seen between the Log2CPM at the corresponding
         samples."
   informationBox(infoText)

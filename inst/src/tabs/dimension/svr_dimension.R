@@ -4,21 +4,28 @@ output[["pca"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
+    ## Only plot if UI is loaded
+    if(is.null(input$group_pca)) {
+      break
+    }
+    
     ## Get input data
     plot_data <- pca_data(inUse_normDge)
     
     ## Create plot
-    scatter_plot(
-      df = plot_data,
-      size = 4,
-      source = "pca",
-      key = "sample",
-      x = input$set_pca_pc1,
-      y = input$set_pca_pc2,
-      group = input$group_pca,
-      title = "PCA",
-      xlab = paste0(input$set_pca_pc1, " (", plot_data$percent[as.numeric(gsub("PC", "", input$set_pca_pc1))], "%)"),
-      ylab = paste0(input$set_pca_pc2, " (", plot_data$percent[as.numeric(gsub("PC", "", input$set_pca_pc2))], "%)")
+    ggplotly(
+      scatter_plot(
+        df = plot_data,
+        size = 5,
+        key = "sample",
+        x = input$set_pca_pc1,
+        y = input$set_pca_pc2,
+        group = input$group_pca,
+        title = "PCA",
+        xlab = paste0(input$set_pca_pc1, " (", plot_data$percent[as.numeric(gsub("PC", "", input$set_pca_pc1))], "%)"),
+        ylab = paste0(input$set_pca_pc2, " (", plot_data$percent[as.numeric(gsub("PC", "", input$set_pca_pc2))], "%)")
+      ),
+      source = "pca"
     )
   }, error = function(err) {
     return(NULL)
@@ -100,21 +107,28 @@ output[["dim_tsne"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
+    ## Only plot if UI is loaded
+    if(is.null(input$group_dim_tsne)) {
+      break
+    }
+    
     ## Get input data
     plot_data <- tsne_data(inUse_normDge)
     
     ## Create plot
-    scatter_plot(
-      df = plot_data,
-      size = 4,
-      source = "tsne",
-      key = "sample",
-      x = "V1",
-      y = "V2",
-      group = input$group_dim_tsne,
-      title = "tSNE",
-      xlab = "tSNE 1",
-      ylab = "tSNE 2"
+    ggplotly(
+      scatter_plot(
+        df = plot_data,
+        size = 5,
+        key = "sample",
+        x = "V1",
+        y = "V2",
+        group = input$group_dim_tsne,
+        title = "tSNE",
+        xlab = "tSNE 1",
+        ylab = "tSNE 2"
+      ),
+      source = "tsne"
     )
   }, error = function(err) {
     return(NULL)
@@ -150,21 +164,28 @@ output[["norm_un_cluster"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
+    ## Only plot if UI is loaded
+    if(is.null(input$group_norm_mds)) {
+      break
+    }
+    
     ## Get input data
     plot_data <- mds_clust(inUse_normDge)
     
     ## Create plot
-    scatter_plot(
-      df = plot_data,
-      size = 4,
-      source = "norm_mds",
-      key = "sample",
-      x = "x",
-      y = "y",
-      group = input$group_norm_mds,
-      title = "MDS Plot",
-      xlab = "MDS 1",
-      ylab = "MDS 2"
+    ggplotly(
+      scatter_plot(
+        df = plot_data,
+        size = 5,
+        key = "sample",
+        x = "x",
+        y = "y",
+        group = input$group_norm_mds,
+        title = "MDS Plot",
+        xlab = "MDS 1",
+        ylab = "MDS 2"
+      ),
+      source = "norm_mds"
     )
   }, error = function(err) {
     return(NULL)
@@ -199,6 +220,11 @@ output[["selected_norm_mds"]] <- DT::renderDataTable({
 output[["dim_dendro"]] <- renderPlotly({
   tryCatch({
     checkReload()
+    
+    ## Only plot if UI is loaded
+    if(is.null(input$color_dendro)) {
+      break
+    }
     
     ## Get input data
     plot_data <- dendro_data(inUse_normDge)

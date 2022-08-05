@@ -25,18 +25,19 @@ tab_raw_data <- tabItem(
     ),
     
     tabPanel(
-      title = "Boxplot distribution",
+      title = "Violin distribution",
       HTML('<hr style="border-color: #0088cc;">'),
       sidebarLayout(
         position = "right",
         sidebarPanel(
           width = 3,
-          uiOutput("dist_boxplot_info"),
+          uiOutput("raw_violin_group"),
+          uiOutput("dist_violin_info"),
           span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
         ),
         mainPanel(
           width = 9,
-          plotlyOutput("dist_boxplot", height = "600px") %>% withSpinner()
+          plotlyOutput("dist_violin", height = "600px") %>% withSpinner()
         )
       ),
       HTML('<hr style="border-color: #0088cc;">')
