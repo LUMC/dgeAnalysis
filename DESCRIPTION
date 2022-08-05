@@ -1,7 +1,7 @@
 Package: dgeAnalysis
 Type: Package
 Title: dgeAnalysis
-Version: 1.4.5
+Version: 1.5.1
 Author@R:
   person("Tom", "Kuipers", email = "t.b.kuipers@lumc.nl", role = c("aut", "cre"))
 Description:
@@ -17,6 +17,7 @@ Imports:
     shinyWidgets (>= 0.5.3),
     shinycssloaders (>= 1.0.0),
     shinyjs (>= 2.0.0),
+    fontawesome (>= 0.3.0),
     BiocManager (>= 1.30.10),
     knitr (>= 1.30),
     SummarizedExperiment (>= 1.18.2),
@@ -30,7 +31,7 @@ Imports:
     Rtsne (>= 0.15),
     rmarkdown (>= 2.4),
     gprofiler2 (>= 0.2.0),
-    igraph (>= 1.2.5)
+    igraph (>= 1.2.5),
 biocViews: Annotation, Clustering, GeneSetEnrichment, GO, KEGG,
     MultipleComparison, Pathways, Reactome, Visualization,
     Sequencing, RNASeq, GeneExpression, Transcription,
