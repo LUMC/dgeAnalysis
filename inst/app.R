@@ -22,9 +22,6 @@ source("inst/src/lib/libraries.R", local = TRUE)
 source("R/de_functions.R", local = TRUE)
 source("R/enrichment.R", local = TRUE)
 source("R/markdown.R", local = TRUE)
-source("R/de_plots.R", local = TRUE)
-
-
 source("R/plots.R", local = TRUE)
 source("R/plot_prep.R", local = TRUE)
 
