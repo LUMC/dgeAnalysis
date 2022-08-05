@@ -4,11 +4,16 @@ Changelog
 <!--
 Newest changes should be on top.
 -->
-version 1.4.5
+version 1.5.1
 ---------------------------
-+ Change filtering for enrichment
++ Apply icon name change in updated package (fontawesome)
++ Update markdowns to use non-interactive ggplot2 plots
++ Reorder chunks in markdown
++ Remove voom plot from raw data
 + Rewrite plots to be based on ggplot2 -> ggplotly
++ Change filtering for enrichment
 + Bug fix for tSNE: Missing break in loop
+
 version 1.4.4
 ---------------------------
 + Add file names and md5 to markdown
