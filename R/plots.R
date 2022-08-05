@@ -1,8 +1,8 @@
 
-line_plot <- function(df, group, title = "", xlab = "", ylab = "", plot = NA) {
+line_plot <- function(df, x, y, group, title = "", xlab = "", ylab = "", plot = "") {
   gg <- ggplot(data = df, aes_string(
-    x = "rank",
-    y = "fraction",
+    x = x,
+    y = y,
     color = group
   )) +
     geom_line(aes(group = sample), size = 1) +
@@ -14,28 +14,6 @@ line_plot <- function(df, group, title = "", xlab = "", ylab = "", plot = NA) {
   if (plot == "complexity") {
     gg <- gg + scale_x_continuous(trans = "log10")
   }
-  
-  gg
-}
-
-density_plot <- function(df, group, title = "", xlab = "", ylab = "") {
-  gg <- ggplot(data = df, aes_string(
-    x = "logCPM",
-    color = group,
-    fill = group
-  )) +
-    geom_line(aes(group = sample),
-              stat = "density",
-              size = 1,
-              show.legend = TRUE) +
-    geom_density(aes(group = sample),
-                 alpha = 0.05,
-                 size = 0,
-                 show.legend = FALSE) +
-    labs(title = title,
-         x = xlab,
-         y = ylab) +
-    theme_bw()
   
   gg
 }

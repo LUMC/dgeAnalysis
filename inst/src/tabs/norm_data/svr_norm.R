@@ -21,15 +21,26 @@ output[["norm_dist_line"]] <- renderPlotly({
     plot_data <- count_dist(inUse_normDge)
     
     ## Create plot
-    density_plot(
+    line_plot(
       df = plot_data,
+      x = "x",
+      y = "y",
       group = input$norm_line_color,
       title = "Gene count distribution",
-      x = "Log2CPM",
-      y = "Density"
+      xlab = "Log2CPM",
+      ylab = "Density"
+    )
+    
+    line_plot(
+      df = plot_data,
+      x = "x",
+      y = "y",
+      group = "sample",
+      title = "Gene count distribution",
+      xlab = "Log2CPM",
+      ylab = "Density"
     )
   }, error = function(err) {
-    print(err)
     return(NULL)
   })
 })
@@ -54,17 +65,18 @@ output[["norm_dist_boxplot"]] <- renderPlotly({
     checkReload()
     
     ## Get input data
-    plot_data <- count_dist(inUse_normDge)
+    plot_data <- violin_dist(inUse_normDge)
     
     ## Create plot
     violin_plot(
       df = plot_data,
       group = "sample",
       title = "Gene count distribution",
-      x = "",
-      y = "Log2CPM"
+      xlab = "",
+      ylab = "Log2CPM"
     )
   }, error = function(err) {
+    print(err)
     return(NULL)
   })
 })

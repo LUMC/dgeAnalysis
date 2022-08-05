@@ -9,12 +9,14 @@ output[["dist_line"]] <- renderPlotly({
     plot_data <- count_dist(dge)
     
     ## Create plot
-    density_plot(
+    line_plot(
       df = plot_data,
+      x = "x",
+      y = "y",
       group = input$raw_line_color,
       title = "Gene count distribution",
-      x = "Log2CPM",
-      y = "Density"
+      xlab = "Log2CPM",
+      ylab = "Density"
     )
   }, error = function(err) {
     print(err)
@@ -43,15 +45,15 @@ output[["dist_boxplot"]] <- renderPlotly({
     
     ## Get input data
     dge <- get_raw_dge()
-    plot_data <- count_dist(dge)
+    plot_data <- violin_dist(dge)
     
     ## Create plot
     violin_plot(
       df = plot_data,
       group = "sample",
       title = "Gene count distribution",
-      x = "",
-      y = "Log2CPM"
+      xlab = "",
+      ylab = "Log2CPM"
     )
   }, error = function(err) {
     return(NULL)

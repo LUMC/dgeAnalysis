@@ -56,6 +56,8 @@ output[["complex"]] <- renderPlotly({
     ## Create plot
     line_plot(
       df = plot_data,
+      x = "rank",
+      y = "fraction",
       group = input$group_color,
       title = "Gene complexity",
       xlab = "Cumulative reads per number of genes",

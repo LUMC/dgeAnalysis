@@ -25,6 +25,31 @@ complexity <- function(se, rank = 1000) {
 }
 
 count_dist <- function(dge) {
+  dens <- apply(dge$counts, 2, density)
+  
+  data <- data.frame(
+    sample = character(),
+    x = numeric(),
+    y = numeric()
+  )
+  for (item in 1:length(dens)) {
+    temp <- as.data.frame(dens[[item]][c("x", "y")])
+    temp$sample <- names(dens[item])
+    data <- rbind(data, temp)
+  }
+  
+  data <- merge(
+    x = data,
+    y = dge$samples,
+    by.x = "sample",
+    by.y = "row.names",
+    all.x = TRUE
+  )
+  
+  return(data)
+}
+
+violin_dist <- function(dge) {
   stackCounts <- data.frame(stackDge(dge))
   stackCounts <- merge(
     x = stackCounts,
