@@ -19,7 +19,7 @@ options(spinner.color = "#0088cc")
 options(warn = 0)
 
 source("inst/src/lib/libraries.R", local = TRUE)
-source("R/de.R", local = TRUE)
+source("R/de_functions.R", local = TRUE)
 source("R/enrichment.R", local = TRUE)
 source("R/markdown.R", local = TRUE)
 source("R/de_plots.R", local = TRUE)
