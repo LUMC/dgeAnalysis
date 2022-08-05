@@ -111,8 +111,7 @@ complexityData <- function(se, max) {
     sorted <- sort(values, T)
     total <- sum(sorted)
     out[out$sample == x, "value"] <- cumsum(sorted)[1:max]
-    out[out$sample == x, "fraction"] <-
-      out[out$sample == x, "value"] / total
+    out[out$sample == x, "fraction"] <- out[out$sample == x, "value"] / total * 100
   }
   out
 }
