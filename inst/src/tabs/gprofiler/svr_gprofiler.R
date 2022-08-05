@@ -78,7 +78,7 @@ output[["enrich_DEbarplot"]] <- renderPlotly({
     
     ## Get input data
     enrich <- clean_enrich()
-    plot_data <- enrich_barDE(enrich, input$DEterms_slider)
+    plot_data <- enrich_barDE(enrich, input$DEterms_slider, inUse_deTab)
     
     ## Create plot
     bar_plot(
@@ -164,7 +164,7 @@ output[["heat_plot"]] <- renderPlotly({
     geneSets <- extract_geneSets(enrich,
                                  input$heat_slider,
                                  input$select_heat)
-    plot_data <- heat_terms(geneSets)
+    plot_data <- heat_terms(geneSets, inUse_deTab)
     
     ## Create plot
     heatmap_plot(
