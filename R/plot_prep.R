@@ -1,4 +1,13 @@
 
+#' Prepare data for alignment plot
+#'
+#' @param se Summarized Experiment, SE to use as input with samplesheet & counts
+#' @param percent String, Should output value be in percentages or not
+#'
+#' @return plot_data, Dataframe with cleaned data
+#'
+#' @export
+
 alignment_summary <- function(se, percent = "percent") {
   plot_data <- alignmentSummary(se)
   plot_data$feature <- gsub("_", " ", gsub("__", "", plot_data$feature))
@@ -21,6 +30,16 @@ alignment_summary <- function(se, percent = "percent") {
   return(plot_data)
 }
 
+
+#' Prepare data for complexity plot
+#'
+#' @param se Summarized Experiment, SE to use as input with samplesheet & counts
+#' @param rank Numeric, How many genes should be plotted
+#'
+#' @return plot_data, Dataframe with cleaned data
+#'
+#' @export
+
 complexity <- function(se, rank = 1000) {
   compData <- complexityData(se, rank)
   compData <- merge(
@@ -33,6 +52,15 @@ complexity <- function(se, rank = 1000) {
   
   return(compData)
 }
+
+
+#' Prepare data for count distribution plot
+#'
+#' @param dge DGE List, DGE List with samplesheet, count data & annotation
+#'
+#' @return plot_data, Dataframe with cleaned data
+#'
+#' @export
 
 count_dist <- function(dge) {
   dens <- apply(dge$counts, 2, density)
@@ -59,6 +87,15 @@ count_dist <- function(dge) {
   return(data)
 }
 
+
+#' Prepare data for violin distribution plot
+#'
+#' @param dge DGE List, DGE List with samplesheet, count data & annotation
+#'
+#' @return plot_data, Dataframe with cleaned data
+#'
+#' @export
+
 violin_dist <- function(dge) {
   stackCounts <- data.frame(stackDge(dge))
   stackCounts <- merge(
@@ -72,10 +109,20 @@ violin_dist <- function(dge) {
   return(stackCounts)
 }
 
-mds_clust <- function(dge, group) {
+
+#' Prepare data for MDS plot
+#'
+#' @param dge DGE List, DGE List with samplesheet, count data & annotation
+#'
+#' @return plot_data, Dataframe with cleaned data
+#'
+#' @export
+
+mds_clust <- function(dge) {
   logFC <- plotMDS(dge$counts, ndim = ncol(dge) - 1)
   for_plots <- data.frame(logFC[c("x", "y")])
   for_plots$sample <- rownames(logFC$distance.matrix.squared)
+  
   for_plots <- merge(
     x = for_plots,
     y = dge$samples,
@@ -86,6 +133,15 @@ mds_clust <- function(dge, group) {
   
   return(for_plots)
 }
+
+
+#' Prepare data for voom plot
+#'
+#' @param dge DGE List, DGE List with samplesheet, count data & annotation
+#'
+#' @return plot_data, Dataframe with cleaned data
+#'
+#' @export
 
 voom_data <- function(dge) {
   v <- voom(2 ^ (dge$counts), save.plot = TRUE)
@@ -99,6 +155,15 @@ voom_data <- function(dge) {
   
   return(v)
 }
+
+
+#' Prepare data for PCA plot
+#'
+#' @param dge DGE List, DGE List with samplesheet, count data & annotation
+#'
+#' @return plot_data, Dataframe with cleaned data
+#'
+#' @export
 
 pca_data <- function(dge) {
   tdge <- t(dge$counts)
@@ -120,6 +185,15 @@ pca_data <- function(dge) {
   
   return(pca)
 }
+
+
+#' Prepare data for tSNE plot
+#'
+#' @param dge DGE List, DGE List with samplesheet, count data & annotation
+#'
+#' @return plot_data, Dataframe with cleaned data
+#'
+#' @export
 
 tsne_data <- function(dge) {
   set.seed(1234)
@@ -152,6 +226,15 @@ tsne_data <- function(dge) {
   return(tsne_data)
 }
 
+
+#' Prepare data for dendrogram plot
+#'
+#' @param dge DGE List, DGE List with samplesheet, count data & annotation
+#'
+#' @return plot_data, Dataframe with cleaned data
+#'
+#' @export
+
 dendro_data <- function(dge) {
   sampleTree <- hclust(dist(t(dge$counts)), method = "average")
   dendro <- get_dendrogram_data(sampleTree)
@@ -167,6 +250,16 @@ dendro_data <- function(dge) {
   
   return(dendro)
 }
+
+
+#' Prepare data for heatmap plot
+#'
+#' @param dge DGE List, DGE List with samplesheet, count data & annotation
+#' @param amount Numeric, Number of genes that should be present in plot
+#'
+#' @return plot_data, Dataframe with cleaned data
+#'
+#' @export
 
 heat_var <- function(dge, amount) {
   lcpm <- dge$counts
@@ -185,6 +278,17 @@ heat_var <- function(dge, amount) {
   
   return(high_var_cpm)
 }
+
+
+#' Prepare data for heatmap plot
+#'
+#' @param dge DGE List, DGE List with samplesheet, count data & annotation
+#' @param deTab Dataframe, Dataframe with expression results from analysis
+#' @param amount Numeric, Number of genes that should be present in plot
+#'
+#' @return plot_data, Dataframe with cleaned data
+#'
+#' @export
 
 heat_de <- function(dge, deTab, amount) {
   sortdeTab <- deTab[order(rank(deTab$FDR)), ]
@@ -205,6 +309,14 @@ heat_de <- function(dge, deTab, amount) {
 }
 
 
+#' Prepare data for expression ratio plot
+#'
+#' @param deTab Dataframe, Dataframe with expression results from analysis
+#'
+#' @return plot_data, Dataframe with cleaned data
+#'
+#' @export
+
 de_ratio <- function(deTab) {
   defeatures <- data.frame(table(deTab$DE))
   defeatures$perc <- defeatures[, 2] / sum(defeatures[, 2]) * 100
@@ -220,6 +332,15 @@ de_ratio <- function(deTab) {
   
   return(defeatures)
 }
+
+
+#' Prepare data for MA plot
+#'
+#' @param deTab Dataframe, Dataframe with expression results from analysis
+#'
+#' @return plot_data, Dataframe with cleaned data
+#'
+#' @export
 
 ma <- function(deTab) {
   plot_data <- deTab[order(deTab$avgLog2CPM), ]
@@ -237,6 +358,15 @@ ma <- function(deTab) {
   return(plot_data)
 }
 
+
+#' Prepare data for volcano plot
+#'
+#' @param deTab Dataframe, Dataframe with expression results from analysis
+#'
+#' @return plot_data, Dataframe with cleaned data
+#'
+#' @export
+
 volcano <- function(deTab) {
   deTab$DE <- factor(
     x = deTab$DE,
@@ -252,6 +382,18 @@ volcano <- function(deTab) {
   
   return(deTab)
 }
+
+
+#' Prepare data for barcode plot
+#'
+#' @param deTab Dataframe, Dataframe with expression results from analysis
+#' @param dge DGE List, DGE List with samplesheet, count data & annotation
+#' @param amount Numeric, Number of genes that should be present in plot
+#' @param select Vector, Manual selected genes that should be added to plot
+#'
+#' @return plot_data, Dataframe with cleaned data
+#'
+#' @export
 
 barcode <- function(deTab, dge, amount, select) {
   sortdeTab <- deTab[order(rank(deTab$FDR)), ]
@@ -271,12 +413,31 @@ barcode <- function(deTab, dge, amount, select) {
   return(stack1)
 }
 
+
+#' Prepare data for pvalue plot
+#'
+#' @param deTab Dataframe, Dataframe with expression results from analysis
+#'
+#' @return plot_data, Dataframe with cleaned data
+#'
+#' @export
+
 pvalue <- function(deTab) {
   p <- round(deTab$P.Value, digits = 2)
   p <- aggregate(p, by = list(p = p), FUN = length)
   
   return(p)
 }
+
+
+#' Prepare data for GC bias plot
+#'
+#' @param deTab Dataframe, Dataframe with expression results from analysis
+#' @param select String, GC Bias to be selected from annotation, e.g., gene, transcript or exon
+#'
+#' @return plot_data, Dataframe with cleaned data
+#'
+#' @export
 
 bias_gc <- function(deTab, select) {
   plot_data <- deTab[order(deTab[[select]]), ]
@@ -285,6 +446,15 @@ bias_gc <- function(deTab, select) {
   
   return(plot_data)
 }
+
+
+#' Prepare data for gene strand bias plot
+#'
+#' @param deTab Dataframe, Dataframe with expression results from analysis
+#'
+#' @return plot_data, Dataframe with cleaned data
+#'
+#' @export
 
 gene_strand <- function(deTab) {
   geneStrand <- as.data.frame(table(deTab$geneStrand, deTab$DE, dnn = c("strand", "DE")))
@@ -310,6 +480,16 @@ gene_strand <- function(deTab) {
   return(geneStrand)
 }
 
+
+#' Prepare data for enriched bar plot
+#'
+#' @param enrich Dataframe, Dataframe with enrichment results from analysis
+#' @param amount Numeric, Number of terms that should be present in plot
+#'
+#' @return plot_data, Dataframe with cleaned data
+#'
+#' @export
+
 enrich_bar <- function(enrich, amount) {
   enrich <- na.omit(enrich[0:amount, ])
   enrich$term_name <- factor(enrich$term_name,
@@ -321,7 +501,18 @@ enrich_bar <- function(enrich, amount) {
   return(enrich)
 }
 
-enrich_barDE <- function(enrich, amount) {
+
+#' Prepare data for enriched bar plot with DE genes
+#'
+#' @param enrich Dataframe, Dataframe with enrichment results from analysis
+#' @param amount Numeric, Number of terms that should be present in plot
+#' @param deTab Dataframe, Dataframe with expression results from analysis
+#'
+#' @return plot_data, Dataframe with cleaned data
+#'
+#' @export
+
+enrich_barDE <- function(enrich, amount, deTab) {
   enrich <- na.omit(enrich[0:amount, ])
   enrich$term_name <- factor(enrich$term_name,
                              levels = unique(enrich$term_name)[order(enrich$p_value,
@@ -342,6 +533,17 @@ enrich_barDE <- function(enrich, amount) {
   
   return(plot_data)
 }
+
+
+#' Prepare data for concept network plot
+#'
+#' @param deTab Dataframe, Dataframe with expression results from analysis
+#' @param graphData Dataframe, Data object with graph location
+#' @param terms Numeric, Number of terms that should be present in plot
+#'
+#' @return plot_data, Dataframe with cleaned data
+#'
+#' @export
 
 cnet_data <- function(deTab, graphData, terms) {
   set.seed(1234)
@@ -373,11 +575,21 @@ cnet_data <- function(deTab, graphData, terms) {
   return(cnet)
 }
 
-heat_terms <- function(geneSets) {
+
+#' Prepare data for enrichment heatmap plot
+#'
+#' @param geneSets Dataframe, GeneSets from corresponding terms
+#' @param deTab Dataframe, Dataframe with expression results from analysis
+#'
+#' @return plot_data, Dataframe with cleaned data
+#'
+#' @export
+
+heat_terms <- function(geneSets, deTab) {
   genelist <- list2df(geneSets)
   genelist <- merge(
     genelist,
-    inUse_deTab[c("avgLog2FC"), drop = FALSE],
+    deTab[c("avgLog2FC"), drop = FALSE],
     by.x = "Gene",
     by.y = 0,
     all.x = TRUE

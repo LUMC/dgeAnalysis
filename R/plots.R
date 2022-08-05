@@ -1,4 +1,19 @@
 
+#' Create line plot with ggplot2
+#'
+#' @param df Dataframe, Dataframe to create plot with
+#' @param x String, Value to plot on X axis
+#' @param y String, Value to plot on Y axis
+#' @param group String, Value to color/group data
+#' @param title String, Title for plot
+#' @param xlab String, Label for X axis
+#' @param ylab String, Label for Y axis
+#' @param plot String, Extra condition for complexity plot
+#'
+#' @return gg, Plot object (ggplot2)
+#'
+#' @export
+
 line_plot <- function(df, x, y, group, title = "", xlab = "", ylab = "", plot = "") {
   gg <- ggplot(data = df, aes_string(
     x = x,
@@ -19,6 +34,18 @@ line_plot <- function(df, x, y, group, title = "", xlab = "", ylab = "", plot = 
 }
 
 
+#' Create violin plot with ggplot2
+#'
+#' @param df Dataframe, Dataframe to create plot with
+#' @param title String, Title for plot
+#' @param xlab String, Label for X axis
+#' @param ylab String, Label for Y axis
+#' @param plot String, Extra condition for complexity plot
+#'
+#' @return gg, Plot object (ggplot2)
+#'
+#' @export
+
 violin_plot <- function(df, group, title = "", xlab = "", ylab = "") {
   gg <- ggplot(data = df, aes_string(
     x = "sample",
@@ -36,6 +63,24 @@ violin_plot <- function(df, group, title = "", xlab = "", ylab = "") {
   gg
 }
 
+
+#' Create scatter plot with ggplot2
+#'
+#' @param df Dataframe, Dataframe to create plot with
+#' @param size Numeric, size of dots (default 1.5)
+#' @param key String, Value for point selection by plotly
+#' @param index Vector, vector of items to select from dataframe
+#' @param x String, Value to plot on X axis
+#' @param y String, Value to plot on Y axis
+#' @param group String, Value to color/group data
+#' @param title String, Title for plot
+#' @param xlab String, Label for X axis
+#' @param ylab String, Label for Y axis
+#' @param scale String, Should X-axis be scaled in log10
+#'
+#' @return gg, Plot object (ggplot2)
+#'
+#' @export
 
 scatter_plot <- function(df, size = 1.5, key = NA, index = NA, x, y, group, title = "", xlab = "", ylab = "", scale = NA) {
   gg <- ggplot(data = df, aes_string(
@@ -70,6 +115,22 @@ scatter_plot <- function(df, size = 1.5, key = NA, index = NA, x, y, group, titl
 }
 
 
+#' Create bar plot with ggplot2
+#'
+#' @param df Dataframe, Dataframe to create plot with
+#' @param x String, Value to plot on X axis
+#' @param y String, Value to plot on Y axis
+#' @param fill String, value to fill bars by color
+#' @param title String, Title for plot
+#' @param xlab String, Label for X axis
+#' @param ylab String, Label for Y axis
+#' @param colorbar String, Should default colors be used
+#' @param facet String, Should data be ordered by group
+#'
+#' @return gg, Plot object (ggplot2)
+#'
+#' @export
+
 bar_plot <- function(df, group, x, y, fill = NULL, title = "", xlab = "", ylab = "", colorbar = NA, facet = "none") {
   gg <- ggplot(data = df, aes_string(
     x = x,
@@ -94,6 +155,20 @@ bar_plot <- function(df, group, x, y, fill = NULL, title = "", xlab = "", ylab =
 }
 
 
+#' Create barcode plot with ggplot2
+#'
+#' @param df Dataframe, Dataframe to create plot with
+#' @param x String, Value to plot on X axis
+#' @param y String, Value to plot on Y axis
+#' @param group String, Value to color/group data
+#' @param title String, Title for plot
+#' @param xlab String, Label for X axis
+#' @param ylab String, Label for Y axis
+#'
+#' @return gg, Plot object (ggplot2)
+#'
+#' @export
+
 barcode_plot <- function(df, x, y, group, title = "", xlab = "", ylab = "") {
   gg <- ggplot(data = df, aes_string(
     x = x,
@@ -109,6 +184,18 @@ barcode_plot <- function(df, x, y, group, title = "", xlab = "", ylab = "") {
   gg
 }
 
+
+#' Create dendrogram plot with ggplot2
+#'
+#' @param df Dataframe, Dataframe to create plot with
+#' @param group String, Value to color/group data
+#' @param title String, Title for plot
+#' @param xlab String, Label for X axis
+#' @param ylab String, Label for Y axis
+#'
+#' @return gg, Plot object (ggplot2)
+#'
+#' @export
 
 dendro_plot <- function(df, group = NULL, title = "", xlab = "", ylab = "") {
   gg <- ggplot(data = df) +
@@ -128,6 +215,21 @@ dendro_plot <- function(df, group = NULL, title = "", xlab = "", ylab = "") {
   gg
 }
 
+
+#' Create heatmap plot with ggplot2
+#'
+#' @param df Dataframe, Dataframe to create plot with
+#' @param group String, Value to color/group data
+#' @param x String, Value to plot on X axis
+#' @param y String, Value to plot on Y axis
+#' @param fill String, value to fill bars by color
+#' @param title String, Title for plot
+#' @param xlab String, Label for X axis
+#' @param ylab String, Label for Y axis
+#'
+#' @return gg, Plot object (ggplot2)
+#'
+#' @export
 
 heatmap_plot <- function(df, group, x, y, fill, title = "", xlab = "", ylab = "") {
   gg <- ggplot(data = df, aes_string(x = x,
@@ -150,6 +252,19 @@ heatmap_plot <- function(df, group, x, y, fill, title = "", xlab = "", ylab = ""
   gg
 }
 
+
+#' Create network plot with ggplot2
+#'
+#' @param df Dataframe, Dataframe to create plot with
+#' @param title String, Title for plot
+#' @param xlab String, Label for X axis
+#' @param ylab String, Label for Y axis
+#' @param label1 Boolean, Should terms be labeled in plot
+#' @param label2 Boolean, Should genes be labeled in plot
+#'
+#' @return gg, Plot object (ggplot2)
+#'
+#' @export
 
 network_plot <- function(df, title = "", xlab = "", ylab = "", label1 = TRUE, label2 = FALSE) {
   gg <- ggplot() +

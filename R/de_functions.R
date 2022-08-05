@@ -1,6 +1,4 @@
 
-## ----- Read files -----
-
 
 #' Add all counts that are in samples in SummerizedExperiment.
 #'
@@ -52,10 +50,6 @@ addAnnotationsFromTableToSE <- function(se, data_annotation) {
   se
 }
 
-## --------------------------------------------------------------------------
-
-## ----- Analysis utility -----
-
 
 #' Count the read counts per feature to find number of reads that are aligned, not aligned, etc.
 #'
@@ -93,30 +87,6 @@ alignmentSummary <- function(se) {
 }
 
 
-#' Creates dataframe with number of reads per gene, ordered on genes with the most reads assigned.
-#'
-#' @param se SummerizedExperiment, With samples, counts (and annotation)
-#' @param max Integer, The maximum rank that is used
-#'
-#' @return out, (Dataframe) With total read counts per gene
-#'
-#' @export
-
-complexityData <- function(se, max) {
-  features <- rownames(se)[!grepl("^__", rownames(se))]
-  ranks <- c(1:max)
-  out <- expand.grid(rank = ranks, sample = colnames(se))
-  for (x in colnames(se)) {
-    values <- as.vector(assay(se)[features, x])
-    sorted <- sort(values, T)
-    total <- sum(sorted)
-    out[out$sample == x, "value"] <- cumsum(sorted)[1:max]
-    out[out$sample == x, "fraction"] <- out[out$sample == x, "value"] / total * 100
-  }
-  out
-}
-
-
 #' Stacks total DGE counts based on: mapping feature (aligned, not aligned, etc.), sample and LogCPM.
 #'
 #' @param dge DGE list object, containing samples and counts
@@ -131,43 +101,6 @@ stackDge <- function(dge) {
   names(count) <- c("feature", "sample", "logCPM")
   count
 }
-
-
-#' Calculates a confidence fit for various plots.
-#' Model used is GAM to calculate predictions.
-#'
-#' @param deTab Dataframe, with all analysis results
-#' @param biasColumn String, Value on which to calculate confidence
-#'
-#' @return prediction, (Vector) With coordinates of prediction locations (line plot)
-#'
-#' @export
-
-gamConfidenceFit <- function(deTab, biasColumn) {
-  method.args = list()
-  method.args$method <- "REML"
-  
-  formula <- avgLog2FC ~ s(columnHere, bs = "cs")
-  formula <- paste(gsub("columnHere", parse(text = biasColumn), formula))
-  formula <- eval(parse(text = gsub(
-    "\\", "", paste(formula[2], formula[3], sep = " ~ "), fixed = TRUE
-  )))
-  
-  base.args <- list(quote(formula), data = quote(deTab))
-  gamModel <- do.call(mgcv::gam, c(base.args, method.args))
-  
-  prediction <- deTab[, c(biasColumn, "avgLog2FC")]
-  prediction <- cbind(prediction, predict(gamModel, se.fit = TRUE))
-  prediction <- prediction[order(prediction[[biasColumn]]),]
-  
-  setRange <- range(1, nrow(prediction))
-  result <- round(seq(setRange[1], setRange[2], length.out = 500))
-  prediction <- prediction[c(result), ]
-}
-
-## --------------------------------------------------------------------------
-
-## ----- TREE PLOTS -----
 
 
 #' Get heigth information from tree object.
