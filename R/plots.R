@@ -69,9 +69,7 @@ scatter_plot <- function(df, size = 1.5, key = NA, index = NA, x, y, group, titl
   gg
 }
 
-## x = "count",
-## y = group,
-## fill = "feature"
+
 bar_plot <- function(df, group, x, y, fill = NULL, title = "", xlab = "", ylab = "", colorbar = NA, facet = "none") {
   gg <- ggplot(data = df, aes_string(
     x = x,
