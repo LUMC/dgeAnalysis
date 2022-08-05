@@ -16,7 +16,7 @@ options(spinner.color = "#0088cc")
 ##  envir = .GlobalEnv
 ##))
 
-options(warn = -1)
+options(warn = 0)
 
 source("inst/src/lib/libraries.R", local = TRUE)
 source("R/de.R", local = TRUE)
