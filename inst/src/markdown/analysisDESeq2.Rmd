@@ -102,9 +102,31 @@ data_counts <- data_counts[,!colnames(data_counts) %in% excluded_samples]
 se <- readCountsFromTable(data_counts, data_samples)
 se <- addSamplesFromTableToSE(se, data_samples)
 
-## Show plots
-alignmentSummaryPlot(se)
-complexityPlot(se)
+## Alignment summary
+plot_data <- alignment_summary(se)
+bar_plot(
+  df = plot_data,
+  x = "count",
+  y = "sample",
+  fill = "feature",
+  group = "sample",
+  title = "Count assignments",
+  xlab = "Counts",
+  ylab = ""
+)
+
+## Complexity
+plot_data <- complexity(se)
+line_plot(
+  df = plot_data,
+  x = "rank",
+  y = "fraction",
+  group = "sample",
+  title = "Gene complexity",
+  xlab = "Cumulative reads per number of genes",
+  ylab = "Number of genes",
+  plot = "complexity"
+)
 
 ## Create final Summarized Experiment
 se <- readCountsFromTable(data_counts[!grepl('^__', rownames(data_counts)), ], data_samples)
@@ -128,10 +150,19 @@ dge <- DGEList(counts = assay(se),
 ## Remove genes with all 0 counts
 dge <- dge[rowSums(abs(dge$counts)) > 1, ]
 
-## Show plots
+## Count distribution
 tempDge <- dge
 tempDge$counts <- cpm(dge, log = TRUE, prior.count = 1)
-countDistributionLinePlot(tempDge)
+plot_data <- count_dist(tempDge)
+line_plot(
+  df = plot_data,
+  x = "x",
+  y = "y",
+  group = "sample",
+  title = "Gene count distribution",
+  xlab = "Log2CPM",
+  ylab = "Density"
+)
 
 ```
 
@@ -181,9 +212,30 @@ getSize <- estimateSizeFactors(analysis)
 normDge <- DGEList(counts = data.frame(counts(getSize, normalized = TRUE)), samples = dge$samples)
 normDge$counts <- cpm(normDge, log = TRUE, prior.count = 1)
 
-## Show plots
-countDistributionLinePlot(normDge)
-pcaPlot(normDge, design_base, "PC1", "PC2")
+## Count distribution
+plot_data <- count_dist(normDge)
+line_plot(
+  df = plot_data,
+  x = "x",
+  y = "y",
+  group = "sample",
+  title = "Gene count distribution",
+  xlab = "Log2CPM",
+  ylab = "Density"
+)
+
+## PCA
+plot_data <- pca_data(normDge)
+scatter_plot(
+  df = plot_data,
+  size = 4,
+  x = "PC1",
+  y = "PC2",
+  group = design_base,
+  title = "PCA",
+  xlab = paste0("PC1", " (", plot_data$percent[1], "%)"),
+  ylab = paste0("PC2", " (", plot_data$percent[2], "%)")
+)
 
 ```
 
@@ -265,9 +317,30 @@ if (setGeneName == "symbol" && !is.null(data_annotation)) {
 
 ```{r showDGEResult}
 
-## Show plots
-ma_plot(deTab)
-pValuePlot(deTab)
+## MA
+index <- round(seq(1, nrow(deTab), length.out = 1000))
+plot_data <- ma(deTab)
+scatter_plot(
+  df = plot_data,
+  group = "DE",
+  index = index,
+  x = "avgLog2CPM",
+  y = "avgLog2FC",
+  title = "MA Plot",
+  xlab = "Average Log2CPM",
+  ylab = "Average Log2FC"
+)
+
+## P-value
+plot_data <- pvalue(deTab)
+bar_plot(
+  df = plot_data,
+  x = "p",
+  y = "x",
+  title = "P-Value plot",
+  xlab = "P-Value",
+  ylab = "Count"
+)
 
 ```
 
