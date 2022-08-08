@@ -30,7 +30,7 @@ output[["align_sum"]] <- renderPlotly({
     }
     
     ## Get input data
-    se <- get_se()
+    se <<- get_se()
     plot_data <- alignment_summary(se, input$setSummary)
     text <- 'paste("Sample:", sample,
                   "\nClass:", feature,
@@ -45,6 +45,7 @@ output[["align_sum"]] <- renderPlotly({
         text = text,
         group = input$group_sum,
         fill = "feature",
+        rev = TRUE,
         facet = input$group_sum,
         title = "Count assignments",
         xlab = "Counts",

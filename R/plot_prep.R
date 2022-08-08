@@ -12,10 +12,7 @@ alignment_summary <- function(se, percent = "percent") {
   features <- rownames(se)[grepl("^__", rownames(se))]
   plot_data <-  expand.grid(feature = c("aligned", features), sample = colnames(se))
   plot_data$count <- apply(plot_data, 1, getCount, assays(se)$counts)
-  
   plot_data$feature <- gsub("_", " ", gsub("__", "", plot_data$feature))
-  plot_data$feature <- factor(plot_data$feature , levels = rev(unique(plot_data$feature)))
-  plot_data$sample <- factor(plot_data$sample , levels = rev(sort(unique(plot_data$sample))))
   
   if (percent == "percent") {
     for (var in unique(plot_data$sample)) {
@@ -31,6 +28,7 @@ alignment_summary <- function(se, percent = "percent") {
     by.y = "row.names",
     all.x = TRUE
   )
+  plot_data$sample <- factor(plot_data$sample, levels = rev(unique(plot_data$sample)))
   
   return(plot_data)
 }

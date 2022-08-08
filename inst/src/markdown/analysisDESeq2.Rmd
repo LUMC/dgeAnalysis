@@ -110,6 +110,7 @@ bar_plot(
   y = "sample",
   group = "sample",
   fill = "feature",
+  rev = TRUE,
   title = "Count assignments",
   xlab = "Counts",
   ylab = ""

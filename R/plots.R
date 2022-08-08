@@ -130,6 +130,7 @@ scatter_plot <- function(df, x, y, text = NA, group, size = 1.5, scale = NA, ind
 #' @param group String, Value to color/group data
 #' @param fill String, value to fill bars by color
 #' @param colorbar String, Should default colors be used
+#' @param rev Boolean, Plot bars in reverse order (alignment sum) for correct colors
 #' @param facet String, Should data be ordered by group
 #' @param title String, Title for plot
 #' @param xlab String, Label for X axis
@@ -139,14 +140,14 @@ scatter_plot <- function(df, x, y, text = NA, group, size = 1.5, scale = NA, ind
 #'
 #' @export
 
-bar_plot <- function(df, x, y, text = NA, group, fill = NULL, colorbar = NA, facet = "none", title = "", xlab = "", ylab = "") {
+bar_plot <- function(df, x, y, text = NA, group, fill = NULL, colorbar = NA, rev = FALSE, facet = "none", title = "", xlab = "", ylab = "") {
   gg <- ggplot(data = df, aes_string(
     x = x,
     y = y,
     fill = fill,
     text = text
   )) +
-    geom_bar(stat = "identity") +
+    geom_bar(stat = "identity", position = position_stack(reverse = rev)) +
     labs(title = title,
          x = xlab,
          y = ylab) +
