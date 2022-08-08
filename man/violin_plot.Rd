@@ -4,18 +4,20 @@
 \alias{violin_plot}
 \title{Create violin plot with ggplot2}
 \usage{
-violin_plot(df, group, title = "", xlab = "", ylab = "")
+violin_plot(df, text = NA, group, title = "", xlab = "", ylab = "")
 }
 \arguments{
 \item{df}{Dataframe, Dataframe to create plot with}
+
+\item{text}{String, Hover info text}
+
+\item{group}{String, Value to color/group data}
 
 \item{title}{String, Title for plot}
 
 \item{xlab}{String, Label for X axis}
 
 \item{ylab}{String, Label for Y axis}
-
-\item{plot}{String, Extra condition for complexity plot}
 }
 \value{
 gg, Plot object (ggplot2)

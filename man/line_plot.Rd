@@ -4,7 +4,17 @@
 \alias{line_plot}
 \title{Create line plot with ggplot2}
 \usage{
-line_plot(df, x, y, group, title = "", xlab = "", ylab = "", plot = "")
+line_plot(
+  df,
+  x,
+  y,
+  text = NA,
+  group,
+  plot = "",
+  title = "",
+  xlab = "",
+  ylab = ""
+)
 }
 \arguments{
 \item{df}{Dataframe, Dataframe to create plot with}
@@ -13,15 +23,17 @@ line_plot(df, x, y, group, title = "", xlab = "", ylab = "", plot = "")
 
 \item{y}{String, Value to plot on Y axis}
 
+\item{text}{String, Hover info text}
+
 \item{group}{String, Value to color/group data}
+
+\item{plot}{String, Extra condition for complexity plot}
 
 \item{title}{String, Title for plot}
 
 \item{xlab}{String, Label for X axis}
 
 \item{ylab}{String, Label for Y axis}
-
-\item{plot}{String, Extra condition for complexity plot}
 }
 \value{
 gg, Plot object (ggplot2)

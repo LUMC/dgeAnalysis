@@ -4,10 +4,12 @@
 \alias{dendro_plot}
 \title{Create dendrogram plot with ggplot2}
 \usage{
-dendro_plot(df, group = NULL, title = "", xlab = "", ylab = "")
+dendro_plot(df, text = NA, group, title = "", xlab = "", ylab = "")
 }
 \arguments{
 \item{df}{Dataframe, Dataframe to create plot with}
+
+\item{text}{String, Hover info text}
 
 \item{group}{String, Value to color/group data}
 

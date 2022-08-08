@@ -6,25 +6,28 @@
 \usage{
 network_plot(
   df,
+  text = NA,
+  label1 = TRUE,
+  label2 = FALSE,
   title = "",
   xlab = "",
-  ylab = "",
-  label1 = TRUE,
-  label2 = FALSE
+  ylab = ""
 )
 }
 \arguments{
 \item{df}{Dataframe, Dataframe to create plot with}
+
+\item{text}{String, Hover info text}
+
+\item{label1}{Boolean, Should terms be labeled in plot}
+
+\item{label2}{Boolean, Should genes be labeled in plot}
 
 \item{title}{String, Title for plot}
 
 \item{xlab}{String, Label for X axis}
 
 \item{ylab}{String, Label for Y axis}
-
-\item{label1}{Boolean, Should terms be labeled in plot}
-
-\item{label2}{Boolean, Should genes be labeled in plot}
 }
 \value{
 gg, Plot object (ggplot2)

@@ -6,15 +6,16 @@
 \usage{
 bar_plot(
   df,
-  group,
   x,
   y,
+  text = NA,
+  group,
   fill = NULL,
+  colorbar = NA,
+  facet = "none",
   title = "",
   xlab = "",
-  ylab = "",
-  colorbar = NA,
-  facet = "none"
+  ylab = ""
 )
 }
 \arguments{
@@ -24,17 +25,21 @@ bar_plot(
 
 \item{y}{String, Value to plot on Y axis}
 
+\item{text}{String, Hover info text}
+
+\item{group}{String, Value to color/group data}
+
 \item{fill}{String, value to fill bars by color}
+
+\item{colorbar}{String, Should default colors be used}
+
+\item{facet}{String, Should data be ordered by group}
 
 \item{title}{String, Title for plot}
 
 \item{xlab}{String, Label for X axis}
 
 \item{ylab}{String, Label for Y axis}
-
-\item{colorbar}{String, Should default colors be used}
-
-\item{facet}{String, Should data be ordered by group}
 }
 \value{
 gg, Plot object (ggplot2)

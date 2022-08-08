@@ -4,7 +4,7 @@
 \alias{barcode_plot}
 \title{Create barcode plot with ggplot2}
 \usage{
-barcode_plot(df, x, y, group, title = "", xlab = "", ylab = "")
+barcode_plot(df, x, y, text = NA, group, title = "", xlab = "", ylab = "")
 }
 \arguments{
 \item{df}{Dataframe, Dataframe to create plot with}
@@ -12,6 +12,8 @@ barcode_plot(df, x, y, group, title = "", xlab = "", ylab = "")
 \item{x}{String, Value to plot on X axis}
 
 \item{y}{String, Value to plot on Y axis}
+
+\item{text}{String, Hover info text}
 
 \item{group}{String, Value to color/group data}
 

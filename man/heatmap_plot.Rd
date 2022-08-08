@@ -4,16 +4,28 @@
 \alias{heatmap_plot}
 \title{Create heatmap plot with ggplot2}
 \usage{
-heatmap_plot(df, group, x, y, fill, title = "", xlab = "", ylab = "")
+heatmap_plot(
+  df,
+  x,
+  y,
+  text = NA,
+  group,
+  fill,
+  title = "",
+  xlab = "",
+  ylab = ""
+)
 }
 \arguments{
 \item{df}{Dataframe, Dataframe to create plot with}
 
-\item{group}{String, Value to color/group data}
-
 \item{x}{String, Value to plot on X axis}
 
 \item{y}{String, Value to plot on Y axis}
+
+\item{text}{String, Hover info text}
+
+\item{group}{String, Value to color/group data}
 
 \item{fill}{String, value to fill bars by color}
 
