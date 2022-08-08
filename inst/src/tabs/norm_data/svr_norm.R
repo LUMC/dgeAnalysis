@@ -154,6 +154,10 @@ output[["selected_norm_voom"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
     s <- event_data(event = "plotly_selected", source = "norm_voom")
+    if (is.null(s)) {
+      throw()
+    }
+    
     DT::datatable(data.frame(inUse_normDge$counts)[unlist(s$key), ],
                   options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {

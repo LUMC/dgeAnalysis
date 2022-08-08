@@ -75,6 +75,10 @@ output[["selected_pca"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
     s <- event_data(event = "plotly_selected", source = "pca")
+    if (is.null(s)) {
+      throw()
+    }
+    
     DT::datatable(data_samples()[unlist(s$key), , drop = FALSE], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c(
@@ -165,9 +169,15 @@ output[["selected_dim_tsne"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
     s <- event_data(event = "plotly_selected", source = "tsne")
+    if (is.null(s)) {
+      throw()
+    }
+    
     DT::datatable(data_samples()[unlist(s$key), , drop = FALSE], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
-    return(NULL)
+    return(DT::datatable(data.frame(c(
+      "No data available in table"
+    )), rownames = FALSE, colnames = ""))
   })
 })
 
@@ -225,9 +235,15 @@ output[["selected_norm_mds"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
     s <- event_data(event = "plotly_selected", source = "norm_mds")
+    if (is.null(s)) {
+      throw()
+    }
+    
     DT::datatable(data_samples()[unlist(s$key), , drop = FALSE], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
-    return(NULL)
+    return(DT::datatable(data.frame(c(
+      "No data available in table"
+    )), rownames = FALSE, colnames = ""))
   })
 })
 

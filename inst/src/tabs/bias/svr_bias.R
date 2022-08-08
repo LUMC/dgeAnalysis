@@ -45,6 +45,10 @@ output[["gc_bias"]] <- renderPlotly({
 output[["selected_biasgc"]] <- DT::renderDataTable({
   tryCatch({
     s <- event_data(event = "plotly_selected", source = "biasGC")
+    if (is.null(s)) {
+      throw()
+    }
+    
     DT::datatable(inUse_deTab[s$key, ], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c(
@@ -119,6 +123,10 @@ output[["len_bias"]] <- renderPlotly({
 output[["selected_biaslength"]] <- DT::renderDataTable({
   tryCatch({
     s <- event_data(event = "plotly_selected", source = "biasLength")
+    if (is.null(s)) {
+      throw()
+    }
+    
     DT::datatable(inUse_deTab[s$key, ], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c(
