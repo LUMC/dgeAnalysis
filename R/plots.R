@@ -255,15 +255,15 @@ heatmap_plot <- function(df, x, y, text = NA, group, fill, title = "", xlab = ""
     labs(title = title,
          x = xlab,
          y = ylab) +
-    theme_bw()
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45))
   
   if (table(df[[x]])[1] > 50) {
     gg <- gg + theme(axis.text.y = element_blank())
   }
   
   if (group != "none") {
-    gg <-
-      gg + facet_grid(as.formula(paste("~", group)), scales = "free")
+    gg <- gg + facet_grid(as.formula(paste("~", group)), scales = "free")
   }
   
   gg

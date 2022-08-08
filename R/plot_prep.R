@@ -274,6 +274,7 @@ heat_var <- function(dge, amount) {
   select_var <- names(sort(var_genes, decreasing = TRUE))[1:amount]
   high_var_cpm <- lcpm[select_var, ]
   high_var_cpm <- as.data.frame(stack(high_var_cpm))
+  high_var_cpm$row <- factor(x = high_var_cpm$row, levels = rev(unique(high_var_cpm$row)))
   
   high_var_cpm <- merge(
     x = high_var_cpm,
@@ -303,6 +304,7 @@ heat_de <- function(dge, deTab, amount) {
   getnorm <- dge[rownames(sortdeTab), ]
   getnorm <- getnorm$counts
   getnorm <- as.data.frame(stack(getnorm))
+  getnorm$row <- factor(x = getnorm$row, levels = rev(unique(getnorm$row)))
   
   getnorm <- merge(
     x = getnorm,
@@ -408,6 +410,7 @@ barcode <- function(deTab, dge, amount, select) {
   getnorm <- inUse_normDge[c(rownames(sortdeTab), select), ]
   stack1 <- as.data.frame(stack(getnorm$counts))
   stack1$sample <- stack1$col
+  stack1$row <- factor(x = stack1$row, levels = rev(unique(stack1$row)))
   
   stack1 <- merge(
     x = stack1,
