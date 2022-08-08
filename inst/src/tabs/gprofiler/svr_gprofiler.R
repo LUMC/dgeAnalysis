@@ -55,16 +55,24 @@ output[["enrich_barplot"]] <- renderPlotly({
     ## Get input data
     enrich <- clean_enrich()
     plot_data <- enrich_bar(enrich, input$terms_slider)
+    text <- 'paste("Source:", source,
+                  "\nTerm:", term_name,
+                  "\nGenes:", intersection_size,
+                  "\nP-Value:", round(p_value, 5))'
     
     ## Create plot
-    bar_plot(
-      df = plot_data,
-      x = "intersection_size",
-      y = "term_name",
-      fill = "p_value",
-      title = "Enrichment barplot",
-      xlab = "Number of genes",
-      ylab = ""
+    ggplotly(
+      bar_plot(
+        df = plot_data,
+        x = "intersection_size",
+        y = "term_name",
+        text = text,
+        fill = "p_value",
+        title = "Enrichment barplot",
+        xlab = "Number of genes",
+        ylab = ""
+      ),
+      tooltip = "text"
     )
   }, error = function(err) {
     return(NULL)
@@ -79,16 +87,23 @@ output[["enrich_DEbarplot"]] <- renderPlotly({
     ## Get input data
     enrich <- clean_enrich()
     plot_data <- enrich_barDE(enrich, input$DEterms_slider, inUse_deTab)
+    text <- 'paste("Term:", name,
+                  "\nGenes:", abs(values),
+                  "\nRegulation:", ind)'
     
     ## Create plot
-    bar_plot(
-      df = plot_data,
-      x = "values",
-      y = "name",
-      fill = "ind",
-      title = "DE genes in terms",
-      xlab = "Number of genes",
-      ylab = ""
+    ggplotly(
+      bar_plot(
+        df = plot_data,
+        x = "values",
+        y = "name",
+        text = text,
+        fill = "ind",
+        title = "DE genes in terms",
+        xlab = "Number of genes",
+        ylab = ""
+      ),
+      tooltip = "text"
     )
   }, error = function(err) {
     return(NULL)
@@ -107,13 +122,19 @@ output[["cnet_plot"]] <- renderPlotly({
                                  input$select_pathway)
     graphData <- cnetPlotly(enrich, geneSets, inUse_deTab)
     plot_data <- cnet_data(inUse_deTab, graphData, (input$cnet_slider + length(input$select_pathway)))
+    text <- 'paste("Node:", genes,
+                  "\nLog2FC:", round(fc, 2))'
     
     ## Create plot
-    network_plot(
-      df = plot_data,
-      title = "Gene-Concept Network",
-      label1 = input$cnet_annoP,
-      label2 = input$cnet_annoG
+    ggplotly(
+      network_plot(
+        df = plot_data,
+        text = text,
+        title = "Gene-Concept Network",
+        label1 = input$cnet_annoP,
+        label2 = input$cnet_annoG
+      ),
+      tooltip = "text"
     )
   }, error = function(err) {
     return(NULL)
@@ -165,17 +186,24 @@ output[["heat_plot"]] <- renderPlotly({
                                  input$heat_slider,
                                  input$select_heat)
     plot_data <- heat_terms(geneSets, inUse_deTab)
+    text <- 'paste("Term:", stringr::str_wrap(categoryID, 50),
+                  "\nGene:", Gene,
+                  "\nAverage Log2FC:", round(avgLog2FC, 2))'
     
     ## Create plot
-    heatmap_plot(
-      df = plot_data,
-      x = "categoryID",
-      y = "Gene",
-      group = "none",
-      fill = "avgLog2FC",
-      title = "Genes in pathway",
-      xlab = "",
-      ylab = ""
+    ggplotly(
+      heatmap_plot(
+        df = plot_data,
+        x = "categoryID",
+        y = "Gene",
+        text = text,
+        group = "none",
+        fill = "avgLog2FC",
+        title = "Genes in pathway",
+        xlab = "",
+        ylab = ""
+      ),
+      tooltip = "text"
     )
   }, error = function(err) {
     return(NULL)

@@ -24,16 +24,22 @@ output[["norm_dist_line"]] <- renderPlotly({
     
     ## Get input data
     plot_data <- count_dist(inUse_normDge)
+    text <- 'paste("Sample:", sample,
+                  "\nLog2CPM:", round(x, 2))'
     
     ## Create plot
-    line_plot(
-      df = plot_data,
-      x = "x",
-      y = "y",
-      group = input$norm_line_color,
-      title = "Gene count distribution",
-      xlab = "Log2CPM",
-      ylab = "Density"
+    ggplotly(
+      line_plot(
+        df = plot_data,
+        x = "x",
+        y = "y",
+        text = text,
+        group = input$norm_line_color,
+        title = "Gene count distribution",
+        xlab = "Log2CPM",
+        ylab = "Density"
+      ),
+      tooltip = "text"
     )
   }, error = function(err) {
     return(NULL)
@@ -66,14 +72,19 @@ output[["norm_dist_violin"]] <- renderPlotly({
     
     ## Get input data
     plot_data <- violin_dist(inUse_normDge)
+    text <- 'paste("Sample:", sample)'
     
     ## Create plot
-    violin_plot(
-      df = plot_data,
-      group = input$norm_violin_group,
-      title = "Gene count distribution",
-      xlab = "",
-      ylab = "Log2CPM"
+    ggplotly(
+      violin_plot(
+        df = plot_data,
+        text = text,
+        group = input$norm_violin_group,
+        title = "Gene count distribution",
+        xlab = "",
+        ylab = "Log2CPM"
+      ),
+      tooltip = "text"
     )
   }, error = function(err) {
     return(NULL)
@@ -102,22 +113,27 @@ output[["norm_voom_plot"]] <- renderPlotly({
     ## Get input data
     plot_data <- voom_data(inUse_normDge)
     index <- round(seq(1, nrow(plot_data), length.out = 1000))
+    text <- 'paste("Gene:", gene)'
     
     ## Create plot
-    toWebGL(ggplotly(
-      scatter_plot(
-        df = plot_data,
-        group = "Genes",
-        key = "gene",
-        index = index,
-        x = "x",
-        y = "y",
-        title = "Voom Plot",
-        xlab = "Average Log2 count",
-        ylab = "SQRT (Standart Deviation)"
-      ),
-      source = "norm_voom"
-    ))
+    toWebGL(
+      ggplotly(
+        scatter_plot(
+          df = plot_data,
+          group = "Genes",
+          key = "gene",
+          text = text,
+          index = index,
+          x = "x",
+          y = "y",
+          title = "Voom Plot",
+          xlab = "Average Log2 count",
+          ylab = "SQRT (Standart Deviation)"
+        ),
+        source = "norm_voom",
+        tooltip = "text"
+      ) %>% layout(dragmode = "select", clickmode = "event+select")
+    )
   }, error = function(err) {
     return(NULL)
   })

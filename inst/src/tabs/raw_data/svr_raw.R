@@ -12,16 +12,22 @@ output[["dist_line"]] <- renderPlotly({
     ## Get input data
     dge <- get_raw_dge()
     plot_data <- count_dist(dge)
+    text <- 'paste("Sample:", sample,
+                  "\nLog2CPM:", round(x, 2))'
     
     ## Create plot
-    line_plot(
-      df = plot_data,
-      x = "x",
-      y = "y",
-      group = input$raw_line_color,
-      title = "Gene count distribution",
-      xlab = "Log2CPM",
-      ylab = "Density"
+    ggplotly(
+      line_plot(
+        df = plot_data,
+        x = "x",
+        y = "y",
+        text = text,
+        group = input$raw_line_color,
+        title = "Gene count distribution",
+        xlab = "Log2CPM",
+        ylab = "Density"
+      ),
+      tooltip = "text"
     )
   }, error = function(err) {
     return(NULL)
@@ -55,14 +61,19 @@ output[["dist_violin"]] <- renderPlotly({
     ## Get input data
     dge <- get_raw_dge()
     plot_data <- violin_dist(dge)
+    text <- 'paste("Sample:", sample)'
     
     ## Create plot
-    violin_plot(
-      df = plot_data,
-      group = input$raw_violin_group,
-      title = "Gene count distribution",
-      xlab = "",
-      ylab = "Log2CPM"
+    ggplotly(
+      violin_plot(
+        df = plot_data,
+        text = text,
+        group = input$raw_violin_group,
+        title = "Gene count distribution",
+        xlab = "",
+        ylab = "Log2CPM"
+      ),
+      tooltip = "text"
     )
   }, error = function(err) {
     return(NULL)
@@ -97,6 +108,7 @@ output[["un_cluster"]] <- renderPlotly({
     ## Get input data
     dge <- get_raw_dge()
     plot_data <- mds_clust(dge)
+    text <- 'paste("Sample:", sample)'
     
     ## Create plot
     ggplotly(
@@ -104,6 +116,7 @@ output[["un_cluster"]] <- renderPlotly({
         df = plot_data,
         size = 5,
         key = "sample",
+        text = text,
         x = "x",
         y = "y",
         group = input$group_raw_mds,
@@ -111,8 +124,9 @@ output[["un_cluster"]] <- renderPlotly({
         xlab = "MDS 1",
         ylab = "MDS 2"
       ),
-      source = "raw_mds"
-    )
+      source = "raw_mds",
+      tooltip = "text"
+    ) %>% layout(dragmode = "select", clickmode = "event+select")
   }, error = function(err) {
     return(NULL)
   })

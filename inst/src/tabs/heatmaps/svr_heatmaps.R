@@ -11,17 +11,24 @@ output[["var_heat"]] <- renderPlotly({
     
     ## Get input data
     plot_data <- heat_var(inUse_normDge, input$slider_heatmap_var)
+    text <- 'paste("Sample:", col,
+                  "\nGene:", row,
+                  "\nLog2CPM:", round(value, 2))'
     
     ## Create plot
-    heatmap_plot(
-      df = plot_data,
-      x = "col",
-      y = "row",
-      fill = "value",
-      group = input$group_var,
-      title = "Most variable genes",
-      xlab = "",
-      ylab = ""
+    ggplotly(
+      heatmap_plot(
+        df = plot_data,
+        x = "col",
+        y = "row",
+        text = text,
+        fill = "value",
+        group = input$group_var,
+        title = "Most variable genes",
+        xlab = "",
+        ylab = ""
+      ),
+      tooltip = "text"
     )
   }, error = function(err) {
     return(NULL)
@@ -73,17 +80,24 @@ output[["dge_heat"]] <- renderPlotly({
     
     ## Get input data
     plot_data <- heat_de(inUse_normDge, inUse_deTab, input$slider_heatmap_dge)
+    text <- 'paste("Sample:", col,
+                  "\nGene:", row,
+                  "\nLog2CPM:", round(value, 2))'
     
     ## Create plot
-    heatmap_plot(
-      df = plot_data,
-      x = "col",
-      y = "row",
-      fill = "value",
-      group = input$group_dge,
-      title = "Most DE genes",
-      xlab = "",
-      ylab = ""
+    ggplotly(
+      heatmap_plot(
+        df = plot_data,
+        x = "col",
+        y = "row",
+        text = text,
+        fill = "value",
+        group = input$group_dge,
+        title = "Most DE genes",
+        xlab = "",
+        ylab = ""
+      ),
+      tooltip = "text"
     )
   }, error = function(err) {
     return(NULL)

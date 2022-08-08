@@ -12,22 +12,30 @@ output[["gc_bias"]] <- renderPlotly({
     ## Get input data
     index <- round(seq(1, nrow(inUse_deTab), length.out = 1000))
     plot_data <- bias_gc(inUse_deTab, input$selectGC)
+    text <- 'paste("Gene:", gene,
+                  "\nAverage Log2FC:", round(avgLog2FC, 2),
+                  "\nPercentage:", round(get(y), 2),
+                  "\nFDR:", round(FDR, 5))'
     
     ## Create plot
-    toWebGL(ggplotly(
-      scatter_plot(
-        df = plot_data,
-        group = "FDR",
-        key = "gene",
-        index = index,
-        x = input$selectGC,
-        y = "avgLog2FC",
-        title = paste("Bias based on", input$selectGC),
-        xlab = paste(input$selectGC, "(%)"),
-        ylab = "Average Log2FC"
-      ),
-      source = "biasGC"
-    ))
+    toWebGL(
+      ggplotly(
+        scatter_plot(
+          df = plot_data,
+          group = "FDR",
+          key = "gene",
+          index = index,
+          text = text,
+          x = input$selectGC,
+          y = "avgLog2FC",
+          title = paste("Bias based on", input$selectGC),
+          xlab = paste(input$selectGC, "(%)"),
+          ylab = "Average Log2FC"
+        ),
+        source = "biasGC",
+        tooltip = "text"
+      ) %>% layout(dragmode = "select", clickmode = "event+select")
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -77,23 +85,31 @@ output[["len_bias"]] <- renderPlotly({
     ## Get input data
     index <- round(seq(1, nrow(inUse_deTab), length.out = 1000))
     plot_data <- bias_gc(inUse_deTab, input$selectLength)
+    text <- 'paste("Gene:", gene,
+                  "\nAverage Log2FC:", round(avgLog2FC, 2),
+                  "\nLength:", round(get(x), 2),
+                  "\nFDR:", round(FDR, 5))'
     
     ## Create plot
-    toWebGL(ggplotly(
-      scatter_plot(
-        df = plot_data,
-        group = "FDR",
-        key = "gene",
-        scale = TRUE,
-        index = index,
-        x = input$selectLength,
-        y = "avgLog2FC",
-        title = paste("Bias based on", input$selectLength),
-        xlab = input$selectLength,
-        ylab = "Average Log2FC"
-      ),
-      source = "biasLength"
-    ))
+    toWebGL(
+      ggplotly(
+        scatter_plot(
+          df = plot_data,
+          group = "FDR",
+          key = "gene",
+          text = text,
+          scale = TRUE,
+          index = index,
+          x = input$selectLength,
+          y = "avgLog2FC",
+          title = paste("Bias based on", input$selectLength),
+          xlab = input$selectLength,
+          ylab = "Average Log2FC"
+        ),
+        source = "biasLength",
+        tooltip = "text"
+      ) %>% layout(dragmode = "select", clickmode = "event+select")
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -138,18 +154,26 @@ output[["geneStrand_bias"]] <- renderPlotly({
     ## Get input data
     index <- round(seq(1, nrow(inUse_deTab), length.out = 1000))
     plot_data <- gene_strand(inUse_deTab)
+    text <- 'paste("Strand:", strand,
+                  "\nRegulation:", DE,
+                  "\nGenes:", Freq,
+                  "\nPercentage:", round(perc, 2))'
     
     ## Create plot
-    bar_plot(
-      df = plot_data,
-      group = "strand",
-      x = "DE",
-      y = "perc",
-      fill = "DE",
-      facet = TRUE,
-      title = "Gene strand ratio",
-      xlab = "",
-      ylab = "Percentage of genes"
+    ggplotly(
+      bar_plot(
+        df = plot_data,
+        group = "strand",
+        x = "DE",
+        y = "perc",
+        text = text,
+        fill = "DE",
+        facet = TRUE,
+        title = "Gene strand ratio",
+        xlab = "",
+        ylab = "Percentage of genes"
+      ),
+      tooltip = "text"
     )
   }, error = function(err) {
     return(NULL)

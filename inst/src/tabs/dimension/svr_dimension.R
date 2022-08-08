@@ -11,6 +11,7 @@ output[["pca"]] <- renderPlotly({
     
     ## Get input data
     plot_data <- pca_data(inUse_normDge)
+    text <- 'paste("Sample:", sample)'
     
     ## Create plot
     ggplotly(
@@ -18,6 +19,7 @@ output[["pca"]] <- renderPlotly({
         df = plot_data,
         size = 5,
         key = "sample",
+        text = text,
         x = input$set_pca_pc1,
         y = input$set_pca_pc2,
         group = input$group_pca,
@@ -25,8 +27,9 @@ output[["pca"]] <- renderPlotly({
         xlab = paste0(input$set_pca_pc1, " (", plot_data$percent[as.numeric(gsub("PC", "", input$set_pca_pc1))], "%)"),
         ylab = paste0(input$set_pca_pc2, " (", plot_data$percent[as.numeric(gsub("PC", "", input$set_pca_pc2))], "%)")
       ),
-      source = "pca"
-    )
+      source = "pca",
+      tooltip = "text"
+    ) %>% layout(dragmode = "select", clickmode = "event+select")
   }, error = function(err) {
     return(NULL)
   })
@@ -87,15 +90,21 @@ output[["variance_pca"]] <- renderPlotly({
     
     ## Get input data
     plot_data <- pca_data(inUse_normDge)
+    text <- 'paste("PC:", pc,
+                  "\nPercentage:", percent)'
     
     ## Create plot
-    bar_plot(
-      df = plot_data,
-      x = "pc",
-      y = "percent",
-      title = "PCA Scree plot",
-      xlab = "Principal component",
-      ylab = "Percentage"
+    ggplotly(
+      bar_plot(
+        df = plot_data,
+        text = text,
+        x = "pc",
+        y = "percent",
+        title = "PCA Scree plot",
+        xlab = "Principal component",
+        ylab = "Percentage"
+      ),
+      tooltip = "text"
     )
   }, error = function(err) {
     return(NULL)
@@ -114,6 +123,7 @@ output[["dim_tsne"]] <- renderPlotly({
     
     ## Get input data
     plot_data <- tsne_data(inUse_normDge)
+    text <- 'paste("Sample:", sample)'
     
     ## Create plot
     ggplotly(
@@ -121,6 +131,7 @@ output[["dim_tsne"]] <- renderPlotly({
         df = plot_data,
         size = 5,
         key = "sample",
+        text = text,
         x = "V1",
         y = "V2",
         group = input$group_dim_tsne,
@@ -128,8 +139,9 @@ output[["dim_tsne"]] <- renderPlotly({
         xlab = "tSNE 1",
         ylab = "tSNE 2"
       ),
-      source = "tsne"
-    )
+      source = "tsne",
+      tooltip = "text"
+    ) %>% layout(dragmode = "select", clickmode = "event+select")
   }, error = function(err) {
     return(NULL)
   })
@@ -171,6 +183,7 @@ output[["norm_un_cluster"]] <- renderPlotly({
     
     ## Get input data
     plot_data <- mds_clust(inUse_normDge)
+    text <- 'paste("Sample:", sample)'
     
     ## Create plot
     ggplotly(
@@ -178,6 +191,7 @@ output[["norm_un_cluster"]] <- renderPlotly({
         df = plot_data,
         size = 5,
         key = "sample",
+        text = text,
         x = "x",
         y = "y",
         group = input$group_norm_mds,
@@ -185,8 +199,9 @@ output[["norm_un_cluster"]] <- renderPlotly({
         xlab = "MDS 1",
         ylab = "MDS 2"
       ),
-      source = "norm_mds"
-    )
+      source = "norm_mds",
+      tooltip = "text"
+    ) %>% layout(dragmode = "select", clickmode = "event+select")
   }, error = function(err) {
     return(NULL)
   })
@@ -228,14 +243,19 @@ output[["dim_dendro"]] <- renderPlotly({
     
     ## Get input data
     plot_data <- dendro_data(inUse_normDge)
+    text <- 'paste("Sample:", sample)'
     
     ## Create plot
-    dendro_plot(
-      df = plot_data,
-      group = input$color_dendro,
-      title = "Dendrogram",
-      xlab = "",
-      ylab = "Height"
+    ggplotly(
+      dendro_plot(
+        df = plot_data,
+        text = text,
+        group = input$color_dendro,
+        title = "Dendrogram",
+        xlab = "",
+        ylab = "Height"
+      ),
+      tooltip = "text"
     )
   }, error = function(err) {
     return(NULL)

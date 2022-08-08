@@ -32,18 +32,25 @@ output[["align_sum"]] <- renderPlotly({
     ## Get input data
     se <- get_se()
     plot_data <- alignment_summary(se, input$setSummary)
-    
+    text <- 'paste("Sample:", sample,
+                  "\nClass:", feature,
+                  "\nSize:", round(count, 2))'
+
     ## Create plot
-    bar_plot(
-      df = plot_data,
-      x = "count",
-      y = "sample",
-      facet = input$group_sum,
-      fill = "feature",
-      group = input$group_sum,
-      title = "Count assignments",
-      xlab = "Counts",
-      ylab = ""
+    ggplotly(
+      bar_plot(
+        df = plot_data,
+        x = "count",
+        y = "sample",
+        text = text,
+        facet = input$group_sum,
+        fill = "feature",
+        group = input$group_sum,
+        title = "Count assignments",
+        xlab = "Counts",
+        ylab = ""
+      ),
+      tooltip = "text"
     )
   }, error = function(err) {
     return(NULL)
@@ -63,17 +70,24 @@ output[["complex"]] <- renderPlotly({
     ## Get input data
     se <- get_se()
     plot_data <- complexity(se, rank = input$comp_rank)
+    text <- 'paste("Sample:", sample,
+                  "\nGenes:", rank,
+                  "\nSize:", round(get(y), 2))'
     
     ## Create plot
-    line_plot(
-      df = plot_data,
-      x = "rank",
-      y = input$setComplexity,
-      group = input$group_color,
-      title = "Gene complexity",
-      xlab = "Number of genes",
-      ylab = "Cumulative reads per number of genes",
-      plot = "complexity"
+    ggplotly(
+      line_plot(
+        df = plot_data,
+        x = "rank",
+        y = input$setComplexity,
+        text = text,
+        group = input$group_color,
+        title = "Gene complexity",
+        xlab = "Number of genes",
+        ylab = "Cumulative reads per number of genes",
+        plot = "complexity"
+      ),
+      tooltip = "text"
     )
   }, error = function(err) {
     return(NULL)

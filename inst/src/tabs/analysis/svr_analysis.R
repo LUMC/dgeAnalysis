@@ -22,17 +22,24 @@ output[["de_ratio"]] <- renderPlotly({
     
     ## Get input data
     plot_data <- de_ratio(inUse_deTab)
+    text <- 'paste("Regulation:", Var1,
+                  "\nGenes:", Freq,
+                  "\nPercentage:", round(perc, 2))'
     
     ## Create plot
-    bar_plot(
-      df = plot_data,
-      group = "Var1",
-      x = "Var1",
-      y = "perc",
-      fill = "Var1",
-      title = "Differential expression ratio",
-      xlab = "",
-      ylab = "Percentage of genes"
+    ggplotly(
+      bar_plot(
+        df = plot_data,
+        group = "Var1",
+        x = "Var1",
+        y = "perc",
+        text = text,
+        fill = "Var1",
+        title = "Differential expression ratio",
+        xlab = "",
+        ylab = "Percentage of genes"
+      ),
+      tooltip = "text"
     )
   }, error = function(err) {
     return(NULL)
@@ -47,22 +54,30 @@ output[["ma_plot"]] <- renderPlotly({
     ## Get input data
     index <- round(seq(1, nrow(inUse_deTab), length.out = 1000))
     plot_data <- ma(inUse_deTab)
+    text <- 'paste("Gene:", gene,
+                  "\nAverage Log2CPM:", round(avgLog2CPM, 2),
+                  "\nAverage Log2FC:", round(avgLog2FC, 2),
+                  "\nRegulation:", DE)'
     
     ## Create plot
-    toWebGL(ggplotly(
-      scatter_plot(
-        df = plot_data,
-        group = "DE",
-        key = "gene",
-        index = index,
-        x = "avgLog2CPM",
-        y = "avgLog2FC",
-        title = "MA Plot",
-        xlab = "Average Log2CPM",
-        ylab = "Average Log2FC"
-      ),
-      source = "analysis_ma"
-    ))
+    toWebGL(
+      ggplotly(
+        scatter_plot(
+          df = plot_data,
+          group = "DE",
+          key = "gene",
+          text = text,
+          index = index,
+          x = "avgLog2CPM",
+          y = "avgLog2FC",
+          title = "MA Plot",
+          xlab = "Average Log2CPM",
+          ylab = "Average Log2FC"
+        ),
+        source = "analysis_ma",
+        tooltip = "text"
+      ) %>% layout(dragmode = "select", clickmode = "event+select")
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -87,21 +102,29 @@ output[["volcano_plot"]] <- renderPlotly({
     
     ## Get input data
     plot_data <- volcano(inUse_deTab)
+    text <- 'paste("Gene:", gene,
+                  "\n-Log10 FDR:", round(FDR, 2),
+                  "\nAverage Log2FC:", round(avgLog2FC, 2),
+                  "\nRegulation:", DE)'
     
     ## Create plot
-    toWebGL(ggplotly(
-      scatter_plot(
-        df = plot_data,
-        group = "DE",
-        key = "gene",
-        x = "avgLog2FC",
-        y = "FDR",
-        title = "Volcano Plot",
-        xlab = "Average Log2FC",
-        ylab = "-Log10 P-value (FDR)"
-      ),
-      source = "analysis_volcano"
-    ))
+    toWebGL(
+      ggplotly(
+        scatter_plot(
+          df = plot_data,
+          group = "DE",
+          key = "gene",
+          text = text,
+          x = "avgLog2FC",
+          y = "FDR",
+          title = "Volcano Plot",
+          xlab = "Average Log2FC",
+          ylab = "-Log10 P-value (FDR)"
+        ),
+        source = "analysis_volcano",
+        tooltip = "text"
+      ) %>% layout(dragmode = "select", clickmode = "event+select")
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -131,18 +154,23 @@ output[["barcode_plot"]] <- renderPlotly({
     
     ## Get input data
     plot_data <- barcode(inUse_deTab, inUse_normDge, input$slider_barcode, input$selected_analysis_bar)
+    text <- 'paste("Sample:", sample,
+                  "\nGene:", row,
+                  "\nLog2CPM:", round(value, 2))'
     
     ## Create plot
-    toWebGL(
+    ggplotly(
       barcode_plot(
         df = plot_data,
         group = input$group_analysis_bar,
+        text = text,
         x = "value",
         y = "row",
         title = "Barcode Plot",
         xlab = "Log2CPM",
         ylab = ""
-      )
+      ),
+      tooltip = "text"
     )
   }, error = function(err) {
     return(NULL)
@@ -184,15 +212,21 @@ output[["p_val_plot"]] <- renderPlotly({
     
     ## Get input data
     plot_data <- pvalue(inUse_deTab)
+    text <- 'paste("P-Value:", p,
+                  "\nGenes:", x)'
     
     ## Create plot
-    bar_plot(
-      df = plot_data,
-      x = "p",
-      y = "x",
-      title = "P-Value plot",
-      xlab = "P-Value",
-      ylab = "Count"
+    ggplotly(
+      bar_plot(
+        df = plot_data,
+        x = "p",
+        y = "x",
+        text = text,
+        title = "P-Value plot",
+        xlab = "P-Value",
+        ylab = "Number of genes"
+      ),
+      tooltip = "text"
     )
   }, error = function(err) {
     return(NULL)
