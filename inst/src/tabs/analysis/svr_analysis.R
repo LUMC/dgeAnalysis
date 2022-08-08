@@ -30,10 +30,10 @@ output[["de_ratio"]] <- renderPlotly({
     ggplotly(
       bar_plot(
         df = plot_data,
-        group = "Var1",
         x = "Var1",
         y = "perc",
         text = text,
+        group = "Var1",
         fill = "Var1",
         title = "Differential expression ratio",
         xlab = "",
@@ -64,12 +64,12 @@ output[["ma_plot"]] <- renderPlotly({
       ggplotly(
         scatter_plot(
           df = plot_data,
-          group = "DE",
-          key = "gene",
-          text = text,
-          index = index,
           x = "avgLog2CPM",
           y = "avgLog2FC",
+          text = text,
+          group = "DE",
+          index = index,
+          key = "gene",
           title = "MA Plot",
           xlab = "Average Log2CPM",
           ylab = "Average Log2FC"
@@ -112,11 +112,11 @@ output[["volcano_plot"]] <- renderPlotly({
       ggplotly(
         scatter_plot(
           df = plot_data,
-          group = "DE",
-          key = "gene",
-          text = text,
           x = "avgLog2FC",
           y = "FDR",
+          text = text,
+          group = "DE",
+          key = "gene",
           title = "Volcano Plot",
           xlab = "Average Log2FC",
           ylab = "-Log10 P-value (FDR)"
@@ -162,10 +162,10 @@ output[["barcode_plot"]] <- renderPlotly({
     ggplotly(
       barcode_plot(
         df = plot_data,
-        group = input$group_analysis_bar,
-        text = text,
         x = "value",
         y = "row",
+        text = text,
+        group = input$group_analysis_bar,
         title = "Barcode Plot",
         xlab = "Log2CPM",
         ylab = ""

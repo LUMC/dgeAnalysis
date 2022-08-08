@@ -114,12 +114,12 @@ output[["un_cluster"]] <- renderPlotly({
     ggplotly(
       scatter_plot(
         df = plot_data,
-        size = 5,
-        key = "sample",
-        text = text,
         x = "x",
         y = "y",
+        text = text,
         group = input$group_raw_mds,
+        size = 5,
+        key = "sample",
         title = "MDS Plot",
         xlab = "MDS 1",
         ylab = "MDS 2"

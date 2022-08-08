@@ -107,8 +107,8 @@ bar_plot(
   df = plot_data,
   x = "count",
   y = "sample",
-  fill = "feature",
   group = "sample",
+  fill = "feature",
   title = "Count assignments",
   xlab = "Counts",
   ylab = ""
@@ -121,10 +121,10 @@ line_plot(
   x = "rank",
   y = "fraction",
   group = "sample",
+  plot = "complexity",
   title = "Gene complexity",
   xlab = "Cumulative reads per number of genes",
-  ylab = "Number of genes",
-  plot = "complexity"
+  ylab = "Number of genes"
 )
 
 ## Create final Summarized Experiment
@@ -201,10 +201,10 @@ line_plot(
 plot_data <- pca_data(tempDge)
 scatter_plot(
   df = plot_data,
-  size = 4,
   x = "PC1",
   y = "PC2",
   group = design_base,
+  size = 4,
   title = "PCA",
   xlab = paste0("PC1", " (", plot_data$percent[1], "%)"),
   ylab = paste0("PC2", " (", plot_data$percent[2], "%)")
@@ -298,10 +298,10 @@ if (setGeneName == "symbol" && !is.null(data_annotation)) {
 plot_data <- ma(deTab)
 scatter_plot(
   df = plot_data,
-  group = "DE",
-  index = index,
   x = "avgLog2CPM",
   y = "avgLog2FC",
+  group = "DE",
+  index = index,
   title = "MA Plot",
   xlab = "Average Log2CPM",
   ylab = "Average Log2FC"

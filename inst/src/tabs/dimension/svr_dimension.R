@@ -17,12 +17,12 @@ output[["pca"]] <- renderPlotly({
     ggplotly(
       scatter_plot(
         df = plot_data,
-        size = 5,
-        key = "sample",
-        text = text,
         x = input$set_pca_pc1,
         y = input$set_pca_pc2,
+        text = text,
         group = input$group_pca,
+        size = 5,
+        key = "sample",
         title = "PCA",
         xlab = paste0(input$set_pca_pc1, " (", plot_data$percent[as.numeric(gsub("PC", "", input$set_pca_pc1))], "%)"),
         ylab = paste0(input$set_pca_pc2, " (", plot_data$percent[as.numeric(gsub("PC", "", input$set_pca_pc2))], "%)")
@@ -97,9 +97,9 @@ output[["variance_pca"]] <- renderPlotly({
     ggplotly(
       bar_plot(
         df = plot_data,
-        text = text,
         x = "pc",
         y = "percent",
+        text = text,
         title = "PCA Scree plot",
         xlab = "Principal component",
         ylab = "Percentage"
@@ -129,12 +129,12 @@ output[["dim_tsne"]] <- renderPlotly({
     ggplotly(
       scatter_plot(
         df = plot_data,
-        size = 5,
-        key = "sample",
-        text = text,
         x = "V1",
         y = "V2",
+        text = text,
         group = input$group_dim_tsne,
+        size = 5,
+        key = "sample",
         title = "tSNE",
         xlab = "tSNE 1",
         ylab = "tSNE 2"
@@ -189,12 +189,12 @@ output[["norm_un_cluster"]] <- renderPlotly({
     ggplotly(
       scatter_plot(
         df = plot_data,
-        size = 5,
-        key = "sample",
-        text = text,
         x = "x",
         y = "y",
+        text = text,
         group = input$group_norm_mds,
+        size = 5,
+        key = "sample",
         title = "MDS Plot",
         xlab = "MDS 1",
         ylab = "MDS 2"

@@ -130,9 +130,9 @@ output[["cnet_plot"]] <- renderPlotly({
       network_plot(
         df = plot_data,
         text = text,
-        title = "Gene-Concept Network",
         label1 = input$cnet_annoP,
-        label2 = input$cnet_annoG
+        label2 = input$cnet_annoG,
+        title = "Gene-Concept Network"
       ),
       tooltip = "text"
     )

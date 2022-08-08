@@ -22,8 +22,8 @@ output[["var_heat"]] <- renderPlotly({
         x = "col",
         y = "row",
         text = text,
-        fill = "value",
         group = input$group_var,
+        fill = "value",
         title = "Most variable genes",
         xlab = "",
         ylab = ""
@@ -91,8 +91,8 @@ output[["dge_heat"]] <- renderPlotly({
         x = "col",
         y = "row",
         text = text,
-        fill = "value",
         group = input$group_dge,
+        fill = "value",
         title = "Most DE genes",
         xlab = "",
         ylab = ""

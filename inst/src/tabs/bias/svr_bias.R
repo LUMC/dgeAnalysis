@@ -22,12 +22,12 @@ output[["gc_bias"]] <- renderPlotly({
       ggplotly(
         scatter_plot(
           df = plot_data,
-          group = "FDR",
-          key = "gene",
-          index = index,
-          text = text,
           x = input$selectGC,
           y = "avgLog2FC",
+          text = text,
+          group = "FDR",
+          index = index,
+          key = "gene",
           title = paste("Bias based on", input$selectGC),
           xlab = paste(input$selectGC, "(%)"),
           ylab = "Average Log2FC"
@@ -95,13 +95,13 @@ output[["len_bias"]] <- renderPlotly({
       ggplotly(
         scatter_plot(
           df = plot_data,
-          group = "FDR",
-          key = "gene",
-          text = text,
-          scale = TRUE,
-          index = index,
           x = input$selectLength,
           y = "avgLog2FC",
+          text = text,
+          group = "FDR",
+          scale = TRUE,
+          index = index,
+          key = "gene",
           title = paste("Bias based on", input$selectLength),
           xlab = input$selectLength,
           ylab = "Average Log2FC"
@@ -163,10 +163,10 @@ output[["geneStrand_bias"]] <- renderPlotly({
     ggplotly(
       bar_plot(
         df = plot_data,
-        group = "strand",
         x = "DE",
         y = "perc",
         text = text,
+        group = "strand",
         fill = "DE",
         facet = TRUE,
         title = "Gene strand ratio",

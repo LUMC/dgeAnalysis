@@ -43,9 +43,9 @@ output[["align_sum"]] <- renderPlotly({
         x = "count",
         y = "sample",
         text = text,
-        facet = input$group_sum,
-        fill = "feature",
         group = input$group_sum,
+        fill = "feature",
+        facet = input$group_sum,
         title = "Count assignments",
         xlab = "Counts",
         ylab = ""
@@ -82,10 +82,10 @@ output[["complex"]] <- renderPlotly({
         y = input$setComplexity,
         text = text,
         group = input$group_color,
+        plot = "complexity",
         title = "Gene complexity",
         xlab = "Number of genes",
-        ylab = "Cumulative reads per number of genes",
-        plot = "complexity"
+        ylab = "Cumulative reads per number of genes"
       ),
       tooltip = "text"
     )

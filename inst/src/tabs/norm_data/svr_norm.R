@@ -120,12 +120,12 @@ output[["norm_voom_plot"]] <- renderPlotly({
       ggplotly(
         scatter_plot(
           df = plot_data,
-          group = "Genes",
-          key = "gene",
-          text = text,
-          index = index,
           x = "x",
           y = "y",
+          text = text,
+          group = "Genes",
+          index = index,
+          key = "gene",
           title = "Voom Plot",
           xlab = "Average Log2 count",
           ylab = "SQRT (Standart Deviation)"
