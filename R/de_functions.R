@@ -70,19 +70,26 @@ getCount <- function(x, raw) {
 }
 
 
-#' Creates dataframe with counts per mapping feature (aligned, not aligned, etc.).
+#' Creates dataframe with number of reads per gene, ordered on genes with the most reads assigned.
 #'
 #' @param se SummerizedExperiment, With samples, counts (and annotation)
+#' @param max Integer, The maximum rank that is used
 #'
-#' @return out, (Dataframe) With total counts per available mapping feature
+#' @return out, (Dataframe) With total read counts per gene
 #'
 #' @export
 
-alignmentSummary <- function(se) {
-  specialFeatures <- rownames(se)[grepl("^__", rownames(se))]
-  out <-  expand.grid(feature = c("aligned", specialFeatures),
-                sample = colnames(se))
-  out$count <- apply(out, 1, getCount, assays(se)$counts)
+complexityData <- function(se, max) {
+  features <- rownames(se)[!grepl("^__", rownames(se))]
+  ranks <- c(1:max)
+  out <- expand.grid(rank = ranks, sample = colnames(se))
+  for (x in colnames(se)) {
+    values <- as.vector(assay(se)[features, x])
+    sorted <- sort(values, T)
+    total <- sum(sorted)
+    out[out$sample == x, "value"] <- cumsum(sorted)[1:max]
+    out[out$sample == x, "fraction"] <- out[out$sample == x, "value"] / total * 100
+  }
   out
 }
 

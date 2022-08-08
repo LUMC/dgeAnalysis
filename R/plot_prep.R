@@ -9,8 +9,13 @@
 #' @export
 
 alignment_summary <- function(se, percent = "percent") {
-  plot_data <- alignmentSummary(se)
+  features <- rownames(se)[grepl("^__", rownames(se))]
+  plot_data <-  expand.grid(feature = c("aligned", features), sample = colnames(se))
+  plot_data$count <- apply(plot_data, 1, getCount, assays(se)$counts)
+  
   plot_data$feature <- gsub("_", " ", gsub("__", "", plot_data$feature))
+  plot_data$feature <- factor(plot_data$feature , levels = rev(unique(plot_data$feature)))
+  plot_data$sample <- factor(plot_data$sample , levels = rev(sort(unique(plot_data$sample))))
   
   if (percent == "percent") {
     for (var in unique(plot_data$sample)) {
@@ -98,6 +103,8 @@ count_dist <- function(dge) {
 
 violin_dist <- function(dge) {
   stackCounts <- data.frame(stackDge(dge))
+  stackCounts$sample <- factor(stackCounts$sample , levels = rev(sort(unique(stackCounts$sample))))
+  
   stackCounts <- merge(
     x = stackCounts,
     y = dge$samples,
@@ -492,6 +499,7 @@ gene_strand <- function(deTab) {
 
 enrich_bar <- function(enrich, amount) {
   enrich <- na.omit(enrich[0:amount, ])
+  enrich$term_name <- stringr::str_wrap(enrich$term_name, 50)
   enrich$term_name <- factor(enrich$term_name,
                              levels = unique(enrich$term_name)[order(enrich$p_value,
                                                                      enrich$term_name,
@@ -514,6 +522,7 @@ enrich_bar <- function(enrich, amount) {
 
 enrich_barDE <- function(enrich, amount, deTab) {
   enrich <- na.omit(enrich[0:amount, ])
+  enrich$term_name <- stringr::str_wrap(enrich$term_name, 50)
   enrich$term_name <- factor(enrich$term_name,
                              levels = unique(enrich$term_name)[order(enrich$p_value,
                                                                      enrich$term_name,
@@ -529,6 +538,14 @@ enrich_barDE <- function(enrich, amount, deTab) {
   plot_data <- enrich[c("term_name", "down", "up")]
   plot_data$down <- plot_data$down * -1
   plot_data <- stack(plot_data)
+  plot_data$ind <- factor(
+    x = plot_data$ind,
+    levels = c("down", "up"),
+    labels = c(
+      "Down-regulated",
+      "Up-regulated"
+    )
+  )
   plot_data$name <- enrich$term_name
   
   return(plot_data)

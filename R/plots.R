@@ -14,11 +14,12 @@
 #'
 #' @export
 
-line_plot <- function(df, x, y, group, title = "", xlab = "", ylab = "", plot = "") {
+line_plot <- function(df, x, y, text = NA, group, title = "", xlab = "", ylab = "", plot = "") {
   gg <- ggplot(data = df, aes_string(
     x = x,
     y = y,
-    color = group
+    color = group,
+    text = text
   )) +
     geom_line(aes(group = sample), size = 1) +
     labs(title = title,
@@ -46,12 +47,13 @@ line_plot <- function(df, x, y, group, title = "", xlab = "", ylab = "", plot = 
 #'
 #' @export
 
-violin_plot <- function(df, group, title = "", xlab = "", ylab = "") {
+violin_plot <- function(df, text = NA, group, title = "", xlab = "", ylab = "") {
   gg <- ggplot(data = df, aes_string(
     x = "sample",
     y = "logCPM",
     color = group,
-    fill = group
+    fill = group,
+    text = text
   )) +
     geom_violin(aes(group = sample), alpha = 0.75, size = 1) +
     coord_flip() +
@@ -82,11 +84,12 @@ violin_plot <- function(df, group, title = "", xlab = "", ylab = "") {
 #'
 #' @export
 
-scatter_plot <- function(df, size = 1.5, key = NA, index = NA, x, y, group, title = "", xlab = "", ylab = "", scale = NA) {
+scatter_plot <- function(df, size = 1.5, text = NA, key = NA, index = NA, x, y, group, title = "", xlab = "", ylab = "", scale = NA) {
   gg <- ggplot(data = df, aes_string(
     x = x,
     y = y,
     key = key,
+    text = text,
     color = group
   )) +
     geom_point(size = size, alpha = 0.5) +
@@ -131,11 +134,12 @@ scatter_plot <- function(df, size = 1.5, key = NA, index = NA, x, y, group, titl
 #'
 #' @export
 
-bar_plot <- function(df, group, x, y, fill = NULL, title = "", xlab = "", ylab = "", colorbar = NA, facet = "none") {
+bar_plot <- function(df, group, x, y, text = NA, fill = NULL, title = "", xlab = "", ylab = "", colorbar = NA, facet = "none") {
   gg <- ggplot(data = df, aes_string(
     x = x,
     y = y,
-    fill = fill
+    fill = fill,
+    text = text
   )) +
     geom_bar(stat = "identity") +
     labs(title = title,
@@ -169,11 +173,12 @@ bar_plot <- function(df, group, x, y, fill = NULL, title = "", xlab = "", ylab =
 #'
 #' @export
 
-barcode_plot <- function(df, x, y, group, title = "", xlab = "", ylab = "") {
+barcode_plot <- function(df, x, y, group, text = NA, title = "", xlab = "", ylab = "") {
   gg <- ggplot(data = df, aes_string(
     x = x,
     y = y,
-    color = group
+    color = group,
+    text = text
   )) +
     geom_point(size = 4, alpha = 0.5) +
     labs(title = title,
@@ -197,7 +202,7 @@ barcode_plot <- function(df, x, y, group, title = "", xlab = "", ylab = "") {
 #'
 #' @export
 
-dendro_plot <- function(df, group = NULL, title = "", xlab = "", ylab = "") {
+dendro_plot <- function(df, group = NULL, text = NA, title = "", xlab = "", ylab = "") {
   gg <- ggplot(data = df) +
     geom_segment(aes(
       x = x,
@@ -205,7 +210,7 @@ dendro_plot <- function(df, group = NULL, title = "", xlab = "", ylab = "") {
       xend = xend,
       yend = yend
     )) +
-    geom_point(data = df[df$label != "", ], aes_string(x = "x", y = "y", color = group), size = 4) +
+    geom_point(data = df[df$label != "", ], aes_string(x = "x", y = "y", color = group, text = text), size = 4) +
     labs(title = title,
          x = xlab,
          y = ylab) +
@@ -231,10 +236,13 @@ dendro_plot <- function(df, group = NULL, title = "", xlab = "", ylab = "") {
 #'
 #' @export
 
-heatmap_plot <- function(df, group, x, y, fill, title = "", xlab = "", ylab = "") {
-  gg <- ggplot(data = df, aes_string(x = x,
-                              y = y,
-                              fill = fill)) +
+heatmap_plot <- function(df, group, text = NA, x, y, fill, title = "", xlab = "", ylab = "") {
+  gg <- ggplot(data = df, aes_string(
+    x = x,
+    y = y,
+    fill = fill,
+    text = text
+  )) +
     geom_tile() +
     labs(title = title,
          x = xlab,
@@ -246,7 +254,8 @@ heatmap_plot <- function(df, group, x, y, fill, title = "", xlab = "", ylab = ""
   }
   
   if (group != "none") {
-    gg <- gg + facet_grid(as.formula(paste("~", group)), scales = "free")
+    gg <-
+      gg + facet_grid(as.formula(paste("~", group)), scales = "free")
   }
   
   gg
@@ -266,7 +275,7 @@ heatmap_plot <- function(df, group, x, y, fill, title = "", xlab = "", ylab = ""
 #'
 #' @export
 
-network_plot <- function(df, title = "", xlab = "", ylab = "", label1 = TRUE, label2 = FALSE) {
+network_plot <- function(df, title = "", text = NA, xlab = "", ylab = "", label1 = TRUE, label2 = FALSE) {
   gg <- ggplot() +
     geom_segment(
       data = df[[1]],
@@ -287,7 +296,7 @@ network_plot <- function(df, title = "", xlab = "", ylab = "", label1 = TRUE, la
     ) +
     geom_point(
       data = df[[3]],
-      aes(x = V1, y = V2, colour = fc),
+      aes_string(x = "V1", y = "V2", colour = "fc", text = text),
       size = 4
     ) +
     theme_void()
