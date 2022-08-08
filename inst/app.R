@@ -26,6 +26,8 @@ source("R/markdown.R", local = TRUE)
 source("R/plots.R", local = TRUE)
 source("R/plot_prep.R", local = TRUE)
 
+## Update namespace (run in shark R session)
+## roxygen2::roxygenise(package.dir = "/exports/sasc/tbkuipers/dgeAnalysis/")
 
 shiny::runApp(
   appDir = "inst/src/",
