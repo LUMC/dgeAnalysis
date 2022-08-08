@@ -89,7 +89,7 @@ enrich <- gost(
 
 ## Show results
 enrich$result$query <- ""
-gostplot(enrich, capped = FALSE, interactive = TRUE)
+gostplot(enrich, capped = FALSE, interactive = FALSE)
 
 ```
 
