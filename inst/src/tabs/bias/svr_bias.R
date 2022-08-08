@@ -34,7 +34,8 @@ output[["gc_bias"]] <- renderPlotly({
         ),
         source = "biasGC",
         tooltip = "text"
-      ) %>% layout(dragmode = "select", clickmode = "event+select")
+      ) %>% layout(dragmode = "select", clickmode = "event+select") %>%
+        style(hoverinfo = "text")
     )
   }, error = function(err) {
     return(NULL)
@@ -112,7 +113,8 @@ output[["len_bias"]] <- renderPlotly({
         ),
         source = "biasLength",
         tooltip = "text"
-      ) %>% layout(dragmode = "select", clickmode = "event+select")
+      ) %>% layout(dragmode = "select", clickmode = "event+select") %>%
+        style(hoverinfo = "text")
     )
   }, error = function(err) {
     return(NULL)

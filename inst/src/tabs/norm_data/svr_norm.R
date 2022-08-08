@@ -132,7 +132,8 @@ output[["norm_voom_plot"]] <- renderPlotly({
         ),
         source = "norm_voom",
         tooltip = "text"
-      ) %>% layout(dragmode = "select", clickmode = "event+select")
+      ) %>% layout(dragmode = "select", clickmode = "event+select") %>%
+        style(hoverinfo = "text")
     )
   }, error = function(err) {
     return(NULL)

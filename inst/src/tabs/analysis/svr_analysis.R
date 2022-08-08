@@ -76,7 +76,8 @@ output[["ma_plot"]] <- renderPlotly({
         ),
         source = "analysis_ma",
         tooltip = "text"
-      ) %>% layout(dragmode = "select", clickmode = "event+select")
+      ) %>% layout(dragmode = "select", clickmode = "event+select") %>%
+        style(hoverinfo = "text")
     )
   }, error = function(err) {
     return(NULL)
