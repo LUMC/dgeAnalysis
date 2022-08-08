@@ -6,6 +6,8 @@ Newest changes should be on top.
 -->
 version 1.5.1
 ---------------------------
++ Fix empty table not shown
++ Update hover info
 + Apply icon name change in updated package (fontawesome)
 + Update markdowns to use non-interactive ggplot2 plots
 + Reorder chunks in markdown
