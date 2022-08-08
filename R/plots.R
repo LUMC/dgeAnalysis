@@ -4,17 +4,18 @@
 #' @param df Dataframe, Dataframe to create plot with
 #' @param x String, Value to plot on X axis
 #' @param y String, Value to plot on Y axis
+#' @param text String, Hover info text
 #' @param group String, Value to color/group data
+#' @param plot String, Extra condition for complexity plot
 #' @param title String, Title for plot
 #' @param xlab String, Label for X axis
 #' @param ylab String, Label for Y axis
-#' @param plot String, Extra condition for complexity plot
 #'
 #' @return gg, Plot object (ggplot2)
 #'
 #' @export
 
-line_plot <- function(df, x, y, text = NA, group, title = "", xlab = "", ylab = "", plot = "") {
+line_plot <- function(df, x, y, text = NA, group, plot = "", title = "", xlab = "", ylab = "") {
   gg <- ggplot(data = df, aes_string(
     x = x,
     y = y,
@@ -38,10 +39,11 @@ line_plot <- function(df, x, y, text = NA, group, title = "", xlab = "", ylab = 
 #' Create violin plot with ggplot2
 #'
 #' @param df Dataframe, Dataframe to create plot with
+#' @param text String, Hover info text
+#' @param group String, Value to color/group data
 #' @param title String, Title for plot
 #' @param xlab String, Label for X axis
 #' @param ylab String, Label for Y axis
-#' @param plot String, Extra condition for complexity plot
 #'
 #' @return gg, Plot object (ggplot2)
 #'
@@ -69,22 +71,23 @@ violin_plot <- function(df, text = NA, group, title = "", xlab = "", ylab = "") 
 #' Create scatter plot with ggplot2
 #'
 #' @param df Dataframe, Dataframe to create plot with
-#' @param size Numeric, size of dots (default 1.5)
-#' @param key String, Value for point selection by plotly
-#' @param index Vector, vector of items to select from dataframe
 #' @param x String, Value to plot on X axis
 #' @param y String, Value to plot on Y axis
+#' @param text String, Hover info text
 #' @param group String, Value to color/group data
+#' @param size Numeric, size of dots (default 1.5)
+#' @param scale String, Should X-axis be scaled in log10
+#' @param index Vector, vector of items to select from dataframe
+#' @param key String, Value for point selection by plotly
 #' @param title String, Title for plot
 #' @param xlab String, Label for X axis
 #' @param ylab String, Label for Y axis
-#' @param scale String, Should X-axis be scaled in log10
 #'
 #' @return gg, Plot object (ggplot2)
 #'
 #' @export
 
-scatter_plot <- function(df, size = 1.5, text = NA, key = NA, index = NA, x, y, group, title = "", xlab = "", ylab = "", scale = NA) {
+scatter_plot <- function(df, x, y, text = NA, group, size = 1.5, scale = NA, index = NA, key = NA, title = "", xlab = "", ylab = "") {
   gg <- ggplot(data = df, aes_string(
     x = x,
     y = y,
@@ -123,18 +126,20 @@ scatter_plot <- function(df, size = 1.5, text = NA, key = NA, index = NA, x, y, 
 #' @param df Dataframe, Dataframe to create plot with
 #' @param x String, Value to plot on X axis
 #' @param y String, Value to plot on Y axis
+#' @param text String, Hover info text
+#' @param group String, Value to color/group data
 #' @param fill String, value to fill bars by color
+#' @param colorbar String, Should default colors be used
+#' @param facet String, Should data be ordered by group
 #' @param title String, Title for plot
 #' @param xlab String, Label for X axis
 #' @param ylab String, Label for Y axis
-#' @param colorbar String, Should default colors be used
-#' @param facet String, Should data be ordered by group
 #'
 #' @return gg, Plot object (ggplot2)
 #'
 #' @export
 
-bar_plot <- function(df, group, x, y, text = NA, fill = NULL, title = "", xlab = "", ylab = "", colorbar = NA, facet = "none") {
+bar_plot <- function(df, x, y, text = NA, group, fill = NULL, colorbar = NA, facet = "none", title = "", xlab = "", ylab = "") {
   gg <- ggplot(data = df, aes_string(
     x = x,
     y = y,
@@ -164,6 +169,7 @@ bar_plot <- function(df, group, x, y, text = NA, fill = NULL, title = "", xlab =
 #' @param df Dataframe, Dataframe to create plot with
 #' @param x String, Value to plot on X axis
 #' @param y String, Value to plot on Y axis
+#' @param text String, Hover info text
 #' @param group String, Value to color/group data
 #' @param title String, Title for plot
 #' @param xlab String, Label for X axis
@@ -173,7 +179,7 @@ bar_plot <- function(df, group, x, y, text = NA, fill = NULL, title = "", xlab =
 #'
 #' @export
 
-barcode_plot <- function(df, x, y, group, text = NA, title = "", xlab = "", ylab = "") {
+barcode_plot <- function(df, x, y, text = NA, group, title = "", xlab = "", ylab = "") {
   gg <- ggplot(data = df, aes_string(
     x = x,
     y = y,
@@ -193,6 +199,7 @@ barcode_plot <- function(df, x, y, group, text = NA, title = "", xlab = "", ylab
 #' Create dendrogram plot with ggplot2
 #'
 #' @param df Dataframe, Dataframe to create plot with
+#' @param text String, Hover info text
 #' @param group String, Value to color/group data
 #' @param title String, Title for plot
 #' @param xlab String, Label for X axis
@@ -202,7 +209,7 @@ barcode_plot <- function(df, x, y, group, text = NA, title = "", xlab = "", ylab
 #'
 #' @export
 
-dendro_plot <- function(df, group = NULL, text = NA, title = "", xlab = "", ylab = "") {
+dendro_plot <- function(df, text = NA, group, title = "", xlab = "", ylab = "") {
   gg <- ggplot(data = df) +
     geom_segment(aes(
       x = x,
@@ -224,9 +231,10 @@ dendro_plot <- function(df, group = NULL, text = NA, title = "", xlab = "", ylab
 #' Create heatmap plot with ggplot2
 #'
 #' @param df Dataframe, Dataframe to create plot with
-#' @param group String, Value to color/group data
 #' @param x String, Value to plot on X axis
 #' @param y String, Value to plot on Y axis
+#' @param text String, Hover info text
+#' @param group String, Value to color/group data
 #' @param fill String, value to fill bars by color
 #' @param title String, Title for plot
 #' @param xlab String, Label for X axis
@@ -236,7 +244,7 @@ dendro_plot <- function(df, group = NULL, text = NA, title = "", xlab = "", ylab
 #'
 #' @export
 
-heatmap_plot <- function(df, group, text = NA, x, y, fill, title = "", xlab = "", ylab = "") {
+heatmap_plot <- function(df, x, y, text = NA, group, fill, title = "", xlab = "", ylab = "") {
   gg <- ggplot(data = df, aes_string(
     x = x,
     y = y,
@@ -265,17 +273,18 @@ heatmap_plot <- function(df, group, text = NA, x, y, fill, title = "", xlab = ""
 #' Create network plot with ggplot2
 #'
 #' @param df Dataframe, Dataframe to create plot with
+#' @param text String, Hover info text
+#' @param label1 Boolean, Should terms be labeled in plot
+#' @param label2 Boolean, Should genes be labeled in plot
 #' @param title String, Title for plot
 #' @param xlab String, Label for X axis
 #' @param ylab String, Label for Y axis
-#' @param label1 Boolean, Should terms be labeled in plot
-#' @param label2 Boolean, Should genes be labeled in plot
 #'
 #' @return gg, Plot object (ggplot2)
 #'
 #' @export
 
-network_plot <- function(df, title = "", text = NA, xlab = "", ylab = "", label1 = TRUE, label2 = FALSE) {
+network_plot <- function(df, text = NA, label1 = TRUE, label2 = FALSE, title = "", xlab = "", ylab = "") {
   gg <- ggplot() +
     geom_segment(
       data = df[[1]],
