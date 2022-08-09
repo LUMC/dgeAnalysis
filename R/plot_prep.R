@@ -53,6 +53,7 @@ complexity <- function(se, rank = 1000) {
     all.x = TRUE
   )
   
+  compData$sample <- factor(compData$sample, levels = unique(sort(as.character(compData$sample))))
   return(compData)
 }
 
@@ -284,6 +285,8 @@ heat_var <- function(dge, amount) {
     all.x = TRUE
   )
   
+  high_var_cpm$col <- factor(high_var_cpm$col, levels = unique(sort(as.character(high_var_cpm$col))))
+  
   return(high_var_cpm)
 }
 
@@ -313,6 +316,8 @@ heat_de <- function(dge, deTab, amount) {
     by.y = "row.names",
     all.x = TRUE
   )
+  
+  getnorm$col <- factor(getnorm$col, levels = unique(sort(as.character(getnorm$col))))
   
   return(getnorm)
 }
