@@ -13,7 +13,7 @@ if (!require("SummarizedExperiment")) BiocManager::install("SummarizedExperiment
 if (!require("edgeR")) BiocManager::install("edgeR")
 if (!require("limma")) BiocManager::install("limma")
 if (!require("DESeq2")) BiocManager::install("DESeq2")
-if (!require("tidyverse")) install.packages("tidyverse")
+if (!require("tidyr")) install.packages("tidyr")
 if (!require("scales")) install.packages("scales")
 if (!require("broom")) install.packages("broom")
 if (!require("plotly")) install.packages("plotly")
