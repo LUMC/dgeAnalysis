@@ -6,6 +6,7 @@ Newest changes should be on top.
 -->
 version 1.5.1
 ---------------------------
++ Remove heatmap plot in enrichment
 + Fix empty table not shown
 + Update hover info
 + Apply icon name change in updated package (fontawesome)
