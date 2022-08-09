@@ -14,6 +14,7 @@ bar_plot(
   colorbar = NA,
   rev = FALSE,
   facet = "none",
+  plot = NA,
   title = "",
   xlab = "",
   ylab = ""
@@ -37,6 +38,8 @@ bar_plot(
 \item{rev}{Boolean, Plot bars in reverse order (alignment sum) for correct colors}
 
 \item{facet}{String, Should data be ordered by group}
+
+\item{plot}{String, Extra condition for ratio plot}
 
 \item{title}{String, Title for plot}
 
