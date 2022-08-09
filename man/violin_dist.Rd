@@ -4,7 +4,7 @@
 \alias{violin_dist}
 \title{Prepare data for violin distribution plot}
 \usage{
-violin_dist(dge)
+violin_dist(dge, group)
 }
 \arguments{
 \item{dge}{DGE List, DGE List with samplesheet, count data & annotation}

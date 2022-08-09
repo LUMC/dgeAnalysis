@@ -12,6 +12,7 @@ bar_plot(
   group,
   fill = NULL,
   colorbar = NA,
+  rev = FALSE,
   facet = "none",
   title = "",
   xlab = "",
@@ -32,6 +33,8 @@ bar_plot(
 \item{fill}{String, value to fill bars by color}
 
 \item{colorbar}{String, Should default colors be used}
+
+\item{rev}{Boolean, Plot bars in reverse order (alignment sum) for correct colors}
 
 \item{facet}{String, Should data be ordered by group}
 
