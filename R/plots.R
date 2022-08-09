@@ -25,7 +25,8 @@ line_plot <- function(df, x, y, text = NA, group, plot = "", title = "", xlab = 
     geom_line(aes(group = sample), size = 1) +
     labs(title = title,
          x = xlab,
-         y = ylab) +
+         y = ylab,
+         color = "") +
     theme_bw()
   
   if (plot == "complexity") {
@@ -62,10 +63,11 @@ violin_plot <- function(df, text = NA, group, title = "", xlab = "", ylab = "") 
     coord_flip() +
     labs(title = title,
          x = xlab,
-         y = ylab) +
+         y = ylab,
+         color = "",
+         fill = "") +
     theme_bw()
   
-  gg <<- gg
   gg
 }
 
@@ -100,7 +102,8 @@ scatter_plot <- function(df, x, y, text = NA, group, size = 1.5, scale = NA, ind
     geom_point(size = size, alpha = 0.5) +
     labs(title = title,
          x = xlab,
-         y = ylab) +
+         y = ylab,
+         color = "") +
     theme_bw()
   
   ## Add loess trend
@@ -135,6 +138,7 @@ scatter_plot <- function(df, x, y, text = NA, group, size = 1.5, scale = NA, ind
 #' @param colorbar String, Should default colors be used
 #' @param rev Boolean, Plot bars in reverse order (alignment sum) for correct colors
 #' @param facet String, Should data be ordered by group
+#'@param plot String, Extra condition for ratio plot
 #' @param title String, Title for plot
 #' @param xlab String, Label for X axis
 #' @param ylab String, Label for Y axis
@@ -143,7 +147,7 @@ scatter_plot <- function(df, x, y, text = NA, group, size = 1.5, scale = NA, ind
 #'
 #' @export
 
-bar_plot <- function(df, x, y, text = NA, group, fill = NULL, colorbar = NA, rev = FALSE, facet = "none", title = "", xlab = "", ylab = "") {
+bar_plot <- function(df, x, y, text = NA, group, fill = NULL, colorbar = NA, rev = FALSE, facet = "none", plot = NA, title = "", xlab = "", ylab = "") {
   gg <- ggplot(data = df, aes_string(
     x = x,
     y = y,
@@ -153,7 +157,8 @@ bar_plot <- function(df, x, y, text = NA, group, fill = NULL, colorbar = NA, rev
     geom_bar(stat = "identity", position = position_stack(reverse = rev)) +
     labs(title = title,
          x = xlab,
-         y = ylab) +
+         y = ylab,
+         fill = "") +
     theme_bw()
   
   if (!is.na(colorbar)) {
@@ -162,6 +167,10 @@ bar_plot <- function(df, x, y, text = NA, group, fill = NULL, colorbar = NA, rev
   
   if (facet != "none") {
     gg <- gg + facet_grid(as.formula(paste(group, "~ .")), scales = "free")
+  }
+  
+  if (!is.na(plot)) {
+    gg <- gg + geom_text(aes(label = paste(Freq, "genes")), nudge_y = 2)
   }
   
   gg
@@ -193,7 +202,8 @@ barcode_plot <- function(df, x, y, text = NA, group, title = "", xlab = "", ylab
     geom_point(size = 4, alpha = 0.5) +
     labs(title = title,
          x = xlab,
-         y = ylab) +
+         y = ylab,
+         color = "") +
     theme_bw()
   
   gg
@@ -224,7 +234,8 @@ dendro_plot <- function(df, text = NA, group, title = "", xlab = "", ylab = "") 
     geom_point(data = df[df$label != "", ], aes_string(x = "x", y = "y", color = group, text = text), size = 4) +
     labs(title = title,
          x = xlab,
-         y = ylab) +
+         y = ylab,
+         color = "") +
     theme_bw() +
     theme(axis.text.x = element_blank())
   
@@ -258,7 +269,8 @@ heatmap_plot <- function(df, x, y, text = NA, group, fill, title = "", xlab = ""
     geom_tile() +
     labs(title = title,
          x = xlab,
-         y = ylab) +
+         y = ylab,
+         fill = "") +
     theme_bw() +
     theme(axis.text.x = element_text(angle = 45))
   

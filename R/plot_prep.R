@@ -178,8 +178,9 @@ pca_data <- function(dge) {
   
   pca <- data.frame(scale(tdge, center = T, scale = F) %*% pc$rotation)
   pca$percent <- round(summary(pc)$importance[2, ] * 100, 2)
-  pca$pc <- paste0("PC", 1:nrow(pca))
   pca$sample <- rownames(pca)
+  pca$pc <- paste0("PC", 1:nrow(pca))
+  pca$pc <- factor(pca$pc, levels = pca$pc)
   
   pca <- merge(
     x = pca,

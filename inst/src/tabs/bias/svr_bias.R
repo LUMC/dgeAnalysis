@@ -31,7 +31,7 @@ output[["gc_bias"]] <- renderPlotly({
           title = paste("Bias based on", input$selectGC),
           xlab = paste(input$selectGC, "(%)"),
           ylab = "Average Log2FC"
-        ),
+        ) + labs(color = "FDR"),
         source = "biasGC",
         tooltip = "text"
       ) %>% layout(dragmode = "select", clickmode = "event+select") %>%
@@ -110,7 +110,7 @@ output[["len_bias"]] <- renderPlotly({
           title = paste("Bias based on", input$selectLength),
           xlab = input$selectLength,
           ylab = "Average Log2FC"
-        ),
+        ) + labs(color = "FDR"),
         source = "biasLength",
         tooltip = "text"
       ) %>% layout(dragmode = "select", clickmode = "event+select") %>%
@@ -179,6 +179,7 @@ output[["geneStrand_bias"]] <- renderPlotly({
         group = "strand",
         fill = "DE",
         facet = TRUE,
+        plot = "ratio",
         title = "Gene strand ratio",
         xlab = "",
         ylab = "Percentage of genes"

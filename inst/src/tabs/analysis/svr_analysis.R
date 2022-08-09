@@ -35,6 +35,7 @@ output[["de_ratio"]] <- renderPlotly({
         text = text,
         group = "Var1",
         fill = "Var1",
+        plot = "ratio",
         title = "Differential expression ratio",
         xlab = "",
         ylab = "Percentage of genes"
@@ -55,8 +56,8 @@ output[["ma_plot"]] <- renderPlotly({
     index <- round(seq(1, nrow(inUse_deTab), length.out = 1000))
     plot_data <- ma(inUse_deTab)
     text <- 'paste("Gene:", gene,
-                  "\nAverage Log2CPM:", round(avgLog2CPM, 2),
-                  "\nAverage Log2FC:", round(avgLog2FC, 2),
+                  "\nLog2CPM:", round(avgLog2CPM, 2),
+                  "\nLog2FC:", round(avgLog2FC, 2),
                   "\nRegulation:", DE)'
     
     ## Create plot
@@ -109,7 +110,7 @@ output[["volcano_plot"]] <- renderPlotly({
     plot_data <- volcano(inUse_deTab)
     text <- 'paste("Gene:", gene,
                   "\n-Log10 FDR:", round(FDR, 2),
-                  "\nAverage Log2FC:", round(avgLog2FC, 2),
+                  "\nLog2FC:", round(avgLog2FC, 2),
                   "\nRegulation:", DE)'
     
     ## Create plot

@@ -71,7 +71,7 @@ output[["enrich_barplot"]] <- renderPlotly({
         title = "Enrichment barplot",
         xlab = "Number of genes",
         ylab = ""
-      ),
+      ) + labs(fill = "P-Value"),
       tooltip = "text"
     )
   }, error = function(err) {
@@ -133,7 +133,7 @@ output[["cnet_plot"]] <- renderPlotly({
         label1 = input$cnet_annoP,
         label2 = input$cnet_annoG,
         title = "Gene-Concept Network"
-      ),
+      ) + labs(color = "Log2FC"),
       tooltip = "text"
     )
   }, error = function(err) {
@@ -188,7 +188,7 @@ output[["heat_plot"]] <- renderPlotly({
     plot_data <- heat_terms(geneSets, inUse_deTab)
     text <- 'paste("Term:", stringr::str_wrap(categoryID, 50),
                   "\nGene:", Gene,
-                  "\nAverage Log2FC:", round(avgLog2FC, 2))'
+                  "\nLog2FC:", round(avgLog2FC, 2))'
     
     ## Create plot
     ggplotly(
@@ -202,7 +202,7 @@ output[["heat_plot"]] <- renderPlotly({
         title = "Genes in pathway",
         xlab = "",
         ylab = ""
-      ),
+      ) + labs(fill = "Log2FC"),
       tooltip = "text"
     )
   }, error = function(err) {

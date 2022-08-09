@@ -27,7 +27,7 @@ output[["var_heat"]] <- renderPlotly({
         title = "Most variable genes",
         xlab = "",
         ylab = ""
-      ),
+      ) + labs(fill = "Log2CPM"),
       tooltip = "text"
     )
   }, error = function(err) {
@@ -96,7 +96,7 @@ output[["dge_heat"]] <- renderPlotly({
         title = "Most DE genes",
         xlab = "",
         ylab = ""
-      ),
+      ) + labs(fill = "Log2CPM"),
       tooltip = "text"
     )
   }, error = function(err) {
