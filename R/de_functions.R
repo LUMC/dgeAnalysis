@@ -1,5 +1,4 @@
 
-
 #' Add all counts that are in samples in SummerizedExperiment.
 #'
 #' @param data_counts Dataframe, Containing all raw count data
@@ -236,5 +235,3 @@ get_dendrogram_data <- function(tree,
   new <- new[order(new$x), ]
   return(new)
 }
-
-## --------------------------------------------------------------------------
