@@ -296,6 +296,8 @@ if (setGeneName == "symbol" && !is.null(data_annotation)) {
 
 ```{r showDGEResult}
 
+## MA
+index <- round(seq(1, nrow(deTab), length.out = 1000))
 plot_data <- ma(deTab)
 scatter_plot(
   df = plot_data,
