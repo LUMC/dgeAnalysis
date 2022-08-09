@@ -38,9 +38,19 @@ clean_enrich <- reactive({
   tryCatch({
     checkReload()
     enrich_processed <- inUse_enrich$result
-    enrich_processed <- enrich_processed[c("source", "term_name", "p_value", "term_size", "query_size", "intersection_size", "significant", "intersection")]
+    enrich_processed <-
+      enrich_processed[c(
+        "source",
+        "term_name",
+        "p_value",
+        "term_size",
+        "query_size",
+        "intersection_size",
+        "significant",
+        "intersection"
+      )]
     rownames(enrich_processed) <- inUse_enrich$result$term_id
-    enrich_processed <- enrich_processed[order(enrich_processed$p_value),]
+    enrich_processed <- enrich_processed[order(enrich_processed$p_value), ]
     enrich_processed
   }, error = function(err) {
     return(NULL)
@@ -51,25 +61,28 @@ clean_enrich <- reactive({
 output[["enrich_barplot"]] <- renderPlotly({
   tryCatch({
     checkReload()
+    
+    ## Get input data
     enrich <- clean_enrich()
-    enrichBarplot(enrich, input$terms_slider)
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
-## barplot slider, set number of values
-output[["terms_slider"]] <- renderUI({
-  tryCatch({
-    checkReload()
-    enrich <- clean_enrich()
-    sliderInput(
-      inputId = "terms_slider",
-      label = "Amount of shown pathways:",
-      value = nrow(enrich) / 2,
-      min = 1,
-      max = nrow(enrich),
-      step = 1
+    plot_data <- enrich_bar(enrich, input$terms_slider)
+    text <- 'paste("Source:", source,
+                  "\nTerm:", term_name,
+                  "\nGenes:", intersection_size,
+                  "\nP-Value:", round(p_value, 5))'
+    
+    ## Create plot
+    ggplotly(
+      bar_plot(
+        df = plot_data,
+        x = "intersection_size",
+        y = "term_name",
+        text = text,
+        fill = "p_value",
+        title = "Enrichment barplot",
+        xlab = "Number of genes",
+        ylab = ""
+      ) + labs(fill = "P-Value"),
+      tooltip = "text"
     )
   }, error = function(err) {
     return(NULL)
@@ -80,25 +93,27 @@ output[["terms_slider"]] <- renderUI({
 output[["enrich_DEbarplot"]] <- renderPlotly({
   tryCatch({
     checkReload()
+    
+    ## Get input data
     enrich <- clean_enrich()
-    enrichDE(enrich, inUse_deTab, input$DEterms_slider)
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
-## DE barplot slider, set number of values
-output[["DEterms_slider"]] <- renderUI({
-  tryCatch({
-    checkReload()
-    enrich <- clean_enrich()
-    sliderInput(
-      inputId = "DEterms_slider",
-      label = "Amount of shown pathways:",
-      value = nrow(enrich) / 2,
-      min = 1,
-      max = nrow(enrich),
-      step = 1
+    plot_data <- enrich_barDE(enrich, input$DEterms_slider, inUse_deTab)
+    text <- 'paste("Term:", name,
+                  "\nGenes:", abs(values),
+                  "\nRegulation:", ind)'
+    
+    ## Create plot
+    ggplotly(
+      bar_plot(
+        df = plot_data,
+        x = "values",
+        y = "name",
+        text = text,
+        fill = "ind",
+        title = "DE genes in terms",
+        xlab = "Number of genes",
+        ylab = ""
+      ),
+      tooltip = "text"
     )
   }, error = function(err) {
     return(NULL)
@@ -109,19 +124,27 @@ output[["DEterms_slider"]] <- renderUI({
 output[["cnet_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
+    
+    ## Get input data
     enrich <- clean_enrich()
     geneSets <- extract_geneSets(enrich,
                                  input$cnet_slider,
                                  input$select_pathway)
-
     graphData <- cnetPlotly(enrich, geneSets, inUse_deTab)
-    plotlyGraph(
-      graphData,
-      "Gene-Concept Network",
-      "Log2FC",
-      length(geneSets),
-      input$cnet_annoP,
-      input$cnet_annoG
+    plot_data <- cnet_data(inUse_deTab, graphData, (input$cnet_slider + length(input$select_pathway)))
+    text <- 'paste("Node:", genes,
+                  "\nLog2FC:", round(fc, 2))'
+    
+    ## Create plot
+    ggplotly(
+      network_plot(
+        df = plot_data,
+        text = text,
+        label1 = input$cnet_annoP,
+        label2 = input$cnet_annoG,
+        title = "Gene-Concept Network"
+      ) + labs(color = "Log2FC"),
+      tooltip = "text"
     )
   }, error = function(err) {
     return(NULL)
@@ -147,6 +170,7 @@ output[["cnet_select_pathway"]] <- renderUI({
 output[["cnet_table"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
+    
     enrich <- clean_enrich()
     geneSets <- extract_geneSets(enrich,
                                  input$cnet_slider,
@@ -161,53 +185,6 @@ output[["cnet_table"]] <- DT::renderDataTable({
   })
 })
 
-## create heatmap with gprofiler input
-output[["heat_plot"]] <- renderPlotly({
-  tryCatch({
-    checkReload()
-    enrich <- clean_enrich()
-    geneSets <- extract_geneSets(enrich,
-                                 input$heat_slider,
-                                 input$select_heat)
-    
-    heatplotly(geneSets, inUse_deTab)
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
-## Select a specific pathway to add to heatmap
-output[["heat_select_pathway"]] <- renderUI({
-  tryCatch({
-    enrich <- clean_enrich()
-    selectInput(
-      inputId = "select_heat",
-      label = "Add specific pathway:",
-      multiple = TRUE,
-      choices = c("Click to add pathway" = "", enrich$term_name)
-    )
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
-## Table with genes in corresponding heatmap plot
-output[["heat_table"]] <- DT::renderDataTable({
-  tryCatch({
-    checkReload()
-    enrich <- clean_enrich()
-    geneSets <- extract_geneSets(enrich,
-                                 input$heat_slider,
-                                 input$select_heat)
-    
-    graphData <- cnetPlotly(enrich, geneSets, inUse_deTab)
-    DT::datatable(inUse_deTab[rownames(inUse_deTab) %in% names(V(graphData)),], options = list(pageLength = 15, scrollX = TRUE))
-  }, error = function(err) {
-    return(DT::datatable(data.frame(c(
-      "No data available in table"
-    )), rownames = FALSE, colnames = ""))
-  })
-})
 
 ## INFORMATION BOXES
 
@@ -243,13 +220,5 @@ output[["enrich_cnet_info"]] <- renderUI({
         connected. The color given to genes is based on the log-fold change determined after the
         expression analysis. Ultimately, this plot shows the connection of genes between the most
         important road."
-  informationBox(infoText)
-})
-
-output[["enrich_heat_info"]] <- renderUI({
-  infoText <-
-    "The heatmap visualizes pathways and the associated genes. The genes are sorted based on:
-        Log2FC. The paths are sorted by the number of gene maths among other paths, with paths listed with
-        most gene matches on the left. This allows genes present in pathways to be compared on sight."
   informationBox(infoText)
 })

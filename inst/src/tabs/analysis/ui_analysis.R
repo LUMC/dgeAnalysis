@@ -64,23 +64,6 @@ tab_analysis <- tabItem(
         position = "right",
         sidebarPanel(
           width = 3,
-          sliderInput(
-            inputId = "vulcanoLogCut",
-            label = "LogFC Cutoff",
-            value = 1,
-            min = 0,
-            max = 25,
-            step = 0.1
-          ),
-          sliderInput(
-            inputId = "vulcanoPCut",
-            label = "P-Value Cutoff",
-            value = 0.05,
-            min = 0.01,
-            max = 1,
-            step = 0.01
-          ), 
-          br(),
           uiOutput("volcano_plot_info"),
           span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
         ),

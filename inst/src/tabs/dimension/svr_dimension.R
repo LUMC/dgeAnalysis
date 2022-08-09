@@ -3,10 +3,33 @@
 output[["pca"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    pcaPlot(inUse_normDge,
-            input$group_pca,
-            input$set_pca_pc1,
-            input$set_pca_pc2)
+    
+    ## Only plot if UI is loaded
+    if(is.null(input$group_pca)) {
+      break
+    }
+    
+    ## Get input data
+    plot_data <- pca_data(inUse_normDge)
+    text <- 'paste("Sample:", sample)'
+    
+    ## Create plot
+    ggplotly(
+      scatter_plot(
+        df = plot_data,
+        x = input$set_pca_pc1,
+        y = input$set_pca_pc2,
+        text = text,
+        group = input$group_pca,
+        size = 5,
+        key = "sample",
+        title = "PCA",
+        xlab = paste0(input$set_pca_pc1, " (", plot_data$percent[as.numeric(gsub("PC", "", input$set_pca_pc1))], "%)"),
+        ylab = paste0(input$set_pca_pc2, " (", plot_data$percent[as.numeric(gsub("PC", "", input$set_pca_pc2))], "%)")
+      ),
+      source = "pca",
+      tooltip = "text"
+    ) %>% layout(dragmode = "select", clickmode = "event+select")
   }, error = function(err) {
     return(NULL)
   })
@@ -18,7 +41,7 @@ output[["group_pca"]] <- renderUI({
     selectInput(
       inputId = "group_pca",
       label = "Color by:",
-      choices = colnames(data_samples())
+      choices = c("Samples" = "sample", colnames(data_samples()))
     )
   }, error = function(err) {
     return(NULL)
@@ -52,6 +75,10 @@ output[["selected_pca"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
     s <- event_data(event = "plotly_selected", source = "pca")
+    if (is.null(s)) {
+      throw()
+    }
+    
     DT::datatable(data_samples()[unlist(s$key), , drop = FALSE], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c(
@@ -64,7 +91,25 @@ output[["selected_pca"]] <- DT::renderDataTable({
 output[["variance_pca"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    variancePcaPlot(inUse_normDge)
+    
+    ## Get input data
+    plot_data <- pca_data(inUse_normDge)
+    text <- 'paste("PC:", pc,
+                  "\nPercentage:", percent)'
+    
+    ## Create plot
+    ggplotly(
+      bar_plot(
+        df = plot_data,
+        x = "pc",
+        y = "percent",
+        text = text,
+        title = "PCA Scree plot",
+        xlab = "Principal component",
+        ylab = "Percentage"
+      ),
+      tooltip = "text"
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -74,7 +119,33 @@ output[["variance_pca"]] <- renderPlotly({
 output[["dim_tsne"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    tsnePlot(inUse_normDge, input$group_dim_tsne)
+    
+    ## Only plot if UI is loaded
+    if(is.null(input$group_dim_tsne)) {
+      break
+    }
+    
+    ## Get input data
+    plot_data <- tsne_data(inUse_normDge)
+    text <- 'paste("Sample:", sample)'
+    
+    ## Create plot
+    ggplotly(
+      scatter_plot(
+        df = plot_data,
+        x = "V1",
+        y = "V2",
+        text = text,
+        group = input$group_dim_tsne,
+        size = 5,
+        key = "sample",
+        title = "tSNE",
+        xlab = "tSNE 1",
+        ylab = "tSNE 2"
+      ),
+      source = "tsne",
+      tooltip = "text"
+    ) %>% layout(dragmode = "select", clickmode = "event+select")
   }, error = function(err) {
     return(NULL)
   })
@@ -86,7 +157,7 @@ output[["group_dim_tsne"]] <- renderUI({
     selectInput(
       inputId = "group_dim_tsne",
       label = "Color by:",
-      choices = colnames(data_samples())
+      choices = c("Samples" = "sample", colnames(data_samples()))
     )
   }, error = function(err) {
     return(NULL)
@@ -98,9 +169,15 @@ output[["selected_dim_tsne"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
     s <- event_data(event = "plotly_selected", source = "tsne")
+    if (is.null(s)) {
+      throw()
+    }
+    
     DT::datatable(data_samples()[unlist(s$key), , drop = FALSE], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
-    return(NULL)
+    return(DT::datatable(data.frame(c(
+      "No data available in table"
+    )), rownames = FALSE, colnames = ""))
   })
 })
 
@@ -108,7 +185,33 @@ output[["selected_dim_tsne"]] <- DT::renderDataTable({
 output[["norm_un_cluster"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    multidimensionalScalingPlot(inUse_normDge, input$group_norm_mds, "norm_mds")
+    
+    ## Only plot if UI is loaded
+    if(is.null(input$group_norm_mds)) {
+      break
+    }
+    
+    ## Get input data
+    plot_data <- mds_clust(inUse_normDge)
+    text <- 'paste("Sample:", sample)'
+    
+    ## Create plot
+    ggplotly(
+      scatter_plot(
+        df = plot_data,
+        x = "x",
+        y = "y",
+        text = text,
+        group = input$group_norm_mds,
+        size = 5,
+        key = "sample",
+        title = "MDS Plot",
+        xlab = "MDS 1",
+        ylab = "MDS 2"
+      ),
+      source = "norm_mds",
+      tooltip = "text"
+    ) %>% layout(dragmode = "select", clickmode = "event+select")
   }, error = function(err) {
     return(NULL)
   })
@@ -120,7 +223,7 @@ output[["group_norm_mds"]] <- renderUI({
     selectInput(
       inputId = "group_norm_mds",
       label = "Color by:",
-      choices = colnames(data_samples())
+      choices = c("Samples" = "sample", colnames(data_samples()))
     )
   }, error = function(err) {
     return(NULL)
@@ -132,9 +235,15 @@ output[["selected_norm_mds"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
     s <- event_data(event = "plotly_selected", source = "norm_mds")
+    if (is.null(s)) {
+      throw()
+    }
+    
     DT::datatable(data_samples()[unlist(s$key), , drop = FALSE], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
-    return(NULL)
+    return(DT::datatable(data.frame(c(
+      "No data available in table"
+    )), rownames = FALSE, colnames = ""))
   })
 })
 
@@ -143,8 +252,27 @@ output[["dim_dendro"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
-    sampleTree <- hclust(dist(t(inUse_normDge$counts)), method = "average")
-    plotly_dendrogram(sampleTree, inUse_normDge$samples[[input$color_dendro]], NA)
+    ## Only plot if UI is loaded
+    if(is.null(input$color_dendro)) {
+      break
+    }
+    
+    ## Get input data
+    plot_data <- dendro_data(inUse_normDge)
+    text <- 'paste("Sample:", sample)'
+    
+    ## Create plot
+    ggplotly(
+      dendro_plot(
+        df = plot_data,
+        text = text,
+        group = input$color_dendro,
+        title = "Dendrogram",
+        xlab = "",
+        ylab = "Height"
+      ),
+      tooltip = "text"
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -156,7 +284,7 @@ output[["color_dendro"]] <- renderUI({
     selectInput(
       inputId = "color_dendro",
       label = "Color by:",
-      choices = colnames(data_samples())
+      choices = c("Samples" = "sample", colnames(data_samples()))
     )
   }, error = function(err) {
     return(NULL)

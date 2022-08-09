@@ -3,7 +3,33 @@
 output[["var_heat"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    variableHeatmapPlot(inUse_normDge, input$group_var, input$slider_heatmap_var)
+    
+    ## Only plot if UI is loaded
+    if(is.null(input$slider_heatmap_var)) {
+      break
+    }
+    
+    ## Get input data
+    plot_data <- heat_var(inUse_normDge, input$slider_heatmap_var)
+    text <- 'paste("Sample:", col,
+                  "\nGene:", row,
+                  "\nLog2CPM:", round(value, 2))'
+    
+    ## Create plot
+    ggplotly(
+      heatmap_plot(
+        df = plot_data,
+        x = "col",
+        y = "row",
+        text = text,
+        group = input$group_var,
+        fill = "value",
+        title = "Most variable genes",
+        xlab = "",
+        ylab = ""
+      ) + labs(fill = "Log2CPM"),
+      tooltip = "text"
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -32,7 +58,7 @@ output[["group_var"]] <- renderUI({
     selectInput(
       inputId = "group_var",
       label = "Group by:",
-      choices = c("None" = "None", colnames(data_samples()))
+      choices = c("None" = "none", colnames(data_samples()))
     )
   }, error = function(err) {
     return(NULL)
@@ -46,10 +72,33 @@ output[["dge_heat"]] <- renderPlotly({
     if (is.null(inUse_deTab)) {
       return(NULL)
     }
-    topDgeHeatmapPlot(inUse_deTab,
-                      inUse_normDge,
-                      input$group_dge,
-                      input$slider_heatmap_dge)
+    
+    ## Only plot if UI is loaded
+    if(is.null(input$slider_heatmap_dge)) {
+      break
+    }
+    
+    ## Get input data
+    plot_data <- heat_de(inUse_normDge, inUse_deTab, input$slider_heatmap_dge)
+    text <- 'paste("Sample:", col,
+                  "\nGene:", row,
+                  "\nLog2CPM:", round(value, 2))'
+    
+    ## Create plot
+    ggplotly(
+      heatmap_plot(
+        df = plot_data,
+        x = "col",
+        y = "row",
+        text = text,
+        group = input$group_dge,
+        fill = "value",
+        title = "Most DE genes",
+        xlab = "",
+        ylab = ""
+      ) + labs(fill = "Log2CPM"),
+      tooltip = "text"
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -62,7 +111,7 @@ output[["group_dge"]] <- renderUI({
     selectInput(
       inputId = "group_dge",
       label = "Group by:",
-      choices = c("None" = "None", colnames(data_samples()))
+      choices = c("None" = "none", colnames(data_samples()))
     )
   }, error = function(err) {
     return(NULL)

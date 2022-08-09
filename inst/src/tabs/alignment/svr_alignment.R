@@ -12,7 +12,7 @@ output[["group_sum"]] <- renderUI({
     selectInput(
       inputId = "group_sum",
       label = "Group by:",
-      choices = c("None" = "None", colnames(data_samples()))
+      choices = c("Samples" = "none", colnames(data_samples()))
     )
   }, error = function(err) {
     return(NULL)
@@ -23,12 +23,36 @@ output[["group_sum"]] <- renderUI({
 output[["align_sum"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    if (input$setSummary == "actual") {
-      perc = FALSE
-    } else {
-      perc = TRUE
+    
+    ## Only plot if UI is loaded
+    if(is.null(input$group_sum)) {
+      break
     }
-    alignmentSummaryPlot(get_se(), input$group_sum, perc)
+    
+    ## Get input data
+    se <- get_se()
+    plot_data <- alignment_summary(se, input$setSummary)
+    text <- 'paste("Sample:", sample,
+                  "\nClass:", feature,
+                  "\nSize:", round(count, 2))'
+
+    ## Create plot
+    ggplotly(
+      bar_plot(
+        df = plot_data,
+        x = "count",
+        y = "sample",
+        text = text,
+        group = input$group_sum,
+        fill = "feature",
+        rev = TRUE,
+        facet = input$group_sum,
+        title = "Count assignments",
+        xlab = "Counts",
+        ylab = ""
+      ),
+      tooltip = "text"
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -38,12 +62,34 @@ output[["align_sum"]] <- renderPlotly({
 output[["complex"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    if (input$setComplexity == "actual") {
-      perc = FALSE
-    } else {
-      perc = TRUE
+    
+    ## Only plot if UI is loaded
+    if(is.null(input$group_color)) {
+      break
     }
-    complexityPlot(get_se(), input$group_color, perc, input$comp_rank)
+    
+    ## Get input data
+    se <- get_se()
+    plot_data <- complexity(se, rank = input$comp_rank)
+    text <- 'paste("Sample:", sample,
+                  "\nGenes:", rank,
+                  "\nSize:", round(get(y), 2))'
+    
+    ## Create plot
+    ggplotly(
+      line_plot(
+        df = plot_data,
+        x = "rank",
+        y = input$setComplexity,
+        text = text,
+        group = input$group_color,
+        plot = "complexity",
+        title = "Gene complexity",
+        xlab = "Number of genes",
+        ylab = "Cumulative reads per number of genes"
+      ),
+      tooltip = "text"
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -56,7 +102,7 @@ output[["group_color"]] <- renderUI({
     selectInput(
       inputId = "group_color",
       label = "Group by:",
-      choices = c("None" = "None", colnames(data_samples()))
+      choices = c("Samples" = "sample", colnames(data_samples()))
     )
   }, error = function(err) {
     return(NULL)

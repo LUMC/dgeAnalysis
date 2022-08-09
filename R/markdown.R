@@ -1,7 +1,4 @@
 
-## ----- MARKDOWN FUNCTIONS -----
-
-
 #' Create vector from two design values and two matrix values.
 #' Check if all values are the same then design will start with ~0.
 #' Get column names based on corresponding values in matrix.
@@ -139,5 +136,3 @@ createContrast <- function(design, matrix_v1, matrix_v2) {
   contrast[match(matrix_v2, colnames(design))] <- -1
   contrast
 }
-
-## --------------------------------------------------------------------------

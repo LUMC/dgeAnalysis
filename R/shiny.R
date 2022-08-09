@@ -1,7 +1,4 @@
 
-## ----- START THE APPLICATION -----
-
-
 #' Start dgeAnalysis application.
 #'
 #' @return Opens application in default web browser
@@ -16,7 +13,7 @@ startApp <- function(launch.browser = TRUE) {
          call. = FALSE)
   }
   
-  library("dgeAnalysis")
+  require("dgeAnalysis")
   options(shiny.maxRequestSize = 100 * 1024 ^ 2)
   options(spinner.color = "#0088cc")
   options(warn = -1)
@@ -41,4 +38,31 @@ startApp <- function(launch.browser = TRUE) {
     port = 1402,
     launch.browser = launch.browser
   )
+}
+
+
+#' Template for plot information.
+#'
+#' @param infoText String, Explanation of a plot
+#'
+#' @return Shiny Box object
+#'
+#' @export
+
+informationBox <- function(infoText) {
+  tryCatch({
+    box(
+      title = icon("circle-info"),
+      status = "primary",
+      solidHeader = TRUE,
+      width = 12,
+      collapsible = TRUE,
+      collapsed = FALSE,
+      span(infoText,
+           style = "padding-left: 5px; text-align: justify; display: block;"),
+      style = "padding-left: unset;"
+    )
+  }, error = function(err) {
+    return(NULL)
+  })
 }

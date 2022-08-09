@@ -58,7 +58,7 @@ server <- function(input, output, session) {
       menuItem(
         "Home",
         tabName = "home",
-        icon = icon("home")
+        icon = icon("house")
       ),
       menuItem(
         "Data upload",
@@ -135,7 +135,7 @@ server <- function(input, output, session) {
       menuItem(
         "About",
         tabName = "about",
-        icon = icon("info-circle")
+        icon = icon("circle-info")
       ),
       img(src = "lumcLogo.png", width = "200px")
     )

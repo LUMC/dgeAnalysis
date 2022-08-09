@@ -10,19 +10,24 @@ options(spinner.color = "#0088cc")
 ##    "normDge",
 ##    "enrich",
 ##    "inUse_deTab",
-##    "inUse_normDge",
+##    "inUse_normDge",+
 ##    inUse_enrich
 ##  ),
 ##  envir = .GlobalEnv
 ##))
 
-options(warn = -1)
+options(warn = 0)
 
 source("inst/src/lib/libraries.R", local = TRUE)
-source("R/de.R", local = TRUE)
+source("R/shiny.R", local = TRUE)
+source("R/de_functions.R", local = TRUE)
 source("R/enrichment.R", local = TRUE)
 source("R/markdown.R", local = TRUE)
-source("R/de_plots.R", local = TRUE)
+source("R/plots.R", local = TRUE)
+source("R/plot_prep.R", local = TRUE)
+
+## Update namespace (run in shark R session)
+## roxygen2::roxygenise(package.dir = "/exports/sasc/tbkuipers/dgeAnalysis/")
 
 shiny::runApp(
   appDir = "inst/src/",

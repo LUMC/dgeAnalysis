@@ -180,6 +180,10 @@ get_raw_dge <- reactive({
 ## Render sample data to ui
 output[["sample_data"]] <- DT::renderDataTable({
   tryCatch({
+    if (is.null(data_samples())) {
+      throw()
+    }
+    
     DT::datatable(data_samples(), options = list(pageLength = 50, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c(
@@ -191,6 +195,10 @@ output[["sample_data"]] <- DT::renderDataTable({
 ## Render count data to ui
 output[["count_data"]] <- DT::renderDataTable({
   tryCatch({
+    if (is.null(data_counts())) {
+      throw()
+    }
+    
     DT::datatable(data_counts(), options = list(pageLength = 50, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c(
@@ -202,6 +210,10 @@ output[["count_data"]] <- DT::renderDataTable({
 ## Render annotation data to ui
 output[["annotation_data"]] <- DT::renderDataTable({
   tryCatch({
+    if (is.null(data_annotation())) {
+      throw()
+    }
+    
     DT::datatable(data_annotation(), options = list(pageLength = 50, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c(
@@ -217,6 +229,10 @@ output[["annotation_data"]] <- DT::renderDataTable({
 ## Render sample data to ui
 output[["sample_data_view"]] <- DT::renderDataTable({
   tryCatch({
+    if (is.null(data_samples())) {
+      throw()
+    }
+    
     DT::datatable(data_samples(), options = list(pageLength = 50, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c(
@@ -228,6 +244,10 @@ output[["sample_data_view"]] <- DT::renderDataTable({
 ## Render count data to ui
 output[["count_data_view"]] <- DT::renderDataTable({
   tryCatch({
+    if (is.null(data_counts())) {
+      throw()
+    }
+    
     DT::datatable(data_counts(), options = list(pageLength = 50, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c(
@@ -239,6 +259,10 @@ output[["count_data_view"]] <- DT::renderDataTable({
 ## Render normalized data to ui
 output[["norm_data_view"]] <- DT::renderDataTable({
   tryCatch({
+    if (is.null(data_norm())) {
+      throw()
+    }
+    
     DT::datatable(data_norm(), options = list(pageLength = 50, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c(
@@ -250,6 +274,10 @@ output[["norm_data_view"]] <- DT::renderDataTable({
 ## Render normalized data to ui
 output[["detab_data_view"]] <- DT::renderDataTable({
   tryCatch({
+    if (is.null(data_detab())) {
+      throw()
+    }
+    
     DT::datatable(data_detab(), options = list(pageLength = 50, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c(

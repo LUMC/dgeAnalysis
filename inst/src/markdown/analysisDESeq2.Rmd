@@ -29,24 +29,31 @@ params:
   alpha:            ""
 ---
 
-# Reading packages and variables
-Required packages are loaded and the input variables are set. The used input settings are shown.
+
+# Load packages
 
 ```{r setup}
 
-if (!require("knitr")) install.packages("knitr")
-if (!require("SummarizedExperiment")) install.packages("SummarizedExperiment")
-if (!require("DESeq2")) install.packages("DESeq2")
-if (!require("tidyr")) install.packages("tidyr")
-if (!require("scales")) install.packages("scales")
-if (!require("plotly")) install.packages("plotly")
+## Load required packages
+suppressPackageStartupMessages({
+  library(knitr)
+  library(SummarizedExperiment)
+  library(DESeq2)
+  library(edgeR)
+  library(tidyr)
+  library(scales)
+  library(plotly)
+})
 
 ```
 
 
-```{r variables}
-# IMPORT VARIABLES
+# Input
+## Load input variables
 
+```{r variables}
+
+## Import variables
 md5sum <- params$md5sum
 data_samples <- params$data_samples
 data_counts <- params$data_counts
@@ -64,19 +71,11 @@ alpha <- params$alpha
 ```
 
 
-```{r filterData}
-# FILTER DATA IF NECESSARY
-
-data_samples <- data_samples[!rownames(data_samples) %in% excluded_samples, , drop=FALSE]
-data_counts <- data_counts[,!colnames(data_counts) %in% excluded_samples]
-
-```
-
-## Input values
+## Show input variables
 
 ```{r showVariables}
-# SHOW VALUES OF VARIABLES
 
+## Values of variables
 md5sum
 cpm_value
 cpm_perc
@@ -89,142 +88,213 @@ matrix_v2
 
 ```
 
-# Process raw data
-The raw data is processed and pre-filtered, to remove non feature counts. The data is placed in a format (DGE list) which can be used for later analsis.
 
-```{r showRawData}
-# SHOW RAW DATA
+# Pre-process data
+## Create Summarized Experiment
 
+```{r preprocess}
+
+## Match sample sheet & count data
+data_samples <- data_samples[!rownames(data_samples) %in% excluded_samples, , drop=FALSE]
+data_counts <- data_counts[,!colnames(data_counts) %in% excluded_samples]
+
+## Read data as Summarized Experiment
 se <- readCountsFromTable(data_counts, data_samples)
 se <- addSamplesFromTableToSE(se, data_samples)
 
-alignmentSummaryPlot(se)
-complexityPlot(se)
+## Alignment summary
+plot_data <- alignment_summary(se)
+bar_plot(
+  df = plot_data,
+  x = "count",
+  y = "sample",
+  group = "sample",
+  fill = "feature",
+  rev = TRUE,
+  title = "Count assignments",
+  xlab = "Counts",
+  ylab = ""
+)
 
-```
+## Complexity
+plot_data <- complexity(se)
+line_plot(
+  df = plot_data,
+  x = "rank",
+  y = "fraction",
+  group = "sample",
+  plot = "complexity",
+  title = "Gene complexity",
+  xlab = "Cumulative reads per number of genes",
+  ylab = "Number of genes"
+)
 
-## Create DGE list
-
-```{r filesIntoSE}
-# READ ALL FILES INTO SE
-
+## Create final Summarized Experiment
 se <- readCountsFromTable(data_counts[!grepl('^__', rownames(data_counts)), ], data_samples)
 se <- addSamplesFromTableToSE(se, data_samples)
 if (!is.null(data_annotation)) {
   se <- addAnnotationsFromTableToSE(se, data_annotation)
 }
 
+```
+
+
+## Create DGE list
+
+```{r dge}
+
+## Create DGE list
 dge <- DGEList(counts = assay(se),
                samples = colData(se),
                genes = rowData(se))
-dge <- dge[rowSums(abs(dge$counts)) > 1,]
 
+## Remove genes with all 0 counts
+dge <- dge[rowSums(abs(dge$counts)) > 1, ]
+
+## Count distribution
 tempDge <- dge
 tempDge$counts <- cpm(dge, log = TRUE, prior.count = 1)
-countDistributionLinePlot(tempDge)
-
-dge <- DGEList(counts = assay(se), samples = colData(se))
+plot_data <- count_dist(tempDge)
+line_plot(
+  df = plot_data,
+  x = "x",
+  y = "y",
+  group = "sample",
+  title = "Gene count distribution",
+  xlab = "Log2CPM",
+  ylab = "Density"
+)
 
 ```
 
+
 # Create design and prepare analysis
-The design matrix is created and the raw data is filtered based on the input values provided.
 
 ```{r selectedFeatures}
-# GET SELECTED FEATURES
 
+## Create design
 get_design <- createDesign(dge$samples, design_base, design_value, matrix_v1, matrix_v2)
 get_design
 dge <- relevelSamples(dge, design_base, design_value, matrix_v1, matrix_v2)
 design <- model.matrix(eval(parse(text = get_design)), dge$samples)
 design
 
+## Prepare analysis
 analysis <- DESeqDataSet(se, design = design)
 analysis <- analysis[rowSums(abs(assay(analysis))) > 1,]
 
-# FILTER IF NESSECARY
+## Filter data on low expressed genes
 counts <- cpm(counts(analysis), log = TRUE, prior.count = 1)
 selectedFeatures <- rownames(analysis)[apply(counts, 1, function(v)
   sum(v >= cpm_value)) >= (cpm_perc / 100) * ncol(counts)]
+
+## Get high expressed genes
 analysis <- analysis[selectedFeatures, ]
 
 ```
 
+
 # Perform analysis
-The analysis is performed with the filtered data using DESeq2.
 
 ```{r startAnalysis}
-# START ANALYSIS
 
+## Run analysis
 analysis <- DESeq(analysis)
 
 ```
 
+
 # Normalization
-Extract the normalized data from the analysis results.
 
 ```{r getNormalizedCounts}
-# GET NORMALIZED COUNTS
 
+## Normalize data
 getSize <- estimateSizeFactors(analysis)
 normDge <- DGEList(counts = data.frame(counts(getSize, normalized = TRUE)), samples = dge$samples)
 normDge$counts <- cpm(normDge, log = TRUE, prior.count = 1)
 
-countDistributionLinePlot(normDge)
-pcaPlot(normDge, design_base, "PC1", "PC2")
+## Count distribution
+plot_data <- count_dist(normDge)
+line_plot(
+  df = plot_data,
+  x = "x",
+  y = "y",
+  group = "sample",
+  title = "Gene count distribution",
+  xlab = "Log2CPM",
+  ylab = "Density"
+)
+
+## PCA
+plot_data <- pca_data(normDge)
+scatter_plot(
+  df = plot_data,
+  x = "PC1",
+  y = "PC2",
+  group = design_base,
+  size = 4,
+  title = "PCA",
+  xlab = paste0("PC1", " (", plot_data$percent[1], "%)"),
+  ylab = paste0("PC2", " (", plot_data$percent[2], "%)")
+)
 
 ```
 
+
 # Collect DE results
-Create the contrast matrix and collect DE results based on this matrix.
 
 ```{r getResults}
-# GET RESULTS
 
+## Get contrast values
 get_matrix1 <- createMatrix(normDge, design_base, design_value, matrix_v1)
 get_matrix2 <- createMatrix(normDge, design_base, design_value, matrix_v2)
 get_matrix1
 get_matrix2
 
+## Create contrast
 contrast <- createContrast(design, get_matrix1, get_matrix2)
 contrast
 
+## Get expression results
 deTab <- results(analysis, contrast = contrast, alpha = alpha)
 summary(deTab)
 
 ```
 
+
 ## Format DE output table
 
 ```{r create_deTab}
-# CREATE deTab TABLE
 
+## Reorder & rename table values
 deTab <- data.frame(deTab[, c("log2FoldChange", "pvalue", "padj")])
 colnames(deTab) <- c("avgLog2FC", "P.Value", "adj.P.Val")
 deTab$avgLog2CPM <- rowMeans(normDge$counts)
 
-# SET DE GENES
+## Set DE values
 deTab$DE <- 0
 deTab$DE[deTab$adj.P.Val < alpha & deTab$avgLog2FC < 0] <- -1
 deTab$DE[deTab$adj.P.Val < alpha & deTab$avgLog2FC > 0] <- 1
 
 ```
 
+
 ## Add annotation to DE table
 
 ```{r addAnnotation}
-# ADD ANNOTATION TO deTab
 
+## Add annotation to deTab
 if (!is.null(data_annotation)) {
   deTab <- merge(data_annotation, deTab, by = 0, all = FALSE)
   rownames(deTab) <- deTab$Row.names
   deTab$Row.names <- NULL
 }
 
-#ORDER deTab TABLE
+## Rename table values
 deTab <- rename(deTab, "FDR" = "adj.P.Val")
 deOrder <- c("avgLog2CPM", "avgLog2FC", "P.Value", "FDR", "DE")
 
+## Reorder annotation (if present)
 if (!is.null(data_annotation)) {
   deTab <- deTab[colnames(deTab)
                  [c(1, match(deOrder, names(deTab)), 2:(ncol(deTab) - 5))]]
@@ -232,12 +302,7 @@ if (!is.null(data_annotation)) {
   deTab <- deTab[deOrder]
 }
 
-```
-
-
-```{r changeToSymbol}
-# CHANGE GENE ID TO SYMBOL IF NECESSARY
-
+## Add gene symbol
 if (setGeneName == "symbol" && !is.null(data_annotation)) {
   tempCol <- rownames(deTab)
   rownames(deTab) <- make.names(deTab$geneName, unique = TRUE)
@@ -248,33 +313,55 @@ if (setGeneName == "symbol" && !is.null(data_annotation)) {
 
 ```
 
+
 ## DE results
 
 ```{r showDGEResult}
-# SHOW DGE RESULTS
 
-ma_plot(deTab)
-pValuePlot(deTab)
+## MA
+index <- round(seq(1, nrow(deTab), length.out = 1000))
+plot_data <- ma(deTab)
+scatter_plot(
+  df = plot_data,
+  x = "avgLog2CPM",
+  y = "avgLog2FC",
+  group = "DE",
+  index = index,
+  title = "MA Plot",
+  xlab = "Average Log2CPM",
+  ylab = "Average Log2FC"
+)
+
+## P-value
+plot_data <- pvalue(deTab)
+bar_plot(
+  df = plot_data,
+  x = "p",
+  y = "x",
+  title = "P-Value plot",
+  xlab = "P-Value",
+  ylab = "Count"
+)
 
 ```
 
+
 # Save results
-Results are saved, so they can be retrieved by the application.
 
 ```{r save}
-# SAVE ANALYSIS
 
+## Save data files
 deTab <- deTab[order(deTab$FDR),]
 save(deTab, normDge, file = "analysis.RData")
 
 ```
 
+
 # Session info
-Showing all used packages including version numbers.
 
 ```{r session}
-#INFO
 
+## Session info
 sessionInfo()
 
 ```

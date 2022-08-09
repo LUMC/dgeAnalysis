@@ -20,6 +20,6 @@ if (!require("plotly")) install.packages("plotly")
 if (!require("Rtsne")) install.packages("Rtsne")
 if (!require("rmarkdown")) install.packages("rmarkdown")
 
-## Pathway analysis
+## Enrichment analysis
 if (!require("gprofiler2")) install.packages("gprofiler2")
 if (!require("igraph")) install.packages("igraph")

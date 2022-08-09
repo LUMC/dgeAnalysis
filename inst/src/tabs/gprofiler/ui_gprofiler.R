@@ -38,8 +38,14 @@ tab_gprofiler <- tabItem(
         position = "right",
         sidebarPanel(
           width = 3,
-          uiOutput("terms_slider"),
-          ## Filter on source??
+          sliderInput(
+            inputId = "terms_slider",
+            label = "Amount of shown pathways:",
+            value = 25,
+            min = 1,
+            max = 50,
+            step = 1
+          ),
           br(),
           uiOutput("enrich_barplot_info"),
           span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
@@ -59,8 +65,14 @@ tab_gprofiler <- tabItem(
         position = "right",
         sidebarPanel(
           width = 3,
-          uiOutput("DEterms_slider"),
-          ## Filter on source??
+          sliderInput(
+            inputId = "DEterms_slider",
+            label = "Amount of shown pathways:",
+            value = 25,
+            min = 1,
+            max = 50,
+            step = 1
+          ),
           br(),
           uiOutput("enrich_DEbarplot_info"),
           span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
@@ -103,37 +115,6 @@ tab_gprofiler <- tabItem(
       ),
       HTML('<hr style="border-color: #0088cc;">'),
       DT::dataTableOutput("cnet_table") %>% withSpinner(),
-      HTML('<hr style="border-color: #0088cc;">')
-    ),
-    
-    tabPanel(
-      title = "Enriched terms heatmap",
-      HTML('<hr style="border-color: #0088cc;">'),
-      sidebarLayout(
-        position = "right",
-        sidebarPanel(
-          width = 3,
-          br(),
-          sliderInput(
-            inputId = "heat_slider",
-            label = "Number of shown pathways:",
-            value = 5,
-            min = 0,
-            max = 15,
-            step = 1
-          ),
-          uiOutput("heat_select_pathway"),
-          br(),
-          uiOutput("enrich_heat_info"),
-          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
-        ),
-        mainPanel(
-          width = 9,
-          plotlyOutput("heat_plot", height = "600px") %>% withSpinner()
-        )
-      ),
-      HTML('<hr style="border-color: #0088cc;">'),
-      DT::dataTableOutput("heat_table") %>% withSpinner(),
       HTML('<hr style="border-color: #0088cc;">')
     )
   )

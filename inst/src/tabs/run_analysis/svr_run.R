@@ -231,8 +231,8 @@ output[["show_matrix"]] <- renderUI({
       }
     }
     
-    total_matrix1 <- paste(total_matrix1, collapse = " in ")
-    total_matrix2 <- paste(total_matrix2, collapse = " in ")
+    total_matrix1 <- paste(total_matrix1, collapse = " & ")
+    total_matrix2 <- paste(total_matrix2, collapse = " & ")
     
     if (total_matrix1 == "") {
       total_matrix1 <- "NaN"

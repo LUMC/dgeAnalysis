@@ -3,7 +3,32 @@
 output[["dist_line"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    countDistributionLinePlot(get_raw_dge(), input$raw_line_color)
+    
+    ## Only plot if UI is loaded
+    if(is.null(input$raw_line_color)) {
+      break
+    }
+    
+    ## Get input data
+    dge <- get_raw_dge()
+    plot_data <- count_dist(dge)
+    text <- 'paste("Sample:", sample,
+                  "\nLog2CPM:", round(x, 2))'
+    
+    ## Create plot
+    ggplotly(
+      line_plot(
+        df = plot_data,
+        x = "x",
+        y = "y",
+        text = text,
+        group = input$raw_line_color,
+        title = "Gene count distribution",
+        xlab = "Log2CPM",
+        ylab = "Density"
+      ),
+      tooltip = "text"
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -16,82 +41,95 @@ output[["raw_line_color"]] <- renderUI({
     selectInput(
       inputId = "raw_line_color",
       label = "Group by:",
-      choices = c("None" = "None", colnames(data_samples()))
+      choices = c("Samples" = "sample", colnames(data_samples()))
     )
   }, error = function(err) {
     return(NULL)
   })
 })
 
-## Distribution plot boxplot
-output[["dist_boxplot"]] <- renderPlotly({
+## Distribution plot violin
+output[["dist_violin"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    countDistributionBoxPlot(get_raw_dge())
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
-## Make dge voom ready
-get_pre_voom <- reactive({
-  dge <- get_raw_dge()
-  dge$counts <- dge$counts[!grepl('^__', rownames(dge$counts)), ]
-  selectedFeatures <-
-    rownames(dge$counts)[apply(dge$counts, 1, function(v)
-      sum(v >= input$slider_raw_voom)) >= 1 / 4 * ncol(dge$counts)]
-  highExprDge <- dge[selectedFeatures, , keep.lib.sizes = FALSE]
-  highExprDge
-})
-
-## Voom plot
-output[["raw_voom_plot"]] <- renderPlotly({
-  tryCatch({
-    checkReload()
-    dge <- get_raw_dge()
-    dge$counts <- dge$counts[!grepl('^__', rownames(dge$counts)), ]
-    selectedFeatures <-
-      rownames(dge$counts)[apply(dge$counts, 1, function(v)
-        sum(v >= input$slider_raw_voom)) >= 1 / 4 * ncol(dge$counts)]
-    highExprDge <- dge[selectedFeatures, , keep.lib.sizes = FALSE]
     
-    voomPlot(highExprDge, "raw_voom")
+    ## Only plot if UI is loaded
+    if(is.null(input$raw_violin_group)) {
+      break
+    }
+    
+    ## Get input data
+    dge <- get_raw_dge()
+    plot_data <- violin_dist(dge, input$raw_violin_group)
+    text <- 'paste("Sample:", sample)'
+    
+    ## Create plot
+    gg <- ggplotly(
+      violin_plot(
+        df = plot_data,
+        text = text,
+        group = input$raw_violin_group,
+        title = "Gene count distribution",
+        xlab = "",
+        ylab = "Log2CPM"
+      ),
+      tooltip = "text"
+    )
+    
+    ## Fix labels & plot
+    fix_violin_hover(gg)
   }, error = function(err) {
     return(NULL)
   })
 })
 
-## Show amount of genes left after filtering
-output[["raw_voom_ngenes"]] <- renderUI({
-  tryCatch({
-    h2("Predicted after filtering:",
-       br(),
-       nrow(get_pre_voom()),
-       "Genes")
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
-## Selected data points raw_voom_plot
-output[["selected_raw_voom"]] <- DT::renderDataTable({
+## Select a group to group violin plot
+output[["raw_violin_group"]] <- renderUI({
   tryCatch({
     checkReload()
-    s <- event_data(event = "plotly_selected", source = "raw_voom")
-    counts <- data.frame(get_raw_dge()$counts[!grepl('^__', rownames(get_raw_dge()$counts)), ])
-    DT::datatable(counts[unlist(s$key), ], options = list(pageLength = 15, scrollX = TRUE))
+    selectInput(
+      inputId = "raw_violin_group",
+      label = "Group by:",
+      choices = c("Samples" = "sample", colnames(data_samples()))
+    )
   }, error = function(err) {
-    return(DT::datatable(data.frame(c(
-      "No data available in table"
-    )), rownames = FALSE, colnames = ""))
+    return(NULL)
   })
 })
+
 
 ## Multidimensional scaling
 output[["un_cluster"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    multidimensionalScalingPlot(get_raw_dge(), input$group_raw_mds, "raw_mds")
+    
+    ## Only plot if UI is loaded
+    if(is.null(input$group_raw_mds)) {
+      break
+    }
+    
+    ## Get input data
+    dge <- get_raw_dge()
+    plot_data <- mds_clust(dge)
+    text <- 'paste("Sample:", sample)'
+    
+    ## Create plot
+    ggplotly(
+      scatter_plot(
+        df = plot_data,
+        x = "x",
+        y = "y",
+        text = text,
+        group = input$group_raw_mds,
+        size = 5,
+        key = "sample",
+        title = "MDS Plot",
+        xlab = "MDS 1",
+        ylab = "MDS 2"
+      ),
+      source = "raw_mds",
+      tooltip = "text"
+    ) %>% layout(dragmode = "select", clickmode = "event+select")
   }, error = function(err) {
     return(NULL)
   })
@@ -103,7 +141,7 @@ output[["group_raw_mds"]] <- renderUI({
     selectInput(
       inputId = "group_raw_mds",
       label = "Color by:",
-      choices = colnames(data_samples())
+      choices =c("Samples" = "sample", colnames(data_samples()))
     )
   }, error = function(err) {
     return(NULL)
@@ -115,6 +153,10 @@ output[["selected_raw_mds"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
     s <- event_data(event = "plotly_selected", source = "raw_mds")
+    if (is.null(s)) {
+      throw()
+    }
+    
     DT::datatable(data_samples()[unlist(s$key), , drop = FALSE], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c(
@@ -133,21 +175,11 @@ output[["dist_line_info"]] <- renderUI({
   informationBox(infoText)
 })
 
-output[["dist_boxplot_info"]] <- renderUI({
+output[["dist_violin_info"]] <- renderUI({
   infoText <-
-    "The box plot serves a similar purpose as the line plot, but the data can be viewed in a different way
+    "The violin plot serves a similar purpose as the line plot, but the data can be viewed in a different way
         format. The distribution can be seen between the Log2CPM at the corresponding
         samples."
-  informationBox(infoText)
-})
-
-output[["raw_voom_plot_info"]] <- renderUI({
-  infoText <-
-    "The voom plot provides a check on the filtering, which is performed at the beginning of the
-        analysis. The method to calculate this is 'voom'. Voom is an acronym for
-        mean variance modeling at the observational level. This means that the mean variance in
-        the data is calculated and gives each observation a certain weight. Problems during the
-        filtering of low expressed genes will be visible in this plot."
   informationBox(infoText)
 })
 

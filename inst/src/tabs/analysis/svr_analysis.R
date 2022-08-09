@@ -19,7 +19,29 @@ output[["detab_table"]] <- DT::renderDataTable({
 output[["de_ratio"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    deRatioPlot(inUse_deTab)
+    
+    ## Get input data
+    plot_data <- de_ratio(inUse_deTab)
+    text <- 'paste("Regulation:", Var1,
+                  "\nGenes:", Freq,
+                  "\nPercentage:", round(perc, 2))'
+    
+    ## Create plot
+    ggplotly(
+      bar_plot(
+        df = plot_data,
+        x = "Var1",
+        y = "perc",
+        text = text,
+        group = "Var1",
+        fill = "Var1",
+        plot = "ratio",
+        title = "Differential expression ratio",
+        xlab = "",
+        ylab = "Percentage of genes"
+      ),
+      tooltip = "text"
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -29,7 +51,35 @@ output[["de_ratio"]] <- renderPlotly({
 output[["ma_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    ma_plot(inUse_deTab)
+    
+    ## Get input data
+    index <- round(seq(1, nrow(inUse_deTab), length.out = 1000))
+    plot_data <- ma(inUse_deTab)
+    text <- 'paste("Gene:", gene,
+                  "\nLog2CPM:", round(avgLog2CPM, 2),
+                  "\nLog2FC:", round(avgLog2FC, 2),
+                  "\nRegulation:", DE)'
+    
+    ## Create plot
+    toWebGL(
+      ggplotly(
+        scatter_plot(
+          df = plot_data,
+          x = "avgLog2CPM",
+          y = "avgLog2FC",
+          text = text,
+          group = "DE",
+          index = index,
+          key = "gene",
+          title = "MA Plot",
+          xlab = "Average Log2CPM",
+          ylab = "Average Log2FC"
+        ),
+        source = "analysis_ma",
+        tooltip = "text"
+      ) %>% layout(dragmode = "select", clickmode = "event+select") %>%
+        style(hoverinfo = "text")
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -39,6 +89,10 @@ output[["ma_plot"]] <- renderPlotly({
 output[["selected_ma"]] <- DT::renderDataTable({
   tryCatch({
     s <- event_data(event = "plotly_selected", source = "analysis_ma")
+    if (is.null(s)) {
+      throw()
+    }
+    
     DT::datatable(inUse_deTab[s$key,], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c(
@@ -51,9 +105,32 @@ output[["selected_ma"]] <- DT::renderDataTable({
 output[["volcano_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    volcanoPlot(inUse_deTab,
-                input$vulcanoLogCut,
-                -log10(input$vulcanoPCut))
+    
+    ## Get input data
+    plot_data <- volcano(inUse_deTab)
+    text <- 'paste("Gene:", gene,
+                  "\n-Log10 FDR:", round(FDR, 2),
+                  "\nLog2FC:", round(avgLog2FC, 2),
+                  "\nRegulation:", DE)'
+    
+    ## Create plot
+    toWebGL(
+      ggplotly(
+        scatter_plot(
+          df = plot_data,
+          x = "avgLog2FC",
+          y = "FDR",
+          text = text,
+          group = "DE",
+          key = "gene",
+          title = "Volcano Plot",
+          xlab = "Average Log2FC",
+          ylab = "-Log10 P-value (FDR)"
+        ),
+        source = "analysis_volcano",
+        tooltip = "text"
+      ) %>% layout(dragmode = "select", clickmode = "event+select")
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -63,6 +140,10 @@ output[["volcano_plot"]] <- renderPlotly({
 output[["selected_volcano"]] <- DT::renderDataTable({
   tryCatch({
     s <- event_data(event = "plotly_selected", source = "analysis_volcano")
+    if (is.null(s)) {
+      throw()
+    }
+    
     DT::datatable(inUse_deTab[s$key,], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c(
@@ -75,12 +156,31 @@ output[["selected_volcano"]] <- DT::renderDataTable({
 output[["barcode_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    barcodePlot(
-      inUse_deTab,
-      inUse_normDge,
-      input$group_analysis_bar,
-      input$slider_barcode,
-      input$selected_analysis_bar
+    
+    ## Only plot if UI is loaded
+    if(is.null(input$group_analysis_bar)) {
+      break
+    }
+    
+    ## Get input data
+    plot_data <- barcode(inUse_deTab, inUse_normDge, input$slider_barcode, input$selected_analysis_bar)
+    text <- 'paste("Sample:", sample,
+                  "\nGene:", row,
+                  "\nLog2CPM:", round(value, 2))'
+    
+    ## Create plot
+    ggplotly(
+      barcode_plot(
+        df = plot_data,
+        x = "value",
+        y = "row",
+        text = text,
+        group = input$group_analysis_bar,
+        title = "Barcode Plot",
+        xlab = "Log2CPM",
+        ylab = ""
+      ),
+      tooltip = "text"
     )
   }, error = function(err) {
     return(NULL)
@@ -93,7 +193,7 @@ output[["group_analysis_bar"]] <- renderUI({
     selectInput(
       inputId = "group_analysis_bar",
       label = "Color by:",
-      choices = colnames(data_samples())
+      choices = c("Samples" = "sample", colnames(data_samples()))
     )
   }, error = function(err) {
     return(NULL)
@@ -106,7 +206,7 @@ observe({
     checkReload()
     updateSelectizeInput(
       session = session,
-      inputId = 'selected_analysis_bar',
+      inputId = "selected_analysis_bar",
       choices = rownames(inUse_deTab),
       server = TRUE
     )
@@ -119,7 +219,25 @@ observe({
 output[["p_val_plot"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    pValuePlot(inUse_deTab)
+    
+    ## Get input data
+    plot_data <- pvalue(inUse_deTab)
+    text <- 'paste("P-Value:", p,
+                  "\nGenes:", x)'
+    
+    ## Create plot
+    ggplotly(
+      bar_plot(
+        df = plot_data,
+        x = "p",
+        y = "x",
+        text = text,
+        title = "P-Value plot",
+        xlab = "P-Value",
+        ylab = "Number of genes"
+      ),
+      tooltip = "text"
+    )
   }, error = function(err) {
     return(NULL)
   })

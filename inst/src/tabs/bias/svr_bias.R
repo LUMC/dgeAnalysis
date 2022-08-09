@@ -3,7 +3,40 @@
 output[["gc_bias"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    biasPlot(inUse_deTab, input$selectGC, NA, "%", "biasGC")
+    
+    ## Only plot if UI is loaded
+    if(is.null(input$selectGC)) {
+      break
+    }
+    
+    ## Get input data
+    index <- round(seq(1, nrow(inUse_deTab), length.out = 1000))
+    plot_data <- bias_gc(inUse_deTab, input$selectGC)
+    text <- 'paste("Gene:", gene,
+                  "\nAverage Log2FC:", round(avgLog2FC, 2),
+                  "\nPercentage:", round(get(y), 2),
+                  "\nFDR:", round(FDR, 5))'
+    
+    ## Create plot
+    toWebGL(
+      ggplotly(
+        scatter_plot(
+          df = plot_data,
+          x = input$selectGC,
+          y = "avgLog2FC",
+          text = text,
+          group = "FDR",
+          index = index,
+          key = "gene",
+          title = paste("Bias based on", input$selectGC),
+          xlab = paste(input$selectGC, "(%)"),
+          ylab = "Average Log2FC"
+        ) + labs(color = "FDR"),
+        source = "biasGC",
+        tooltip = "text"
+      ) %>% layout(dragmode = "select", clickmode = "event+select") %>%
+        style(hoverinfo = "text")
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -13,6 +46,10 @@ output[["gc_bias"]] <- renderPlotly({
 output[["selected_biasgc"]] <- DT::renderDataTable({
   tryCatch({
     s <- event_data(event = "plotly_selected", source = "biasGC")
+    if (is.null(s)) {
+      throw()
+    }
+    
     DT::datatable(inUse_deTab[s$key, ], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c(
@@ -21,7 +58,7 @@ output[["selected_biasgc"]] <- DT::renderDataTable({
   })
 })
 
-## dropdown with all gc choices
+## Dropdown with all gc choices
 output[["selectGC"]] <- renderUI({
   tryCatch({
     checkReload()
@@ -44,7 +81,41 @@ output[["selectGC"]] <- renderUI({
 output[["len_bias"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    biasPlot(inUse_deTab, input$selectLength, "log", NA, "biasLength")
+    
+    ## Only plot if UI is loaded
+    if(is.null(input$selectLength)) {
+      break
+    }
+    
+    ## Get input data
+    index <- round(seq(1, nrow(inUse_deTab), length.out = 1000))
+    plot_data <- bias_gc(inUse_deTab, input$selectLength)
+    text <- 'paste("Gene:", gene,
+                  "\nAverage Log2FC:", round(avgLog2FC, 2),
+                  "\nLength:", round(get(x), 2),
+                  "\nFDR:", round(FDR, 5))'
+    
+    ## Create plot
+    toWebGL(
+      ggplotly(
+        scatter_plot(
+          df = plot_data,
+          x = input$selectLength,
+          y = "avgLog2FC",
+          text = text,
+          group = "FDR",
+          scale = TRUE,
+          index = index,
+          key = "gene",
+          title = paste("Bias based on", input$selectLength),
+          xlab = input$selectLength,
+          ylab = "Average Log2FC"
+        ) + labs(color = "FDR"),
+        source = "biasLength",
+        tooltip = "text"
+      ) %>% layout(dragmode = "select", clickmode = "event+select") %>%
+        style(hoverinfo = "text")
+    )
   }, error = function(err) {
     return(NULL)
   })
@@ -54,6 +125,10 @@ output[["len_bias"]] <- renderPlotly({
 output[["selected_biaslength"]] <- DT::renderDataTable({
   tryCatch({
     s <- event_data(event = "plotly_selected", source = "biasLength")
+    if (is.null(s)) {
+      throw()
+    }
+    
     DT::datatable(inUse_deTab[s$key, ], options = list(pageLength = 15, scrollX = TRUE))
   }, error = function(err) {
     return(DT::datatable(data.frame(c(
@@ -85,7 +160,32 @@ output[["selectLength"]] <- renderUI({
 output[["geneStrand_bias"]] <- renderPlotly({
   tryCatch({
     checkReload()
-    geneStrandBar(inUse_deTab)
+    
+    ## Get input data
+    index <- round(seq(1, nrow(inUse_deTab), length.out = 1000))
+    plot_data <- gene_strand(inUse_deTab)
+    text <- 'paste("Strand:", strand,
+                  "\nRegulation:", DE,
+                  "\nGenes:", Freq,
+                  "\nPercentage:", round(perc, 2))'
+    
+    ## Create plot
+    ggplotly(
+      bar_plot(
+        df = plot_data,
+        x = "DE",
+        y = "perc",
+        text = text,
+        group = "strand",
+        fill = "DE",
+        facet = TRUE,
+        plot = "ratio",
+        title = "Gene strand ratio",
+        xlab = "",
+        ylab = "Percentage of genes"
+      ),
+      tooltip = "text"
+    )
   }, error = function(err) {
     return(NULL)
   })

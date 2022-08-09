@@ -98,27 +98,48 @@ tab_run_gprofiler <- tabItem(
                         "Up regulated" = "up",
                         "Down regulated" = "down")
           ),
-          sliderInput(
-            inputId = "filter_pvalue",
-            label = "P-value filter",
-            value = 0.05,
-            min = 0,
-            max = 1,
-          ),
-          sliderInput(
-            inputId = "filter_fdr",
-            label = "FDR filter",
-            value = 0.05,
-            min = 0,
-            max = 1,
-          ),
-          sliderInput(
-            inputId = "filter_fc",
-            label = "Log2FC filter",
-            value = c(-2, 2),
-            min = -10,
-            max = 10,
-            step = 0.1
+          
+          tags$head(
+            tags$style(
+              type = "text/css",
+              "#inline label{ display: table-cell; text-align: center; vertical-align: middle; }
+                #inline .form-group { display: table-row;}"
+            )
+          ), 
+          tags$div(
+            id = "inline",
+            numericInput(
+              inputId = "filter_pvalue",
+              label = "P-value",
+              value = 0.05,
+              step = 0.01,
+              min = 0,
+              max = 1,
+            ),
+            numericInput(
+              inputId = "filter_fdr",
+              label = "FDR",
+              value = 0.05,
+              step = 0.01,
+              min = 0,
+              max = 1,
+            ),
+            numericInput(
+              inputId = "filter_minfc",
+              label = "Min. FC",
+              value = -2,
+              min = -10,
+              max = 0,
+              step = 0.1
+            ),
+            numericInput(
+              inputId = "filter_maxfc",
+              label = "Max. FC",
+              value = 2,
+              min = 0,
+              max = 10,
+              step = 0.1
+            )
           ),
           uiOutput("enrich_ngenes"),
           span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")

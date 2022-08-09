@@ -1,36 +1,36 @@
 Package: dgeAnalysis
 Type: Package
 Title: dgeAnalysis
-Version: 1.4.4
+Version: 1.5.1
 Author@R:
   person("Tom", "Kuipers", email = "t.b.kuipers@lumc.nl", role = c("aut", "cre"))
 Description:
     R shiny tool to perform differential gene expression and view the results interactively.
-Depends: R (>= 3.6.1)
-RoxygenNote: 7.1.1
+Depends: R (>= 4.1)
+RoxygenNote: 7.2.1
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: 
-    shiny (>= 1.5.0),
-    shinydashboard (>= 0.7.1),
-    shinyWidgets (>= 0.5.3),
+    shiny (>= 1.7.2),
+    shinydashboard (>= 0.7.2),
+    shinyWidgets (>= 0.7.2),
     shinycssloaders (>= 1.0.0),
-    shinyjs (>= 2.0.0),
-    BiocManager (>= 1.30.10),
-    knitr (>= 1.30),
-    SummarizedExperiment (>= 1.18.2),
-    edgeR (>= 3.30.3),
-    limma (>= 3.44.3),
-    DESeq2 (>= 1.28.1),
-    tidyr (>= 1.1.2),
-    scales (>= 1.1.1),
-    broom (>= 0.7.1),
-    plotly (>= 4.9.2),
-    Rtsne (>= 0.15),
-    rmarkdown (>= 2.4),
-    gprofiler2 (>= 0.2.0),
-    igraph (>= 1.2.5)
+    shinyjs (>= 2.1.0),
+    BiocManager (>= 1.30.18),
+    knitr (>= 1.39),
+    SummarizedExperiment (>= 1.24.0),
+    edgeR (>= 3.36.0),
+    limma (>= 3.50.3),
+    DESeq2 (>= 1.34.0),
+    tidyr (>= 1.3.2),
+    scales (>= 1.2.0),
+    broom (>= 1.0.0),
+    plotly (>= 4.10.0),
+    Rtsne (>= 0.16),
+    rmarkdown (>= 2.14),
+    gprofiler2 (>= 0.2.1),
+    igraph (>= 1.3.4),
 biocViews: Annotation, Clustering, GeneSetEnrichment, GO, KEGG,
     MultipleComparison, Pathways, Reactome, Visualization,
     Sequencing, RNASeq, GeneExpression, Transcription,
