@@ -58,12 +58,14 @@ violin_plot <- function(df, text = NA, group, title = "", xlab = "", ylab = "") 
     text = text
   )) +
     geom_violin(aes(group = sample), alpha = 0.75, size = 1) +
+    scale_x_discrete(limits = rev(levels(df$sample))) +
     coord_flip() +
     labs(title = title,
          x = xlab,
          y = ylab) +
     theme_bw()
   
+  gg <<- gg
   gg
 }
 
@@ -158,7 +160,7 @@ bar_plot <- function(df, x, y, text = NA, group, fill = NULL, colorbar = NA, rev
   }
   
   if (facet != "none") {
-    gg <- gg + facet_grid(as.formula(paste("~", group)), scales = "free")
+    gg <- gg + facet_grid(as.formula(paste(group, "~ .")), scales = "free")
   }
   
   gg

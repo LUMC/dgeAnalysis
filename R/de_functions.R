@@ -110,6 +110,26 @@ stackDge <- function(dge) {
 }
 
 
+#' Fix hover info for violin plot, as it cant find CPM values
+#'
+#' @param plot List object, List with plot object from ggplotly
+#'
+#' @return plot, List object with fixed hover
+#'
+#' @export
+
+fix_violin_hover <- function(plot) {
+  for (x in 1:length(plot[["x"]][["data"]])) {
+    layer <- plot[["x"]][["data"]][[x]]
+    logcpm <- round(layer[["x"]], 2)
+    temp <- sub("(<br />).*", "", layer[["text"]])
+    plot[["x"]][["data"]][[x]][["text"]] <- paste(temp, "\nLog2CPM:", logcpm)
+  }
+  
+  plot
+}
+
+
 #' Get heigth information from tree object.
 #' Get labels/names from tree ends.
 #' Calculate start and end positions of tree branches

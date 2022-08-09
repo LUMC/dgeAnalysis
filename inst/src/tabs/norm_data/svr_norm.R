@@ -71,11 +71,11 @@ output[["norm_dist_violin"]] <- renderPlotly({
     }
     
     ## Get input data
-    plot_data <- violin_dist(inUse_normDge)
+    plot_data <- violin_dist(inUse_normDge, input$norm_violin_group)
     text <- 'paste("Sample:", sample)'
     
     ## Create plot
-    ggplotly(
+    gg <- ggplotly(
       violin_plot(
         df = plot_data,
         text = text,
@@ -86,6 +86,9 @@ output[["norm_dist_violin"]] <- renderPlotly({
       ),
       tooltip = "text"
     )
+    
+    ## Fix labels & plot
+    fix_violin_hover(gg)
   }, error = function(err) {
     return(NULL)
   })

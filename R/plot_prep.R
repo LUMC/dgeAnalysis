@@ -99,10 +99,8 @@ count_dist <- function(dge) {
 #'
 #' @export
 
-violin_dist <- function(dge) {
+violin_dist <- function(dge, group) {
   stackCounts <- data.frame(stackDge(dge))
-  stackCounts$sample <- factor(stackCounts$sample , levels = rev(sort(unique(stackCounts$sample))))
-  
   stackCounts <- merge(
     x = stackCounts,
     y = dge$samples,
@@ -110,6 +108,9 @@ violin_dist <- function(dge) {
     by.y = "row.names",
     all.x = TRUE
   )
+  
+  stackCounts <- stackCounts[order(stackCounts[[group]], stackCounts$sample), ]
+  stackCounts$sample <- factor(stackCounts$sample, levels = unique(stackCounts$sample))
   
   return(stackCounts)
 }

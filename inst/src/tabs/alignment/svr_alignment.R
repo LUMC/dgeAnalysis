@@ -30,7 +30,7 @@ output[["align_sum"]] <- renderPlotly({
     }
     
     ## Get input data
-    se <<- get_se()
+    se <- get_se()
     plot_data <- alignment_summary(se, input$setSummary)
     text <- 'paste("Sample:", sample,
                   "\nClass:", feature,

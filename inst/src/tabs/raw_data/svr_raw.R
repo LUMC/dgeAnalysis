@@ -60,11 +60,11 @@ output[["dist_violin"]] <- renderPlotly({
     
     ## Get input data
     dge <- get_raw_dge()
-    plot_data <- violin_dist(dge)
+    plot_data <- violin_dist(dge, input$raw_violin_group)
     text <- 'paste("Sample:", sample)'
     
     ## Create plot
-    ggplotly(
+    gg <- ggplotly(
       violin_plot(
         df = plot_data,
         text = text,
@@ -75,6 +75,9 @@ output[["dist_violin"]] <- renderPlotly({
       ),
       tooltip = "text"
     )
+    
+    ## Fix labels & plot
+    fix_violin_hover(gg)
   }, error = function(err) {
     return(NULL)
   })
