@@ -94,6 +94,7 @@ count_dist <- function(dge) {
 #' Prepare data for violin distribution plot
 #'
 #' @param dge DGE List, DGE List with samplesheet, count data & annotation
+#' @param group String, Value to group/sort values in dataframe by
 #'
 #' @return plot_data, Dataframe with cleaned data
 #'
@@ -109,9 +110,8 @@ violin_dist <- function(dge, group) {
     all.x = TRUE
   )
   
-  stackCounts <- stackCounts[order(stackCounts[[group]], stackCounts$sample), ]
+  stackCounts <- stackCounts[order(as.character(stackCounts[[group]]), as.character(stackCounts$sample)), ]
   stackCounts$sample <- factor(stackCounts$sample, levels = unique(stackCounts$sample))
-  
   return(stackCounts)
 }
 

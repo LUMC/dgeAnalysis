@@ -8,6 +8,8 @@ violin_dist(dge, group)
 }
 \arguments{
 \item{dge}{DGE List, DGE List with samplesheet, count data & annotation}
+
+\item{group}{String, Value to group/sort values in dataframe by}
 }
 \value{
 plot_data, Dataframe with cleaned data
