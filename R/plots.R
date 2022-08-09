@@ -109,6 +109,7 @@ scatter_plot <- function(df, x, y, text = NA, group, size = 1.5, scale = NA, ind
       data = df[index, ],
       aes_string(x = x, y = y),
       inherit.aes = FALSE,
+      formula = y ~ x,
       method = "loess",
       fill = "#3366ff",
       alpha = 0.2
