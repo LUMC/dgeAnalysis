@@ -116,37 +116,6 @@ tab_gprofiler <- tabItem(
       HTML('<hr style="border-color: #0088cc;">'),
       DT::dataTableOutput("cnet_table") %>% withSpinner(),
       HTML('<hr style="border-color: #0088cc;">')
-    ),
-    
-    tabPanel(
-      title = "Enriched terms heatmap",
-      HTML('<hr style="border-color: #0088cc;">'),
-      sidebarLayout(
-        position = "right",
-        sidebarPanel(
-          width = 3,
-          br(),
-          sliderInput(
-            inputId = "heat_slider",
-            label = "Number of shown pathways:",
-            value = 5,
-            min = 0,
-            max = 15,
-            step = 1
-          ),
-          uiOutput("heat_select_pathway"),
-          br(),
-          uiOutput("enrich_heat_info"),
-          span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")
-        ),
-        mainPanel(
-          width = 9,
-          plotlyOutput("heat_plot", height = "600px") %>% withSpinner()
-        )
-      ),
-      HTML('<hr style="border-color: #0088cc;">'),
-      DT::dataTableOutput("heat_table") %>% withSpinner(),
-      HTML('<hr style="border-color: #0088cc;">')
     )
   )
 )

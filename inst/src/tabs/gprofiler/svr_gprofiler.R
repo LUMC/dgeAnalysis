@@ -38,9 +38,19 @@ clean_enrich <- reactive({
   tryCatch({
     checkReload()
     enrich_processed <- inUse_enrich$result
-    enrich_processed <- enrich_processed[c("source", "term_name", "p_value", "term_size", "query_size", "intersection_size", "significant", "intersection")]
+    enrich_processed <-
+      enrich_processed[c(
+        "source",
+        "term_name",
+        "p_value",
+        "term_size",
+        "query_size",
+        "intersection_size",
+        "significant",
+        "intersection"
+      )]
     rownames(enrich_processed) <- inUse_enrich$result$term_id
-    enrich_processed <- enrich_processed[order(enrich_processed$p_value),]
+    enrich_processed <- enrich_processed[order(enrich_processed$p_value), ]
     enrich_processed
   }, error = function(err) {
     return(NULL)
@@ -175,73 +185,6 @@ output[["cnet_table"]] <- DT::renderDataTable({
   })
 })
 
-## create heatmap with gprofiler input
-output[["heat_plot"]] <- renderPlotly({
-  tryCatch({
-    checkReload()
-    
-    ## Get input data
-    enrich <- clean_enrich()
-    geneSets <- extract_geneSets(enrich,
-                                 input$heat_slider,
-                                 input$select_heat)
-    plot_data <- heat_terms(geneSets, inUse_deTab)
-    text <- 'paste("Term:", stringr::str_wrap(categoryID, 50),
-                  "\nGene:", Gene,
-                  "\nLog2FC:", round(avgLog2FC, 2))'
-    
-    ## Create plot
-    ggplotly(
-      heatmap_plot(
-        df = plot_data,
-        x = "categoryID",
-        y = "Gene",
-        text = text,
-        group = "none",
-        fill = "avgLog2FC",
-        title = "Genes in pathway",
-        xlab = "",
-        ylab = ""
-      ) + labs(fill = "Log2FC"),
-      tooltip = "text"
-    )
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
-## Select a specific pathway to add to heatmap
-output[["heat_select_pathway"]] <- renderUI({
-  tryCatch({
-    enrich <- clean_enrich()
-    selectInput(
-      inputId = "select_heat",
-      label = "Add specific pathway:",
-      multiple = TRUE,
-      choices = c("Click to add pathway" = "", enrich$term_name)
-    )
-  }, error = function(err) {
-    return(NULL)
-  })
-})
-
-## Table with genes in corresponding heatmap plot
-output[["heat_table"]] <- DT::renderDataTable({
-  tryCatch({
-    checkReload()
-    enrich <- clean_enrich()
-    geneSets <- extract_geneSets(enrich,
-                                 input$heat_slider,
-                                 input$select_heat)
-    
-    graphData <- cnetPlotly(enrich, geneSets, inUse_deTab)
-    DT::datatable(inUse_deTab[rownames(inUse_deTab) %in% names(V(graphData)),], options = list(pageLength = 15, scrollX = TRUE))
-  }, error = function(err) {
-    return(DT::datatable(data.frame(c(
-      "No data available in table"
-    )), rownames = FALSE, colnames = ""))
-  })
-})
 
 ## INFORMATION BOXES
 
@@ -277,13 +220,5 @@ output[["enrich_cnet_info"]] <- renderUI({
         connected. The color given to genes is based on the log-fold change determined after the
         expression analysis. Ultimately, this plot shows the connection of genes between the most
         important road."
-  informationBox(infoText)
-})
-
-output[["enrich_heat_info"]] <- renderUI({
-  infoText <-
-    "The heatmap visualizes pathways and the associated genes. The genes are sorted based on:
-        Log2FC. The paths are sorted by the number of gene maths among other paths, with paths listed with
-        most gene matches on the left. This allows genes present in pathways to be compared on sight."
   informationBox(infoText)
 })
