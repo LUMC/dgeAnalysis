@@ -1,6 +1,6 @@
 # dgeAnalysis
 
-This R package contains the R-Shiny application v1.4.4 developed to perform differential gene expression analysis.
+This R package contains the R-Shiny application v1.5.1 developed to perform differential gene expression analysis.
 * dgeAnalysis manual: https://github.com/LUMC/dgeAnalysis/blob/master/MANUAL.pdf
 
 ## Installing
@@ -33,7 +33,7 @@ dgeAnalysis::startApp()
 Note: In the folder "exampleData" there is a .zip file, containing three data files. These example files can be used to e.g. check if the application is working and/or your data has the correct format.
 
 ## Requirements
-R version: 3.6+
+R version: 4.1+
 
 Linux install libraries:
 ````
@@ -53,8 +53,6 @@ sudo apt-get update && apt-get install \
 ````
 
 Windows install RTools and pandoc:\
-R 3.6.x:\
-&nbsp; https://cran.r-project.org/bin/windows/Rtools/Rtools35.exe \
 R 4.0 and up:\
 &nbsp; https://cran.r-project.org/bin/windows/Rtools/rtools40-i686.exe \
 &nbsp; https://cran.r-project.org/bin/windows/Rtools/rtools40-x86_64.exe \
@@ -78,7 +76,7 @@ if (!require("SummarizedExperiment")) BiocManager::install("SummarizedExperiment
 if (!require("edgeR")) BiocManager::install("edgeR")
 if (!require("limma")) BiocManager::install("limma")
 if (!require("DESeq2")) BiocManager::install("DESeq2")
-if (!require("tidyr")) install.packages("tidyr")
+if (!require("tidyverse")) install.packages("tidyverse")
 if (!require("scales")) install.packages("scales")
 if (!require("broom")) install.packages("broom")
 if (!require("plotly")) install.packages("plotly")
