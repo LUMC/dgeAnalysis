@@ -437,7 +437,7 @@ barcode <- function(deTab, dge, amount, select) {
 #'
 #' @export
 
-pvalue <- function(deTab) {
+pvalue_data <- function(deTab) {
   p <- round(deTab$P.Value, digits = 2)
   p <- aggregate(p, by = list(p = p), FUN = length)
   

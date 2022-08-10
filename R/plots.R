@@ -138,7 +138,7 @@ scatter_plot <- function(df, x, y, text = NA, group, size = 1.5, scale = NA, ind
 #' @param colorbar String, Should default colors be used
 #' @param rev Boolean, Plot bars in reverse order (alignment sum) for correct colors
 #' @param facet String, Should data be ordered by group
-#'@param plot String, Extra condition for ratio plot
+#' @param plot String, Extra condition for ratio plot
 #' @param title String, Title for plot
 #' @param xlab String, Label for X axis
 #' @param ylab String, Label for Y axis
