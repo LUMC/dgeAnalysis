@@ -4,6 +4,10 @@ Changelog
 <!--
 Newest changes should be on top.
 -->
+version 1.5.2
+---------------------------
++ Bug fix: pvalue function overwritten
+
 version 1.5.1
 ---------------------------
 + Remove heatmap plot in enrichment

@@ -221,7 +221,7 @@ output[["p_val_plot"]] <- renderPlotly({
     checkReload()
     
     ## Get input data
-    plot_data <- pvalue(inUse_deTab)
+    plot_data <- pvalue_data(inUse_deTab)
     text <- 'paste("P-Value:", p,
                   "\nGenes:", x)'
     

@@ -311,7 +311,7 @@ scatter_plot(
 )
 
 ## P-value
-plot_data <- pvalue(deTab)
+plot_data <- pvalue_data(deTab)
 bar_plot(
   df = plot_data,
   x = "p",
