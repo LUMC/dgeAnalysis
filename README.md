@@ -55,8 +55,7 @@ sudo apt-get update && apt-get install \
 
 Windows install RTools and pandoc:\
 R 4.0 and up:\
-&nbsp; https://cran.r-project.org/bin/windows/Rtools/rtools40-i686.exe \
-&nbsp; https://cran.r-project.org/bin/windows/Rtools/rtools40-x86_64.exe \
+&nbsp; https://cran.r-project.org/bin/windows/Rtools \
 Pandoc:\
 &nbsp; https://pandoc.org/installing.html
 
