@@ -6,9 +6,9 @@ output[["pca"]] <- renderPlotly({
     checkReload()
     
     ## Only plot if UI is loaded
-    if(is.null(input$group_pca)) {
-      break
-    }
+#    if(is.null(input$group_pca)) {
+#      break
+#    }
     
     ## Get input data
     plot_data <- pca_data(inUse_normDge)
