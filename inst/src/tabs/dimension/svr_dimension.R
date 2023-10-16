@@ -1,25 +1,44 @@
 
 ## PCA
 
+selected_points <- reactiveValues(points = data.frame(key = character(), color = character(), stringsAsFactors = FALSE))
+
+observe({
+  new_point <- event_data("plotly_selected", source = "pca")$key
+  new_color <- input$selected_color
+  
+  #Only run if a data point is selected and a color is selected
+  if (!is.null(new_point) && !is.null(new_color)) {
+    existing <- selected_points$points$key == new_point
+    
+    if (any(existing)) {
+      # The point is already in the list, update its color
+      selected_points$points$color[existing] <- new_color
+    } else {
+      # It's a new point, add it to the list
+      new_data <- data.frame(key = as.character(new_point), color = new_color, stringsAsFactors = FALSE)
+      selected_points$points <- dplyr::bind_rows(selected_points$points, new_data)
+    }
+    
+    # Remove any duplicates that might have occurred, keeping the last entry
+    selected_points$points <- selected_points$points %>%
+      dplyr::distinct(key, .keep_all = TRUE)
+  }
+
+})
+
 output[["pca"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
     ## Only plot if UI is loaded
-#    if(is.null(input$group_pca)) {
-#      break
-#    }
+        if(is.null(input$group_pca)) {
+          return()
+        }
     
     ## Get input data
     plot_data <- pca_data(inUse_normDge)
-    plot_data$color <- NA
     text <- 'paste("Sample:", sample)'
-    
-    selected_color <- NULL
-    selected_point <- event_data(event = "plotly_selected", source = "pca")
-    if (!is.null(selected_point$key) && !is.null(input$selected_color)) {
-      selected_color <- input$selected_color
-    }
     
     ## Create plot
     ggplotly(
@@ -29,8 +48,7 @@ output[["pca"]] <- renderPlotly({
         y = input$set_pca_pc2,
         text = text,
         group = input$group_pca,
-        selected_color = selected_color,
-        selected_key = selected_point$key,
+        selec_points = selected_points$points,
         size = 5,
         key = "sample",
         title = "PCA",
@@ -41,6 +59,7 @@ output[["pca"]] <- renderPlotly({
       tooltip = "text"
     ) %>% layout(dragmode = "select", clickmode = "event+select")
   }, error = function(err) {
+    print(err)
     return(NULL)
   })
 })
@@ -85,6 +104,7 @@ output[["selected_pca"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
     s <- event_data(event = "plotly_selected", source = "pca")
+    
     if (is.null(s)) {
       throw()
     }
@@ -103,8 +123,10 @@ output[["color_picker"]] <- renderUI({
     colourInput(
       inputId = "selected_color",
       label = "Select Color:",
+      value = "black",
       allowTransparent = TRUE,
-      palette = "limited"
+      palette = "limited",
+      closeOnClick = TRUE
     )
   }
 })
