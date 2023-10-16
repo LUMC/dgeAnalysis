@@ -1,5 +1,6 @@
 
 ## PCA
+
 output[["pca"]] <- renderPlotly({
   tryCatch({
     checkReload()
@@ -11,7 +12,14 @@ output[["pca"]] <- renderPlotly({
     
     ## Get input data
     plot_data <- pca_data(inUse_normDge)
+    plot_data$color <- NA
     text <- 'paste("Sample:", sample)'
+    
+    selected_color <- NULL
+    selected_point <- event_data(event = "plotly_selected", source = "pca")
+    if (!is.null(selected_point$key) && !is.null(input$selected_color)) {
+      selected_color <- input$selected_color
+    }
     
     ## Create plot
     ggplotly(
@@ -21,6 +29,8 @@ output[["pca"]] <- renderPlotly({
         y = input$set_pca_pc2,
         text = text,
         group = input$group_pca,
+        selected_color = selected_color,
+        selected_key = selected_point$key,
         size = 5,
         key = "sample",
         title = "PCA",
@@ -86,6 +96,23 @@ output[["selected_pca"]] <- DT::renderDataTable({
     )), rownames = FALSE, colnames = ""))
   })
 })
+
+## Manually set color of selected data point
+output[["color_picker"]] <- renderUI({
+  if (!is.null(event_data(event = "plotly_selected", source = "pca")$key)) {
+    colourInput(
+      inputId = "selected_color",
+      label = "Select Color:",
+      allowTransparent = TRUE,
+      palette = "limited"
+    )
+  }
+})
+
+output[["test"]] <- renderPrint({
+  event_data(event = "plotly_selected", source = "pca")
+}
+)
 
 ## Variance PCA
 output[["variance_pca"]] <- renderPlotly({
