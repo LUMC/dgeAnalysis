@@ -79,6 +79,7 @@ violin_plot <- function(df, text = NA, group, title = "", xlab = "", ylab = "") 
 #' @param y String, Value to plot on Y axis
 #' @param text String, Hover info text
 #' @param group String, Value to color/group data
+#' @param colors String, Changes the color to custom user choice
 #' @param size Numeric, size of dots (default 1.5)
 #' @param scale String, Should X-axis be scaled in log10
 #' @param index Vector, vector of items to select from dataframe
@@ -91,20 +92,29 @@ violin_plot <- function(df, text = NA, group, title = "", xlab = "", ylab = "") 
 #'
 #' @export
 
-scatter_plot <- function(df, x, y, text = NA, group, size = 1.5, scale = NA, index = NA, key = NA, title = "", xlab = "", ylab = "") {
+scatter_plot <- function(df, x, y, text = NA, group = NULL, selected_color = NULL, selected_key = NULL, size = 1.5, scale = NA, index = NA, key = NA, title = "", xlab = "", ylab = "") {
   gg <- ggplot(data = df, aes_string(
     x = x,
     y = y,
     key = key,
-    text = text,
-    color = group
-  )) +
-    geom_point(size = size, alpha = 0.5) +
-    labs(title = title,
-         x = xlab,
-         y = ylab,
-         color = "") +
+    text = text
+  ))
+  
+  if (!is.null(selected_color) && !is.null(selected_key)) {
+    # First plot the points that are not selected
+    gg <- gg + geom_point(data = df[df[[key]] != selected_key, ], aes_string(color = group), size = size, alpha = 0.5)
+    # Plot the selected point with the chosen color
+    gg <- gg + geom_point(data = df[df[[key]] == selected_key, ], aes_string(x = x, y = y), color = selected_color, size = size, alpha = 0.5)
+  } else {
+    gg <- gg + geom_point(aes_string(color = group), size = size, alpha = 0.5)
+  }
+  
+  gg <- gg + labs(title = title,
+                  x = xlab,
+                  y = ylab,
+                  color = "") +
     theme_bw()
+  
   
   ## Add loess trend
   if (!is.na(index[1])) {
