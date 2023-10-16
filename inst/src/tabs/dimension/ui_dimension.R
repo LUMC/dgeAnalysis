@@ -14,7 +14,6 @@ tab_dimension <- tabItem(
           width = 3,
           uiOutput("group_pca"),
           uiOutput("setpc_pca"),
-          verbatimTextOutput("test"),
           uiOutput("color_picker"),
           br(),
           uiOutput("pca_info"),
