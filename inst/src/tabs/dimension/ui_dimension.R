@@ -14,6 +14,13 @@ tab_dimension <- tabItem(
           width = 3,
           uiOutput("group_pca"),
           uiOutput("setpc_pca"),
+          selectInput(
+            inputId = "color_groups",
+            label = "Select group for custom colorization",
+            multiple = TRUE,
+            choices = c("Click to add group" = ""),
+            selected = 1
+          ),
           uiOutput("color_picker"),
           br(),
           uiOutput("pca_info"),
