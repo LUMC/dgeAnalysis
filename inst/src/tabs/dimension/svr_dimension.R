@@ -1,6 +1,7 @@
 
 ## PCA
 color_mapping_global = NULL
+last_group_pca = reactiveVal(NULL)
 output[["pca"]] <- renderPlotly({
   tryCatch({
     checkReload()
@@ -22,20 +23,23 @@ output[["pca"]] <- renderPlotly({
       unique_values <- unique(data_samples()[[selected_col]])
     }
     
-    default_colors <- scales::hue_pal()(length(unique_values))
-    new_color_mapping <- setNames(default_colors, unique_values)
+    ## Update amount of groups when group_pca is changed
+    if (!identical(unique_values, last_group_pca())) {
+      default_colors <- scales::hue_pal()(length(unique_values))
+      new_color_mapping <- setNames(default_colors, unique_values)
+      color_mapping_global <<- new_color_mapping
+      last_group_pca(unique_values)
+      updateColourInput(session, inputId = "selected_color", value = "white")
+      } else {
+        new_color_mapping <- color_mapping_global
+      }
     
     if (!is.null(input$selected_color)) {
       new_color_mapping[input$color_groups] <- input$selected_color
     }
-    
-    if (is.null(color_mapping_global)) {
-      overlapping_keys <- intersect(names(color_mapping_global), names(new_color_mapping))
-      new_color_mapping[overlapping_keys] <- color_mapping_global[overlapping_keys]
-    }
-    
+
     color_mapping_global <<- new_color_mapping
-    print(new_color_mapping)
+
     ## Create plot
     ggplotly(
       scatter_plot(
@@ -55,6 +59,7 @@ output[["pca"]] <- renderPlotly({
       tooltip = "text"
     ) %>% layout(dragmode = "select", clickmode = "event+select")
   }, error = function(err) {
+    print(err)
     return(NULL)
   })
 })
