@@ -1,45 +1,41 @@
 
 ## PCA
-
-selected_points <- reactiveValues(points = data.frame(key = character(), color = character(), stringsAsFactors = FALSE))
-
-observe({
-  new_point <- event_data("plotly_selected", source = "pca")$key
-  new_color <- input$selected_color
-  
-  #Only run if a data point is selected and a color is selected
-  if (!is.null(new_point) && !is.null(new_color)) {
-    existing <- selected_points$points$key == new_point
-    
-    if (any(existing)) {
-      # The point is already in the list, update its color
-      selected_points$points$color[existing] <- new_color
-    } else {
-      # It's a new point, add it to the list
-      new_data <- data.frame(key = as.character(new_point), color = new_color, stringsAsFactors = FALSE)
-      selected_points$points <- dplyr::bind_rows(selected_points$points, new_data)
-    }
-    
-    # Remove any duplicates that might have occurred, keeping the last entry
-    selected_points$points <- selected_points$points %>%
-      dplyr::distinct(key, .keep_all = TRUE)
-  }
-
-})
-
+color_mapping_global = NULL
 output[["pca"]] <- renderPlotly({
   tryCatch({
     checkReload()
     
     ## Only plot if UI is loaded
-        if(is.null(input$group_pca)) {
-          return()
-        }
+    if(is.null(input$group_pca)) {
+      break
+    }
     
     ## Get input data
     plot_data <- pca_data(inUse_normDge)
     text <- 'paste("Sample:", sample)'
+
+    ## Create data point colors
+    selected_col <- input$group_pca
+    if(selected_col == "sample") {
+      unique_values <- unique(rownames(data_samples()))
+    } else {
+      unique_values <- unique(data_samples()[[selected_col]])
+    }
     
+    default_colors <- scales::hue_pal()(length(unique_values))
+    new_color_mapping <- setNames(default_colors, unique_values)
+    
+    if (!is.null(input$selected_color)) {
+      new_color_mapping[input$color_groups] <- input$selected_color
+    }
+    
+    if (is.null(color_mapping_global)) {
+      overlapping_keys <- intersect(names(color_mapping_global), names(new_color_mapping))
+      new_color_mapping[overlapping_keys] <- color_mapping_global[overlapping_keys]
+    }
+    
+    color_mapping_global <<- new_color_mapping
+    print(new_color_mapping)
     ## Create plot
     ggplotly(
       scatter_plot(
@@ -48,7 +44,7 @@ output[["pca"]] <- renderPlotly({
         y = input$set_pca_pc2,
         text = text,
         group = input$group_pca,
-        selec_points = selected_points$points,
+        color_mapping = new_color_mapping,
         size = 5,
         key = "sample",
         title = "PCA",
@@ -59,7 +55,27 @@ output[["pca"]] <- renderPlotly({
       tooltip = "text"
     ) %>% layout(dragmode = "select", clickmode = "event+select")
   }, error = function(err) {
-    print(err)
+    return(NULL)
+  })
+})
+
+## Select groups for custom colorization
+observe({
+  tryCatch({
+    checkReload()
+    selected_col <- input$group_pca
+    if (selected_col == "sample") {
+      unique_values <- unique(rownames(data_samples()))
+    } else {
+      unique_values <- unique(data_samples()[[selected_col]])
+    }
+    updateSelectizeInput(
+      inputId = "color_groups",
+      choices = unique_values,
+      server = TRUE,
+      selected = 1
+    )
+  }, error = function(err) {
     return(NULL)
   })
 })
@@ -72,6 +88,22 @@ output[["group_pca"]] <- renderUI({
       label = "Color by:",
       choices = c("Samples" = "sample", colnames(data_samples()))
     )
+  }, error = function(err)  {
+    return(NULL)
+  })
+})
+
+output[["color_picker"]] <- renderUI ({
+  tryCatch({
+    if (!is.null(input$color_groups) && length(input$color_groups) > 0) {
+      colourInput(
+        inputId = "selected_color",
+        label = "Select Color:",
+        value = input$selected_color,
+        allowTransparent = TRUE,
+        palette = "square",
+      )
+    }
   }, error = function(err) {
     return(NULL)
   })
@@ -104,7 +136,6 @@ output[["selected_pca"]] <- DT::renderDataTable({
   tryCatch({
     checkReload()
     s <- event_data(event = "plotly_selected", source = "pca")
-    
     if (is.null(s)) {
       throw()
     }
@@ -116,25 +147,6 @@ output[["selected_pca"]] <- DT::renderDataTable({
     )), rownames = FALSE, colnames = ""))
   })
 })
-
-## Manually set color of selected data point
-output[["color_picker"]] <- renderUI({
-  if (!is.null(event_data(event = "plotly_selected", source = "pca")$key)) {
-    colourInput(
-      inputId = "selected_color",
-      label = "Select Color:",
-      value = "black",
-      allowTransparent = TRUE,
-      palette = "limited",
-      closeOnClick = TRUE
-    )
-  }
-})
-
-output[["test"]] <- renderPrint({
-  event_data(event = "plotly_selected", source = "pca")
-}
-)
 
 ## Variance PCA
 output[["variance_pca"]] <- renderPlotly({
