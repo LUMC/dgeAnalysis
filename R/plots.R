@@ -79,7 +79,6 @@ violin_plot <- function(df, text = NA, group, title = "", xlab = "", ylab = "") 
 #' @param y String, Value to plot on Y axis
 #' @param text String, Hover info text
 #' @param group String, Value to color/group data
-#' @param selec_points List, list of selected data points by key and color
 #' @param size Numeric, size of dots (default 1.5)
 #' @param scale String, Should X-axis be scaled in log10
 #' @param index Vector, vector of items to select from dataframe
@@ -92,30 +91,24 @@ violin_plot <- function(df, text = NA, group, title = "", xlab = "", ylab = "") 
 #'
 #' @export
 
-scatter_plot <- function(df, x, y, text = NA, group = NULL, selec_points = NULL, size = 1.5, scale = NA, index = NA, key = NA, title = "", xlab = "", ylab = "") {
+scatter_plot <- function(df, x, y, text = NA, group, color_mapping = NULL, size = 1.5, scale = NA, index = NA, key = NA, title = "", xlab = "", ylab = "") {
   gg <- ggplot(data = df, aes_string(
     x = x,
     y = y,
     key = key,
-    text = text
-  ))
-  
-  if (!is.null(selec_points) && nrow(selec_points) > 0) {
-    gg <- gg + geom_point(data = df[!df[[key]] %in% selec_points$key, ], aes_string(color = group), size = size, alpha = 0.5)
-    for (i in seq_len(nrow(selec_points))) {
-      point_data <- selec_points[i, ]
-      gg <- gg + geom_point(data = df[df[[key]] == point_data$key, ], aes_string(x = x, y = y), color = point_data$color, size = size, alpha = 0.5)
-    }
-  } else {
-    gg <- gg + geom_point(aes_string(color = group), size = size, alpha = 0.5)
-  }
-  
-  gg <- gg + labs(title = title,
-                  x = xlab,
-                  y = ylab,
-                  color = "") +
+    text = text,
+    color = group
+  )) +
+    geom_point(size = size, alpha = 0.5) +
+    labs(title = title,
+         x = xlab,
+         y = ylab,
+         color = "") +
     theme_bw()
   
+  if (!is.null(color_mapping)) {
+    gg <- gg + scale_color_manual(values = color_mapping)
+  }
   
   ## Add loess trend
   if (!is.na(index[1])) {
