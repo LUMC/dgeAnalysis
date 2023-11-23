@@ -99,7 +99,7 @@ scatter_plot <- function(df, x, y, text = NA, group, color_mapping = NULL, size 
     text = text,
     color = group
   )) +
-    geom_point(size = size, alpha = 0.5) +
+    geom_point(size = size, alpha = 1.5) +
     labs(title = title,
          x = xlab,
          y = ylab,
