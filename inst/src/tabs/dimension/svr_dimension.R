@@ -26,7 +26,7 @@ output[["pca"]] <- renderPlotly({
     ## Update amount of groups when group_pca is changed
     if (!identical(unique_values, last_group_pca())) {
       default_colors <- scales::hue_pal()(length(unique_values))
-      new_color_mapping <- setNames(default_colors, unique_values)
+      new_color_mapping <- setNames(default_colors, unique_values)  # Connect groups with colors
       color_mapping_global <<- new_color_mapping
       last_group_pca(unique_values)
       updateColourInput(session, inputId = "selected_color", value = "white")
@@ -39,13 +39,16 @@ output[["pca"]] <- renderPlotly({
     }
 
     color_mapping_global <<- new_color_mapping
-
+    
+    pc1 <- if (!is.null(input$set_pca_pc1)) input$set_pca_pc1 else "PC1"
+    pc2 <- if (!is.null(input$set_pca_pc2)) input$set_pca_pc2 else "PC2"
+    
     ## Create plot
     ggplotly(
       scatter_plot(
         df = plot_data,
-        x = input$set_pca_pc1,
-        y = input$set_pca_pc2,
+        x = pc1,
+        y = pc2,
         text = text,
         group = input$group_pca,
         color_mapping = new_color_mapping,
@@ -59,26 +62,26 @@ output[["pca"]] <- renderPlotly({
       tooltip = "text"
     ) %>% layout(dragmode = "select", clickmode = "event+select")
   }, error = function(err) {
-    print(err)
     return(NULL)
   })
 })
 
-## Select groups for custom colorization
-observe({
+
+## Select groups for custom color scheme
+output[["color_groups"]] <- renderUI({
   tryCatch({
-    checkReload()
     selected_col <- input$group_pca
     if (selected_col == "sample") {
       unique_values <- unique(rownames(data_samples()))
     } else {
       unique_values <- unique(data_samples()[[selected_col]])
     }
-    updateSelectizeInput(
+    selectInput(
       inputId = "color_groups",
+      label = "Select groups for custom color scheme",
       choices = unique_values,
-      server = TRUE,
-      selected = 1
+      selected = 1,
+      multiple = TRUE
     )
   }, error = function(err) {
     return(NULL)
@@ -152,6 +155,7 @@ output[["selected_pca"]] <- DT::renderDataTable({
     )), rownames = FALSE, colnames = ""))
   })
 })
+
 
 ## Variance PCA
 output[["variance_pca"]] <- renderPlotly({
