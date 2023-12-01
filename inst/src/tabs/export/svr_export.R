@@ -35,6 +35,7 @@ datasetInput <- reactive({
     input$dataset_select,
     "normCounts" = 2 ^ (inUse_normDge$counts),
     "normCountslog2" = inUse_normDge$counts,
+    "normCountsVST" = inUse_normDge$counts_vst,
     "deTab" = inUse_deTab,
     "deg" = inUse_deTab[inUse_deTab$DE != 0, ],
     "pcGene" = pc_gene_table(),
