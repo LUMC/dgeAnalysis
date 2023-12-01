@@ -12,6 +12,7 @@ tab_export <- tabItem(
     choices = c(
       "Normalized counts" = "normCounts",
       "Log2 Normalized counts" = "normCountslog2",
+      "VST transformed counts" = "normCountsVST",
       "Full DE table" = "deTab",
       "DE genes only" = "deg",
       "PC values per gene (PCA)" = "pcGene",
