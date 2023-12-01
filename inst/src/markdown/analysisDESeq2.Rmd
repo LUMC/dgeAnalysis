@@ -213,6 +213,9 @@ getSize <- estimateSizeFactors(analysis)
 normDge <- DGEList(counts = data.frame(counts(getSize, normalized = TRUE)), samples = dge$samples)
 normDge$counts <- cpm(normDge, log = TRUE, prior.count = 1)
 
+vstData <- vst(analysis, blind = FALSE)
+normDge$counts_vst <- assay(vstData)
+
 ## Count distribution
 plot_data <- count_dist(normDge)
 line_plot(
