@@ -44,6 +44,41 @@ datasetInput <- reactive({
   )
 })
 
+## Reactive expression for different count choices based on the analysis method
+export_choices <- reactive({
+  
+  #Start list of choices to download
+  choices <- list(
+    "Normalized counts" = "normCounts",
+    "Log2 Normalized counts" = "normCountslog2"
+  )
+
+  # Add VST transformed counts only if DESeq2 analysis is done
+  if (deseq2_done()) {
+    choices <- c(choices, "VST transformed counts" = "normCountsVST")
+  }
+  
+  choices <- c(choices, list(
+    "Normalized counts" = "normCounts",
+    "Log2 Normalized counts" = "normCountslog2",
+    "Full DE table" = "deTab",
+    "DE genes only" = "deg",
+    "PC values per gene (PCA)" = "pcGene",
+    "Filtered DE table (enrichment)" = "filtered",
+    "gProfiler2 pathways" = "enrichment"
+  ))
+  
+  return(choices)
+})
+
+output$dataset_select_ui <- renderUI({
+  tryCatch({
+      selectInput(inputId = "dataset_select", label = "Choose Dataset:", choices = export_choices())
+  }, error = function(err) {
+    return(NULL)
+    })
+})
+
 ## create filename and save data as CSV
 output$downloadCSV <- downloadHandler(
   filename = function() {
