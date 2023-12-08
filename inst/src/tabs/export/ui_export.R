@@ -6,20 +6,7 @@ tab_export <- tabItem(
   br(),
   br(),
   h2("Download tables"),
-  selectInput(
-    inputId = "dataset_select",
-    label = "",
-    choices = c(
-      "Normalized counts" = "normCounts",
-      "Log2 Normalized counts" = "normCountslog2",
-      "VST transformed counts" = "normCountsVST",
-      "Full DE table" = "deTab",
-      "DE genes only" = "deg",
-      "PC values per gene (PCA)" = "pcGene",
-      "Filtered DE table (enrichment)" = "filtered",
-      "gProfiler2 pathways" = "enrichment"
-    )
-  ), 
+  uiOutput("dataset_select_ui"), 
   downloadButton("downloadCSV", label = "Download as CSV"),
   downloadButton("downloadTSV", label = "Download as TSV"),
   br(),
