@@ -46,7 +46,7 @@ observeEvent(input$run_button, {
     }
 
   }, error = function(err) {
-    analysis_done(FALSE)
+    deseq2_done(FALSE)
     showNotification(ui = "The analysis failed with an error!",
                      duration = 5,
                      type = "error")
