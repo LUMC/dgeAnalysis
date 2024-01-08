@@ -91,7 +91,7 @@ violin_plot <- function(df, text = NA, group, title = "", xlab = "", ylab = "") 
 #'
 #' @export
 
-scatter_plot <- function(df, x, y, text = NA, group, size = 1.5, scale = NA, index = NA, key = NA, title = "", xlab = "", ylab = "") {
+scatter_plot <- function(df, x, y, text = NA, group, color_mapping = NULL, size = 1.5, scale = NA, index = NA, key = NA, title = "", xlab = "", ylab = "") {
   gg <- ggplot(data = df, aes_string(
     x = x,
     y = y,
@@ -99,12 +99,16 @@ scatter_plot <- function(df, x, y, text = NA, group, size = 1.5, scale = NA, ind
     text = text,
     color = group
   )) +
-    geom_point(size = size, alpha = 0.5) +
+    geom_point(size = size, alpha = 1.5) +
     labs(title = title,
          x = xlab,
          y = ylab,
          color = "") +
     theme_bw()
+  
+  if (!is.null(color_mapping)) {
+    gg <- gg + scale_color_manual(values = color_mapping)
+  }
   
   ## Add loess trend
   if (!is.na(index[1])) {

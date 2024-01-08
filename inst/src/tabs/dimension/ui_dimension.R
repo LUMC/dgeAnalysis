@@ -13,7 +13,20 @@ tab_dimension <- tabItem(
         sidebarPanel(
           width = 3,
           uiOutput("group_pca"),
-          uiOutput("setpc_pca"),
+          radioButtons(
+            inputId = "pca_mode",
+            label = "Options:",
+            choices = c("Basic" = "basic",
+                        "Custom" = "custom"),
+            selected = "basic",
+            inline = TRUE
+          ),
+          conditionalPanel(
+            condition = "input.pca_mode == 'custom'",
+            uiOutput("setpc_pca"),
+            uiOutput("color_groups"),
+            uiOutput("color_picker")
+          ),  
           br(),
           uiOutput("pca_info"),
           span(icon("copyright"), "LUMC - SASC", style = "color: #e3e3e3;")

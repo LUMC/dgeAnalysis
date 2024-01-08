@@ -1,5 +1,7 @@
 
 ## PCA
+color_mapping_global = NULL
+last_group_pca = reactiveVal(NULL)
 output[["pca"]] <- renderPlotly({
   tryCatch({
     checkReload()
@@ -12,15 +14,44 @@ output[["pca"]] <- renderPlotly({
     ## Get input data
     plot_data <- pca_data(inUse_normDge)
     text <- 'paste("Sample:", sample)'
+
+    ## Create data point colors
+    selected_col <- input$group_pca
+    if(selected_col == "sample") {
+      unique_values <- unique(rownames(data_samples()))
+    } else {
+      unique_values <- unique(data_samples()[[selected_col]])
+    }
+    
+    ## Update amount of groups when group_pca is changed
+    if (!identical(unique_values, last_group_pca())) {
+      default_colors <- scales::hue_pal()(length(unique_values))
+      new_color_mapping <- setNames(default_colors, unique_values)  # Connect groups with colors
+      color_mapping_global <<- new_color_mapping
+      last_group_pca(unique_values)
+      updateColourInput(session, inputId = "selected_color", value = "white")
+      } else {
+        new_color_mapping <- color_mapping_global
+      }
+    
+    if (!is.null(input$selected_color)) {
+      new_color_mapping[input$color_groups] <- input$selected_color
+    }
+
+    color_mapping_global <<- new_color_mapping
+    
+    pc1 <- if (!is.null(input$set_pca_pc1)) input$set_pca_pc1 else "PC1"
+    pc2 <- if (!is.null(input$set_pca_pc2)) input$set_pca_pc2 else "PC2"
     
     ## Create plot
     ggplotly(
       scatter_plot(
         df = plot_data,
-        x = input$set_pca_pc1,
-        y = input$set_pca_pc2,
+        x = pc1,
+        y = pc2,
         text = text,
         group = input$group_pca,
+        color_mapping = new_color_mapping,
         size = 5,
         key = "sample",
         title = "PCA",
@@ -35,6 +66,28 @@ output[["pca"]] <- renderPlotly({
   })
 })
 
+
+## Select groups for custom color scheme
+output[["color_groups"]] <- renderUI({
+  tryCatch({
+    selected_col <- input$group_pca
+    if (selected_col == "sample") {
+      unique_values <- unique(rownames(data_samples()))
+    } else {
+      unique_values <- unique(data_samples()[[selected_col]])
+    }
+    selectInput(
+      inputId = "color_groups",
+      label = "Select groups for custom color scheme",
+      choices = unique_values,
+      selected = 1,
+      multiple = TRUE
+    )
+  }, error = function(err) {
+    return(NULL)
+  })
+})
+
 ## Set color of PCA
 output[["group_pca"]] <- renderUI({
   tryCatch({
@@ -43,6 +96,22 @@ output[["group_pca"]] <- renderUI({
       label = "Color by:",
       choices = c("Samples" = "sample", colnames(data_samples()))
     )
+  }, error = function(err)  {
+    return(NULL)
+  })
+})
+
+output[["color_picker"]] <- renderUI ({
+  tryCatch({
+    if (!is.null(input$color_groups) && length(input$color_groups) > 0) {
+      colourInput(
+        inputId = "selected_color",
+        label = "Select Color:",
+        value = input$selected_color,
+        allowTransparent = TRUE,
+        palette = "square",
+      )
+    }
   }, error = function(err) {
     return(NULL)
   })
@@ -86,6 +155,7 @@ output[["selected_pca"]] <- DT::renderDataTable({
     )), rownames = FALSE, colnames = ""))
   })
 })
+
 
 ## Variance PCA
 output[["variance_pca"]] <- renderPlotly({

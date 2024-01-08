@@ -5,6 +5,7 @@ if (!require("shinydashboard")) install.packages("shinydashboard")
 if (!require("shinyWidgets")) install.packages("shinyWidgets")
 if (!require("shinycssloaders")) install.packages("shinycssloaders")
 if (!require("shinyjs")) install.packages("shinyjs")
+if (!require("colourpicker")) install.packages("colourpicker")
 
 ## Differential expression analysis
 if (!require("BiocManager")) install.packages("BiocManager")

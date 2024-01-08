@@ -1,4 +1,5 @@
 
+deseq2_done <- reactiveVal(FALSE)
 ## Start an analysis
 observeEvent(input$run_button, {
   if (!is.null(preMarkdownChecks())) {
@@ -40,14 +41,18 @@ observeEvent(input$run_button, {
     showNotification(ui = "Analysis has been succesful!",
                      duration = 5,
                      type = "message")
+    if (file.exists("markdown/analysisDESeq2.html")) {
+      deseq2_done(TRUE)
+    }
+
   }, error = function(err) {
+    deseq2_done(FALSE)
     showNotification(ui = "The analysis failed with an error!",
                      duration = 5,
                      type = "error")
     showNotification(ui = as.character(err),
                      duration = 10,
                      type = "error")
-    print(err)
     return(NULL)
   })
   removeModal()
